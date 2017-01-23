@@ -12,7 +12,20 @@ namespace
 	const int windowPositionY = 100;
 	const int windowWidth = 800;
 	const int windowHeight = 600;
-	const std::string windowTitle = "Ameya Gadkari's CS6610 Game";
+	const std::string windowTitle = "Ameya Gadkari's CS6610 Game "
+		" -- "
+#ifdef _WIN64
+		"x64"
+#else
+		"x86"
+#endif
+		" -- "
+#ifdef _DEBUG
+		"Debug"
+#else
+		"Release"
+#endif
+		;
 	int currentWindowID = 0;
 	void CalculateNewClearColor(int speed);
 	struct
