@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Includes">
+      <UniqueIdentifier>{ebf79a42-f560-4203-9910-39ec85e5d6d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source">
+      <UniqueIdentifier>{e3f3eede-aedd-4f50-a8ad-d47f1cc3f9d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\InternalIncludes">
+      <UniqueIdentifier>{dd88ff5f-a47e-41d4-8aff-6a88c4b36163}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\InternalIncludes\mswin">
+      <UniqueIdentifier>{3c321eae-bcc4-421d-aaa5-416300d34321}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\InternalIncludes\util">
+      <UniqueIdentifier>{5a69cf70-1855-456d-a3ca-45f19b0b7a41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\mswin">
+      <UniqueIdentifier>{29847a51-52c4-4505-bbe8-8054f75994c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\util">
+      <UniqueIdentifier>{3091b1c4-61b5-4e11-a83d-ca3299675cb3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Includes\freeglut.h">
+      <Filter>Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\freeglut_ext.h">
+      <Filter>Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\freeglut_std.h">
+      <Filter>Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\glut.h">
+      <Filter>Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\InternalIncludes\fg_gl2.h">
+      <Filter>Includes\InternalIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\InternalIncludes\fg_init.h">
+      <Filter>Includes\InternalIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\InternalIncludes\fg_internal.h">
+      <Filter>Includes\InternalIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\InternalIncludes\fg_teapot_data.h">
+      <Filter>Includes\InternalIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\InternalIncludes\mswin\fg_internal_mswin.h">
+      <Filter>Includes\InternalIncludes\mswin</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\InternalIncludes\util\xparsegeometry_repl.h">
+      <Filter>Includes\InternalIncludes\util</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\fg_callbacks.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\fg_cursor.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\fg_display.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\fg_ext.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\fg_font.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\fg_font_data.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\fg_gamemode.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\fg_geometry.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\fg_gl2.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\fg_init.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\fg_input_devices.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\fg_joystick.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\fg_main.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\fg_menu.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\fg_misc.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\fg_overlay.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\fg_spaceball.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\fg_state.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\fg_stroke_mono_roman.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\fg_stroke_roman.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\fg_structure.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\fg_teapot.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\fg_videoresize.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\fg_window.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\mswin\fg_cursor_mswin.c">
+      <Filter>Source\mswin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\mswin\fg_display_mswin.c">
+      <Filter>Source\mswin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\mswin\fg_ext_mswin.c">
+      <Filter>Source\mswin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\mswin\fg_gamemode_mswin.c">
+      <Filter>Source\mswin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\mswin\fg_init_mswin.c">
+      <Filter>Source\mswin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\mswin\fg_input_devices_mswin.c">
+      <Filter>Source\mswin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\mswin\fg_joystick_mswin.c">
+      <Filter>Source\mswin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\mswin\fg_main_mswin.c">
+      <Filter>Source\mswin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\mswin\fg_menu_mswin.c">
+      <Filter>Source\mswin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\mswin\fg_spaceball_mswin.c">
+      <Filter>Source\mswin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\mswin\fg_state_mswin.c">
+      <Filter>Source\mswin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\mswin\fg_structure_mswin.c">
+      <Filter>Source\mswin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\mswin\fg_window_mswin.c">
+      <Filter>Source\mswin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\util\xparsegeometry_repl.c">
+      <Filter>Source\util</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
