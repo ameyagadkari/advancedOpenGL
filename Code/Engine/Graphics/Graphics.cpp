@@ -1,11 +1,11 @@
 #include "Graphics.h"
 
+#define GLEW_STATIC
+#include "../../External/GLEW/glew.h"
 #include "../../External/FreeGLUT/Includes/freeglut.h"
-#include "../Math/Functions.h"
 #include "../Asserts/Asserts.h"
 
-#include <string>
-#include <iostream>
+
 namespace
 {
 	const int windowPositionX = 100;
@@ -56,8 +56,13 @@ bool cs6610::Graphics::Initialize(int i_argumentCount, char** i_arguments)
 	currentWindowID = glutCreateWindow(windowTitle.c_str());
 	if (currentWindowID <= 0)
 	{
-		std::cerr << "Window creation failed" << std::endl;
-		CS6610_ASSERT(false);
+		CS6610_ASSERTF(false, "Window creation failed");
+		wereThereErrors = true;
+	}
+	glewExperimental = GL_TRUE;
+	if (glewInit() != GLEW_OK)
+	{
+		CS6610_ASSERTF(false, "Failed to initialize GLEW");
 		wereThereErrors = true;
 	}
 	glutDisplayFunc(RenderFrame);
