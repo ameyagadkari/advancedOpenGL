@@ -19,27 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cyBVH.h" />
-    <ClInclude Include="cyColor.h" />
-    <ClInclude Include="cyCore.h" />
-    <ClInclude Include="cyGL.h" />
-    <ClInclude Include="cyHairFile.h" />
-    <ClInclude Include="cyHeap.h" />
-    <ClInclude Include="cyIPoint.h" />
-    <ClInclude Include="cyMatrix.h" />
-    <ClInclude Include="cyPoint.h" />
-    <ClInclude Include="cyPointCloud.h" />
-    <ClInclude Include="cyQuat.h" />
-    <ClInclude Include="cySampleElim.h" />
-    <ClInclude Include="cySpatial.h" />
-    <ClInclude Include="cyString.h" />
-    <ClInclude Include="cyTimer.h" />
-    <ClInclude Include="cyTriMesh.h" />
+    <ClInclude Include="Gameobject.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Gameobject.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{AAC31056-D190-42D9-8A40-175888D56E04}</ProjectGuid>
+    <ProjectGuid>{0FFA3003-4380-460F-B5CC-EA9F9F3AA842}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>cyCodeBase</RootNamespace>
+    <RootNamespace>Gameplay</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

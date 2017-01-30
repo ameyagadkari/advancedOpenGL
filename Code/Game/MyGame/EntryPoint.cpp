@@ -14,8 +14,7 @@ int main(int i_argumentCount, char** i_arguments)
 	}
 	else
 	{
-		cs6610::MyGame::Run(); 
+		cs6610::MyGame::Run();
 	}
-
 	return 0;
 }

@@ -1,5 +1,6 @@
 #include "UserInput.h"
 #include "../../External/FreeGLUT/Includes/freeglut.h"
+#include "../../Game/MyGame/MyGame.h"
 
 namespace
 {
@@ -23,6 +24,7 @@ namespace
 		switch (c)
 		{
 		case VK_ESCAPE:
+			cs6610::MyGame::CleanUp();
 			glutLeaveMainLoop();
 		default:
 			break;
@@ -34,6 +36,7 @@ namespace
 	}
 	void close(void)
 	{
+		cs6610::MyGame::CleanUp();
 		glutLeaveMainLoop();
 	}
 }

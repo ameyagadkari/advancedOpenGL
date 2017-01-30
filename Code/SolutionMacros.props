@@ -6,6 +6,8 @@
     <IntermediateDir>$(TempDir)intermediates\$(ProjectName)\</IntermediateDir>
     <BinDir>$(TempDir)bin\</BinDir>
     <GameDir>$(TempDir)game\</GameDir>
+    <AuthoredAssetDir>$(SolutionDir)Assets\</AuthoredAssetDir>
+    <BuiltAssetDir>$(GameDir)data\</BuiltAssetDir>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />
@@ -24,6 +26,14 @@
     </BuildMacro>
     <BuildMacro Include="GameDir">
       <Value>$(GameDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="AuthoredAssetDir">
+      <Value>$(AuthoredAssetDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="BuiltAssetDir">
+      <Value>$(BuiltAssetDir)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
   </ItemGroup>

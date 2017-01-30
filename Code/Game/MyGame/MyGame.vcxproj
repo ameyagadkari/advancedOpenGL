@@ -100,19 +100,20 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Graphics.lib;UserInput.lib</AdditionalDependencies>
+      <AdditionalDependencies>Graphics.lib;UserInput.lib;Gameplay.lib</AdditionalDependencies>
     </Link>
+    <CustomBuildStep />
     <CustomBuildStep>
-      <Command>copy "$(TargetPath)" "$(GameDir)$(TargetFileName)" /y</Command>
+      <Message>Copying Game Executable and Assets</Message>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Message>Copying Game Executable</Message>
-    </CustomBuildStep>
-    <CustomBuildStep>
-      <Outputs>$(GameDir)$(TargetFileName)</Outputs>
+      <Outputs>$(GameDir)$(TargetFileName);$(AuthoredAssetDir)*.*</Outputs>
     </CustomBuildStep>
     <CustomBuildStep>
       <Inputs>$(TargetPath)</Inputs>
+      <Command>copy "$(TargetPath)" "$(GameDir)$(TargetFileName)" /y
+mkdir "$(BuiltAssetDir)" 
+xcopy "$(AuthoredAssetDir)*.*" "$(BuiltAssetDir)" /e /s /y</Command>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -126,19 +127,20 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Graphics.lib;UserInput.lib</AdditionalDependencies>
+      <AdditionalDependencies>Graphics.lib;UserInput.lib;Gameplay.lib</AdditionalDependencies>
     </Link>
+    <CustomBuildStep />
     <CustomBuildStep>
-      <Command>copy "$(TargetPath)" "$(GameDir)$(TargetFileName)" /y</Command>
+      <Message>Copying Game Executable and Assets</Message>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Message>Copying Game Executable</Message>
-    </CustomBuildStep>
-    <CustomBuildStep>
-      <Outputs>$(GameDir)$(TargetFileName)</Outputs>
+      <Outputs>$(GameDir)$(TargetFileName);$(AuthoredAssetDir)*.*</Outputs>
     </CustomBuildStep>
     <CustomBuildStep>
       <Inputs>$(TargetPath)</Inputs>
+      <Command>copy "$(TargetPath)" "$(GameDir)$(TargetFileName)" /y
+mkdir "$(BuiltAssetDir)" 
+xcopy "$(AuthoredAssetDir)*.*" "$(BuiltAssetDir)" /e /s /y</Command>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -156,19 +158,20 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Graphics.lib;UserInput.lib</AdditionalDependencies>
+      <AdditionalDependencies>Graphics.lib;UserInput.lib;Gameplay.lib</AdditionalDependencies>
     </Link>
+    <CustomBuildStep />
     <CustomBuildStep>
-      <Command>copy "$(TargetPath)" "$(GameDir)$(TargetFileName)" /y</Command>
+      <Message>Copying Game Executable and Assets</Message>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Message>Copying Game Executable</Message>
-    </CustomBuildStep>
-    <CustomBuildStep>
-      <Outputs>$(GameDir)$(TargetFileName)</Outputs>
+      <Outputs>$(GameDir)$(TargetFileName);$(AuthoredAssetDir)*.*</Outputs>
     </CustomBuildStep>
     <CustomBuildStep>
       <Inputs>$(TargetPath)</Inputs>
+      <Command>copy "$(TargetPath)" "$(GameDir)$(TargetFileName)" /y
+mkdir "$(BuiltAssetDir)" 
+xcopy "$(AuthoredAssetDir)*.*" "$(BuiltAssetDir)" /e /s /y</Command>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -186,19 +189,20 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Graphics.lib;UserInput.lib</AdditionalDependencies>
+      <AdditionalDependencies>Graphics.lib;UserInput.lib;Gameplay.lib</AdditionalDependencies>
     </Link>
+    <CustomBuildStep />
     <CustomBuildStep>
-      <Command>copy "$(TargetPath)" "$(GameDir)$(TargetFileName)" /y</Command>
+      <Message>Copying Game Executable and Assets</Message>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Message>Copying Game Executable</Message>
-    </CustomBuildStep>
-    <CustomBuildStep>
-      <Outputs>$(GameDir)$(TargetFileName)</Outputs>
+      <Outputs>$(GameDir)$(TargetFileName);$(AuthoredAssetDir)*.*</Outputs>
     </CustomBuildStep>
     <CustomBuildStep>
       <Inputs>$(TargetPath)</Inputs>
+      <Command>copy "$(TargetPath)" "$(GameDir)$(TargetFileName)" /y
+mkdir "$(BuiltAssetDir)" 
+xcopy "$(AuthoredAssetDir)*.*" "$(BuiltAssetDir)" /e /s /y</Command>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>

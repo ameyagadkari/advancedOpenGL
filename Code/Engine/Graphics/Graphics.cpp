@@ -4,10 +4,14 @@
 #include "../../External/GLEW/glew.h"
 #include "../../External/FreeGLUT/Includes/freeglut.h"
 #include "../Asserts/Asserts.h"
-
+#include "../../External/cyCodeBase/cyTimer.h"
+#include "../../Game/MyGame/MyGame.h"
+#include "../../Game/Gameplay/Gameobject.h"
+#include "Mesh.h"
 
 namespace
 {
+#define FPS 0.0166666666666667
 	const int windowPositionX = 100;
 	const int windowPositionY = 100;
 	const int windowWidth = 800;
@@ -27,13 +31,13 @@ namespace
 #endif
 		;
 	int currentWindowID = 0;
-	void CalculateNewClearColor(int speed);
 	struct
 	{
-		GLclampf r = 1.0f, g = 1.0f, b = 1.0f, a = 1.0f;
+		GLclampf r = 0.0f, g = 0.0f, b = 0.0f, a = 1.0f;
 	}clearColor;
-	const int delay = 215;
-	const int colorChangeSpeed = 10;
+	void CallingRedisplay(void);
+	cyTimer s_timer;
+	double s_currentTime = 0, s_elaspsedTime = 0;
 }
 
 void cs6610::Graphics::RenderFrame(void)
@@ -42,6 +46,13 @@ void cs6610::Graphics::RenderFrame(void)
 	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to set clear color");
 	const GLbitfield clearColorBuffer = GL_COLOR_BUFFER_BIT;
 	glClear(clearColorBuffer);
+
+	size_t length = MyGame::ms_gameobjects.size();
+	for (size_t i = 0; i < length; i++)
+	{
+		MyGame::ms_gameobjects[i]->GetMesh()->RenderMesh();
+	}
+
 	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to clear color buffer");
 	glutSwapBuffers();
 }
@@ -66,20 +77,23 @@ bool cs6610::Graphics::Initialize(int i_argumentCount, char** i_arguments)
 		wereThereErrors = true;
 	}
 	glutDisplayFunc(RenderFrame);
-	glutTimerFunc(delay, CalculateNewClearColor, colorChangeSpeed);
+	glutIdleFunc(CallingRedisplay);
 	const GLenum option = GLUT_ACTION_ON_WINDOW_CLOSE;
 	const int mode = GLUT_ACTION_GLUTMAINLOOP_RETURNS;
 	glutSetOption(option, mode);
+	s_timer.Start();
 	return !wereThereErrors;
 }
 
 namespace
 {
-	void CalculateNewClearColor(int speed)
+	void CallingRedisplay(void)
 	{
-		float t = cosf(static_cast<GLfloat>(glutGet(GLUT_ELAPSED_TIME))*1.0f / speed);
-		clearColor.b = (t < 0) ? (t*-1) : t;
-		glutTimerFunc(delay, CalculateNewClearColor, colorChangeSpeed);
-		glutPostWindowRedisplay(currentWindowID);
+		s_currentTime = s_timer.Stop();
+		if (s_currentTime - s_elaspsedTime > FPS)
+		{
+			glutPostWindowRedisplay(currentWindowID);
+			s_elaspsedTime = s_currentTime;
+		}
 	}
 }

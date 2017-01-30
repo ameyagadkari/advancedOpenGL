@@ -4,6 +4,9 @@
 #include "../../Engine/Graphics/Graphics.h"
 #include "../../Engine/UserInput/UserInput.h"
 #include "../../Engine/Asserts/Asserts.h"
+#include "../Gameplay/Gameobject.h"
+
+std::vector<cs6610::Gameplay::GameObject*> cs6610::MyGame::ms_gameobjects;
 
 void cs6610::MyGame::Run(void)
 {
@@ -23,5 +26,22 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 		CS6610_ASSERTF(false, "UserInput Initialization failed");
 		wereThereErrors = true;
 	}
+
+	// Init all gameobjects
+	{
+		ms_gameobjects.push_back(new Gameplay::GameObject());
+		ms_gameobjects.back()->SetMesh("data/meshes/teapot.mesh");
+	}
 	return !wereThereErrors;
+}
+
+void cs6610::MyGame::CleanUp(void)
+{
+	size_t length = ms_gameobjects.size();
+	for (size_t i = 0; i < length; i++)
+	{
+		delete ms_gameobjects[i];
+		ms_gameobjects[i] = nullptr;
+	}
+	//ms_gameobjects.clear();
 }
