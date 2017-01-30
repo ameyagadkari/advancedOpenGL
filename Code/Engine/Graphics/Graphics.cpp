@@ -4,10 +4,14 @@
 #include "../../External/GLEW/glew.h"
 #include "../../External/FreeGLUT/Includes/freeglut.h"
 #include "../Asserts/Asserts.h"
-#include "../../External/cyCodeBase/cyTimer.h"
 #include "../../Game/MyGame/MyGame.h"
 #include "../../Game/Gameplay/Gameobject.h"
 #include "Mesh.h"
+#include "Effect.h"
+#include "../Time/Time.h"
+#include "../Camera/Camera.h"
+#include "../../External/cyCodeBase/cyMatrix.h"
+#include "../../External/cyCodeBase/cyGL.h"
 
 namespace
 {
@@ -36,12 +40,12 @@ namespace
 		GLclampf r = 0.0f, g = 0.0f, b = 0.0f, a = 1.0f;
 	}clearColor;
 	void CallingRedisplay(void);
-	cyTimer s_timer;
-	double s_currentTime = 0, s_elaspsedTime = 0;
+	void ReShapeCallback(int width, int height);
 }
 
 void cs6610::Graphics::RenderFrame(void)
 {
+	cs6610::Time::OnNewFrame();
 	glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
 	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to set clear color");
 	const GLbitfield clearColorBuffer = GL_COLOR_BUFFER_BIT;
@@ -50,6 +54,10 @@ void cs6610::Graphics::RenderFrame(void)
 	size_t length = MyGame::ms_gameobjects.size();
 	for (size_t i = 0; i < length; i++)
 	{
+		MyGame::ms_gameobjects[i]->GetEffect()->Bind();
+		MyGame::ms_gameobjects[i]->GetEffect()->GetProgram()->SetUniform(0, cyMatrix4f::MatrixIdentity());
+		MyGame::ms_gameobjects[i]->GetEffect()->GetProgram()->SetUniform(1, cyMatrix4f::MatrixView(cyPoint3f(0.0f, 0.0f, 10.0f), cyPoint3f(0.0f), cyPoint3f(0.0f, 1.0f, 0.0f)));
+		MyGame::ms_gameobjects[i]->GetEffect()->GetProgram()->SetUniform(2, cyMatrix4f::MatrixPerspective(Math::ConvertDegreesToRadians(45.0f), Camera::Camera::ms_aspectRatio, 0.1f, 100.0f));
 		MyGame::ms_gameobjects[i]->GetMesh()->RenderMesh();
 	}
 
@@ -76,12 +84,12 @@ bool cs6610::Graphics::Initialize(int i_argumentCount, char** i_arguments)
 		CS6610_ASSERTF(false, "Failed to initialize GLEW");
 		wereThereErrors = true;
 	}
+	glutReshapeFunc(ReShapeCallback);
 	glutDisplayFunc(RenderFrame);
 	glutIdleFunc(CallingRedisplay);
 	const GLenum option = GLUT_ACTION_ON_WINDOW_CLOSE;
 	const int mode = GLUT_ACTION_GLUTMAINLOOP_RETURNS;
 	glutSetOption(option, mode);
-	s_timer.Start();
 	return !wereThereErrors;
 }
 
@@ -89,11 +97,14 @@ namespace
 {
 	void CallingRedisplay(void)
 	{
-		s_currentTime = s_timer.Stop();
-		if (s_currentTime - s_elaspsedTime > FPS)
+		if (cs6610::Time::GetElapsedTimeDuringPreviousFrame() > FPS)
 		{
 			glutPostWindowRedisplay(currentWindowID);
-			s_elaspsedTime = s_currentTime;
 		}
+	}
+	void ReShapeCallback(int width, int height)
+	{
+		cs6610::Camera::Camera::ms_aspectRatio = static_cast<float>(width) / height;
+		glViewport(0, 0, width, height);
 	}
 }

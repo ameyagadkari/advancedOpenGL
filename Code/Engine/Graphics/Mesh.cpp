@@ -10,7 +10,7 @@ namespace
 {
 	cyTriMesh* s_meshData = nullptr;
 }
-cs6610::Graphics::Mesh::Mesh(std::string i_relativePath) :
+cs6610::Graphics::Mesh::Mesh(const std::string i_relativePath) :
 	m_vertexArrayId(0),
 	m_vertexBufferId(0)
 {

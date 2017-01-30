@@ -16,7 +16,7 @@ namespace cs6610
 		{
 		public:			
 			void RenderMesh()const;
-			explicit Mesh(std::string i_relativePath);
+			explicit Mesh(const std::string i_relativePath);
 			~Mesh();
 		private:
 			uint32_t m_numberOfVertices;

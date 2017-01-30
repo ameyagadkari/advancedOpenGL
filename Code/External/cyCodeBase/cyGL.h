@@ -38,7 +38,8 @@
 
 #ifndef _CY_GL_H_INCLUDED_
 #define _CY_GL_H_INCLUDED_
-
+#define GLEW_STATIC
+#include "../../External/GLEW/glew.h"
 //-------------------------------------------------------------------------------
 #if !defined(__gl_h_) && !defined(__GL_H__) && !defined(_GL_H) && !defined(__X_GL_H)
 #error gl.h not included before cyGL.h

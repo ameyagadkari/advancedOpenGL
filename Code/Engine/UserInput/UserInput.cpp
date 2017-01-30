@@ -4,14 +4,17 @@
 
 namespace
 {
-	void keyboard(unsigned char c, int x, int y);
+	void keyPress(unsigned char c, int x, int y);
+	void keyRelease(unsigned char c, int x, int y);
 	void mouse(int button, int state, int x, int y);
 	void close(void);
 }
 
 bool cs6610::UserInput::Initialize(void)
 {
-	glutKeyboardFunc(keyboard);
+	glutSetKeyRepeat(GLUT_KEY_REPEAT_ON);
+	glutKeyboardFunc(keyPress);
+	glutKeyboardUpFunc(keyRelease);
 	glutMouseFunc(mouse);
 	glutCloseFunc(close);
 	return true;
@@ -19,16 +22,21 @@ bool cs6610::UserInput::Initialize(void)
 
 namespace
 {
-	void keyboard(unsigned char c, int x, int y)
-	{
-		switch (c)
+	void keyPress(unsigned char c, int x, int y)
+	{		
+		if(c == VK_ESCAPE)
 		{
-		case VK_ESCAPE:
 			cs6610::MyGame::CleanUp();
 			glutLeaveMainLoop();
-		default:
-			break;
 		}
+		else
+		{
+			cs6610::UserInput::keys.set(c);
+		}
+	}
+	void keyRelease(unsigned char c, int x, int y)
+	{
+		cs6610::UserInput::keys.reset(c);
 	}
 	void mouse(int button, int state, int x, int y)
 	{

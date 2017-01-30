@@ -1,6 +1,7 @@
 #include "MyGame.h"
 
 #include "../../External/FreeGLUT/Includes/freeglut.h"
+#include "../../Engine/Time/Time.h"
 #include "../../Engine/Graphics/Graphics.h"
 #include "../../Engine/UserInput/UserInput.h"
 #include "../../Engine/Asserts/Asserts.h"
@@ -16,6 +17,7 @@ void cs6610::MyGame::Run(void)
 bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 {
 	bool wereThereErrors = false;
+	Time::Initialize();
 	if (!Graphics::Initialize(i_argumentCount, i_arguments))
 	{		
 		CS6610_ASSERTF(false, "Graphics Initialization failed");
@@ -31,6 +33,7 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 	{
 		ms_gameobjects.push_back(new Gameplay::GameObject());
 		ms_gameobjects.back()->SetMesh("data/meshes/teapot.mesh");
+		ms_gameobjects.back()->SetEffect("data/shaders/stdvertex.glsl", "data/shaders/stdfragment.glsl","u_model u_view u_pprojection");
 	}
 	return !wereThereErrors;
 }
