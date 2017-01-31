@@ -30,7 +30,10 @@ cs6610::Graphics::Mesh::Mesh(const std::string i_relativePath, cy::Point3f &o_mi
 
 cs6610::Graphics::Mesh::~Mesh()
 {
-	CS6610_ASSERTF(CleanUp(), "Mesh cleanup failed");
+	if (!CleanUp())
+	{
+		CS6610_ASSERTF(false, "Mesh cleanup failed");
+	}
 }
 
 bool cs6610::Graphics::Mesh::Initialize(const cy::TriMesh& i_meshData)

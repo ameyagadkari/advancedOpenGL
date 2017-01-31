@@ -42,7 +42,10 @@ void cs6610::Graphics::Effect::RegisterUniforms(const char * const i_names) cons
 
 void cs6610::Graphics::Effect::Compile(void) const
 {
-	CS6610_ASSERTF(m_program->BuildFiles(m_relativePathVertex.c_str(), m_relativePathFragment.c_str()), "Failed to build shaders and create program");
+	if (!m_program->BuildFiles(m_relativePathVertex.c_str(), m_relativePathFragment.c_str()))
+	{
+		CS6610_ASSERTF(false, "Failed to build shaders and create program");
+	}
 }
 
 void cs6610::Graphics::Effect::ReCompile(void)
