@@ -20,7 +20,7 @@ namespace cs6610
 			~Mesh();
 		private:
 			uint32_t m_numberOfVertices;
-			bool Initialize(const cy::TriMesh& i_meshData);
+			bool Initialize(/*const cy::TriMesh& i_meshData*/);
 			bool CleanUp();
 			GLuint m_vertexArrayId;
 			GLuint m_vertexBufferId;

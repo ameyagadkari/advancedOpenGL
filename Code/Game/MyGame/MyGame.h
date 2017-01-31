@@ -2,6 +2,14 @@
 
 #include <vector>
 
+//namespace cs6610
+//{
+//	namespace Camera
+//	{
+//		class Camera;
+//	}
+//}
+
 namespace cs6610
 {
 	namespace Gameplay
@@ -19,5 +27,6 @@ namespace cs6610
 		static bool Initialize(int i_argumentCount, char** i_arguments);
 		static void CleanUp(void);
 		static std::vector<Gameplay::GameObject*> ms_gameobjects;
+		//static Camera::Camera *ms_camera;
 	};
 }

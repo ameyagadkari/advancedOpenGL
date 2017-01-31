@@ -10,6 +10,7 @@
 #include "Effect.h"
 #include "../Time/Time.h"
 #include "../Camera/Camera.h"
+#include "../../External/cyCodeBase/cyPoint.h"
 #include "../../External/cyCodeBase/cyMatrix.h"
 #include "../../External/cyCodeBase/cyGL.h"
 
@@ -41,11 +42,12 @@ namespace
 	}clearColor;
 	void CallingRedisplay(void);
 	void ReShapeCallback(int width, int height);
+	cs6610::Camera::Camera s_camera;
 }
 
 void cs6610::Graphics::RenderFrame(void)
 {
-	cs6610::Time::OnNewFrame();
+	Time::OnNewFrame();
 	glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
 	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to set clear color");
 	const GLbitfield clearColorBuffer = GL_COLOR_BUFFER_BIT;
@@ -55,9 +57,9 @@ void cs6610::Graphics::RenderFrame(void)
 	for (size_t i = 0; i < length; i++)
 	{
 		MyGame::ms_gameobjects[i]->GetEffect()->Bind();
-		MyGame::ms_gameobjects[i]->GetEffect()->GetProgram()->SetUniform(0, cyMatrix4f::MatrixIdentity());
-		MyGame::ms_gameobjects[i]->GetEffect()->GetProgram()->SetUniform(1, cyMatrix4f::MatrixView(cyPoint3f(0.0f, 0.0f, 10.0f), cyPoint3f(0.0f), cyPoint3f(0.0f, 1.0f, 0.0f)));
-		MyGame::ms_gameobjects[i]->GetEffect()->GetProgram()->SetUniform(2, cyMatrix4f::MatrixPerspective(Math::ConvertDegreesToRadians(45.0f), Camera::Camera::ms_aspectRatio, 0.1f, 100.0f));
+		MyGame::ms_gameobjects[i]->GetEffect()->GetProgram()->SetUniform(0, cyMatrix4f::MatrixScale(1.0f));
+		MyGame::ms_gameobjects[i]->GetEffect()->GetProgram()->SetUniform(1, cyMatrix4f::MatrixView(s_camera.m_position, MyGame::ms_gameobjects[i]->GetPosition(), cyPoint3f(0.0f, 1.0f, 0.0f)));
+		MyGame::ms_gameobjects[i]->GetEffect()->GetProgram()->SetUniform(2, cyMatrix4f::MatrixPerspective(s_camera.m_fieldOfView, Camera::Camera::ms_aspectRatio, s_camera.m_nearPlaneDistance, s_camera.m_farPlaneDistance));
 		MyGame::ms_gameobjects[i]->GetMesh()->RenderMesh();
 	}
 
@@ -99,6 +101,8 @@ namespace
 	{
 		if (cs6610::Time::GetElapsedTimeDuringPreviousFrame() > FPS)
 		{
+			s_camera.UpdateCurrentCameraOrientation();
+			s_camera.UpdateCurrentCameraPosition();
 			glutPostWindowRedisplay(currentWindowID);
 		}
 	}

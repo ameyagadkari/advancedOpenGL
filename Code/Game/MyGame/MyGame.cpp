@@ -6,6 +6,7 @@
 #include "../../Engine/UserInput/UserInput.h"
 #include "../../Engine/Asserts/Asserts.h"
 #include "../Gameplay/Gameobject.h"
+//#include "../../Engine/Camera/Camera.h"
 
 std::vector<cs6610::Gameplay::GameObject*> cs6610::MyGame::ms_gameobjects;
 
@@ -23,7 +24,7 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 		CS6610_ASSERTF(false, "Graphics Initialization failed");
 		wereThereErrors = true;
 	}
-	if (!UserInput::Initialize())
+	if (!UserInput::UserInput::Initialize())
 	{		
 		CS6610_ASSERTF(false, "UserInput Initialization failed");
 		wereThereErrors = true;
@@ -31,10 +32,15 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 
 	// Init all gameobjects
 	{
-		ms_gameobjects.push_back(new Gameplay::GameObject());
+		ms_gameobjects.push_back(new Gameplay::GameObject(cyPoint3f(0.0f,0.0f,0.0f)));
 		ms_gameobjects.back()->SetMesh("data/meshes/teapot.mesh");
 		ms_gameobjects.back()->SetEffect("data/shaders/stdvertex.glsl", "data/shaders/stdfragment.glsl","u_model u_view u_pprojection");
 	}
+
+	//// Init Camera
+	//{
+	//	ms_camera = new Camera::Camera(cyPoint3f(0.0f, 0.0f, 10.0f));
+	//}
 	return !wereThereErrors;
 }
 
@@ -46,5 +52,5 @@ void cs6610::MyGame::CleanUp(void)
 		delete ms_gameobjects[i];
 		ms_gameobjects[i] = nullptr;
 	}
-	//ms_gameobjects.clear();
+	ms_gameobjects.clear();
 }

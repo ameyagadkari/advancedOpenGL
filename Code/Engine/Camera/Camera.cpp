@@ -4,11 +4,11 @@
 
 float cs6610::Camera::Camera::ms_aspectRatio = 0.0f;
 
-inline cs6610::Camera::Camera::Camera(
+cs6610::Camera::Camera::Camera(
 	cyPoint3f i_position, 
-	cyPoint3f i_eularAngles, 
-	float i_fieldOfView, 
-	float i_nearPlaneDistance, 
+	cyPoint3f i_eularAngles,
+	float i_fieldOfView,
+	float i_nearPlaneDistance,
 	float i_farPlaneDistance)
 	:
 	m_position(i_position),
@@ -20,22 +20,22 @@ inline cs6610::Camera::Camera::Camera(
 	UpdateLocalCameraAxes();
 }
 
-inline cs6610::Camera::Camera::~Camera() {}
+cs6610::Camera::Camera::~Camera() {}
 
 void cs6610::Camera::Camera::UpdateCurrentCameraPosition()
 {
 	cyPoint3f localOffset = cyPoint3f(0.0f);
 
-	if (UserInput::keys['W'])
-		localOffset += m_localCameraAxis.m_front;
-	if (UserInput::keys['S'])
-		localOffset -= m_localCameraAxis.m_front;
-	if (UserInput::keys['D'])
-		localOffset += m_localCameraAxis.m_right;
-	if (UserInput::keys['A'])
-		localOffset -= m_localCameraAxis.m_right;
+	if (UserInput::UserInput::keys['w'])
+		localOffset.x += 1.0f;
+	if (UserInput::UserInput::keys['s'])
+		localOffset.x -= 1.0f;
+	if (UserInput::UserInput::keys['d'])
+		localOffset.z += 1.0f;
+	if (UserInput::UserInput::keys['a'])
+		localOffset.z -= 1.0f;
 
-	const float speed_unitsPerSecond = 10.0f;
+	const float speed_unitsPerSecond = 1.0f;
 	const float offsetModifier = speed_unitsPerSecond * static_cast<float>(Time::GetElapsedTimeDuringPreviousFrame());
 	localOffset *= offsetModifier;
 
@@ -45,13 +45,13 @@ void cs6610::Camera::Camera::UpdateCurrentCameraOrientation(bool constrainPitch)
 {
 	cyPoint3f localOffset = cyPoint3f(0.0f);
 
-	if (UserInput::keys['H'])
+	if (UserInput::UserInput::keys['H'])
 		localOffset.y += 1.0f;
-	if (UserInput::keys['F'])
+	if (UserInput::UserInput::keys['F'])
 		localOffset.y -= 1.0f;
-	if (UserInput::keys['G'])
+	if (UserInput::UserInput::keys['G'])
 		localOffset.x += 1.0f;
-	if (UserInput::keys['T'])
+	if (UserInput::UserInput::keys['T'])
 		localOffset.x -= 1.0f;
 
 	const float speed_unitsPerSecond = 10.0f;
@@ -75,9 +75,9 @@ void cs6610::Camera::Camera::UpdateCurrentCameraOrientation(bool constrainPitch)
 
 void cs6610::Camera::Camera::UpdateLocalCameraAxes()
 {
-	m_localCameraAxis.m_front.z = -(cos(Math::ConvertDegreesToRadians(m_eularAngles.y)) * cos(Math::ConvertDegreesToRadians(m_eularAngles.x)));
-	m_localCameraAxis.m_front.y = -sin(Math::ConvertDegreesToRadians(m_eularAngles.x));
-	m_localCameraAxis.m_front.x = sin(Math::ConvertDegreesToRadians(m_eularAngles.y)) * cos(Math::ConvertDegreesToRadians(m_eularAngles.x));
+	m_localCameraAxis.m_front.z = -(cosf(Math::ConvertDegreesToRadians(m_eularAngles.y)) * cosf(Math::ConvertDegreesToRadians(m_eularAngles.x)));
+	m_localCameraAxis.m_front.y = -sinf(Math::ConvertDegreesToRadians(m_eularAngles.x));
+	m_localCameraAxis.m_front.x = sinf(Math::ConvertDegreesToRadians(m_eularAngles.y)) * cosf(Math::ConvertDegreesToRadians(m_eularAngles.x));
 
 	m_localCameraAxis.m_front.Normalize();
 	m_localCameraAxis.m_right = (m_localCameraAxis.m_front.Cross(cyPoint3f(0.0f, 1.0f, 0.0f))).GetNormalized();
