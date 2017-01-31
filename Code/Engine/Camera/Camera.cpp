@@ -98,7 +98,7 @@ void cs6610::Camera::Camera::UpdateCurrentCameraOrientation(bool constrainPitch)
 	localOffset *= offsetModifier;
 	m_eularAngles += localOffset;
 
-	if (constrainPitch)
+	/*if (constrainPitch)
 	{
 		if (m_eularAngles.x > 89.0f)
 		{
@@ -108,7 +108,7 @@ void cs6610::Camera::Camera::UpdateCurrentCameraOrientation(bool constrainPitch)
 		{
 			m_eularAngles.x = -89.0f;
 		}
-	}
+	}*/
 	UpdateLocalCameraAxes();
 }
 

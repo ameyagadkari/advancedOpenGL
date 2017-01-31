@@ -9,7 +9,8 @@
 #include "../../Engine/Camera/Camera.h"
 
 std::vector<cs6610::Gameplay::GameObject*> cs6610::MyGame::ms_gameobjects;
-cs6610::Camera::Camera* cs6610::MyGame::ms_camera;
+cs6610::Camera::Camera* cs6610::MyGame::ms_pcamera;
+cs6610::Camera::Camera* cs6610::MyGame::ms_ocamera;
 
 void cs6610::MyGame::Run(void)
 {
@@ -40,7 +41,8 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 
 	// Init Camera
 	{
-		ms_camera = new Camera::Camera();
+		ms_pcamera = new Camera::Camera();
+		ms_ocamera = new Camera::Camera(cyPoint3f(0.0f, 0.0f, -10.0f), cyPoint3f(0.0f, 0.0f, 0.0f), Math::ConvertDegreesToRadians(45.0f), -20.0f, 20.0f);
 	}
 	return !wereThereErrors;
 }
@@ -54,9 +56,14 @@ void cs6610::MyGame::CleanUp(void)
 		ms_gameobjects[i] = nullptr;
 	}
 	ms_gameobjects.clear();
-	if(ms_camera)
+	if(ms_pcamera)
 	{
-		delete ms_camera;
-		ms_camera = nullptr;
+		delete ms_pcamera;
+		ms_pcamera = nullptr;
+	}
+	if (ms_ocamera)
+	{
+		delete ms_ocamera;
+		ms_ocamera = nullptr;
 	}
 }

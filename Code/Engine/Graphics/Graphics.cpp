@@ -58,32 +58,35 @@ void cs6610::Graphics::RenderFrame(void)
 	for (size_t i = 0; i < length; i++)
 	{
 		MyGame::ms_gameobjects[i]->GetEffect()->Bind();
-		cyGLSLProgram* program = MyGame::ms_gameobjects[i]->GetEffect()->GetProgram();
 		cyMatrix4f model;
-		if (UserInput::UserInput::isCameraPerspective)
-		{
-			model = cyMatrix4f::MatrixScale(0.05f)*cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects[i]->GetPosition());
-		}
-		else
-		{
-			const float scalingFactor = 1.0f / (MyGame::ms_gameobjects[i]->GetPosition() - MyGame::ms_camera->GetPosition()).Length();
-			model = cyMatrix4f::MatrixScale(scalingFactor)/**cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects[i]->GetPosition())*/;
-		}
-		program->SetUniform(0, model);
-		cyMatrix4f trans = cyMatrix4f::MatrixTrans(MyGame::ms_camera->GetPosition());
-		cyMatrix4f xrot = cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(UserInput::UserInput::xRot));
-		cyMatrix4f zrot = cyMatrix4f::MatrixRotationZ(Math::ConvertDegreesToRadians(UserInput::UserInput::zRot));
-		cyMatrix4f view = trans*zrot*xrot;
-		program->SetUniform(1, view);
+		cyMatrix4f view;
 		cyMatrix4f projection;
 		if (UserInput::UserInput::isCameraPerspective)
 		{
-			projection = cyMatrix4f::MatrixPerspective(MyGame::ms_camera->GetFieldOfView(), Camera::Camera::ms_aspectRatio, MyGame::ms_camera->GetNearPlaneDistance(), MyGame::ms_camera->GetFarPlaneDistance());
+			model = cyMatrix4f::MatrixScale(0.05f)*cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects[i]->GetPosition());
+
+			cyMatrix4f trans = cyMatrix4f::MatrixTrans(MyGame::ms_pcamera->GetPosition());
+			cyMatrix4f xrot = cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(UserInput::UserInput::xRot));
+			cyMatrix4f yrot = cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(UserInput::UserInput::yRot));
+			view = trans*yrot*xrot;
+
+			projection = cyMatrix4f::MatrixPerspective(MyGame::ms_pcamera->GetFieldOfView(), Camera::Camera::ms_aspectRatio, MyGame::ms_pcamera->GetNearPlaneDistance(), MyGame::ms_pcamera->GetFarPlaneDistance());
 		}
 		else
 		{
-			projection = MyGame::ms_camera->GetOrthographicProjectionMatrix();
+			const float scalingFactor = 1.0f / (MyGame::ms_gameobjects[i]->GetPosition() - MyGame::ms_ocamera->GetPosition()).Length();
+			model = cyMatrix4f::MatrixScale(scalingFactor)*cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects[i]->GetPosition());
+
+			cyMatrix4f trans = cyMatrix4f::MatrixTrans(MyGame::ms_ocamera->GetPosition());
+			cyMatrix4f xrot = cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(UserInput::UserInput::xRot));
+			cyMatrix4f yrot = cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(UserInput::UserInput::yRot));
+			view = trans*yrot*xrot;
+
+			projection = MyGame::ms_ocamera->GetOrthographicProjectionMatrix();
 		}
+		cyGLSLProgram* program = MyGame::ms_gameobjects[i]->GetEffect()->GetProgram();
+		program->SetUniform(0, model);		
+		program->SetUniform(1, view);
 		program->SetUniform(2, projection);
 		MyGame::ms_gameobjects[i]->GetMesh()->RenderMesh();
 	}
@@ -126,7 +129,7 @@ namespace
 		if (cs6610::Time::GetElapsedTimeDuringPreviousFrame() > FPS)
 		{
 			//s_camera.UpdateCurrentCameraOrientation();
-			//cs6610::MyGame::ms_camera->UpdateCurrentCameraPosition();
+			//cs6610::MyGame::ms_pcamera->UpdateCurrentCameraPosition();
 			glutPostWindowRedisplay(currentWindowID);
 		}
 	}

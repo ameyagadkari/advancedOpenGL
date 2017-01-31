@@ -23,7 +23,7 @@ namespace
 
 std::bitset<256> cs6610::UserInput::UserInput::keys;
 float cs6610::UserInput::UserInput::xRot = -90.0f;
-float cs6610::UserInput::UserInput::zRot = 0.0f;
+float cs6610::UserInput::UserInput::yRot = 0.0f;
 bool cs6610::UserInput::UserInput::isCameraPerspective = true;
 
 bool cs6610::UserInput::UserInput::Initialize(void)
@@ -77,8 +77,8 @@ namespace
 				xOffest *= mouseSensitivity;
 				yOffset *= mouseSensitivity;
 
-				cs6610::UserInput::UserInput::xRot += xOffest;
-				cs6610::UserInput::UserInput::zRot += yOffset;
+				cs6610::UserInput::UserInput::yRot += xOffest;
+				cs6610::UserInput::UserInput::xRot += yOffset;
 			}
 		}
 
@@ -94,10 +94,10 @@ namespace
 
 				yOffsetCam *= mouseSensitivityCam;
 
-				cyPoint3f currentCameraPosition = cs6610::MyGame::ms_camera->GetPosition();
+				cyPoint3f currentCameraPosition = cs6610::MyGame::ms_pcamera->GetPosition();
 				currentCameraPosition.z += yOffsetCam;
 
-				cs6610::MyGame::ms_camera->SetPosition(currentCameraPosition);
+				cs6610::MyGame::ms_pcamera->SetPosition(currentCameraPosition);
 			}
 		}
 	}

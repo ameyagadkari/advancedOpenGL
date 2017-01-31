@@ -905,10 +905,9 @@ public:
 		m.data[0] = s.x; m.data[1] = u.x; m.data[2] = -f.x;
 		m.data[3] = s.y; m.data[4] = u.y; m.data[5] = -f.y;
 		m.data[6] = s.z; m.data[7] = u.z; m.data[8] = -f.z;
+		CY_MEMCLEAR(TYPE,m.data+9,3);
 		Matrix34 t;
-		t.data[ 9] = -pos.x;
-		t.data[10] = -pos.y;
-		t.data[11] = -pos.z;
+		t.SetTrans(-pos);
 		*this = m * t;
 	}
 	//! Set matrix using normal and approximate x direction
@@ -954,7 +953,6 @@ public:
 	void          GetTrans( Point3<TYPE> &p )           const { p.x=data[9]; p.y=data[10]; p.z=data[11]; }								//! Returns the translation component of the matrix
 	void          GetTrans( TYPE *trans )               const { CY_MEMCOPY(TYPE,trans,data+9,3); }										//! Returns the translation component of the matrix
 
-
 	//////////////////////////////////////////////////////////////////////////
 	//!@name Comparison Operators
 
@@ -986,7 +984,7 @@ public:
 	{
 		Matrix34 r;
 		TYPE *rd = r.data;
-		for ( int i=0; i<9; i+=3, rd+=3 ) {
+		for ( int i=0; i<12; i+=3, rd+=3 ) {
 			TYPE a[3], b[3], c[3];
 			for ( int k=0; k<3; ++k ) a[k] = data[  k] * right.data[i  ];
 			for ( int k=0; k<3; ++k ) b[k] = data[3+k] * right.data[i+1];
@@ -1466,12 +1464,9 @@ public:
 		s.Normalize();
 		Point3<TYPE> u = s.Cross(f);
 		Matrix34<TYPE> m;
-		m.data[0] = s.x; m.data[3] = s.y; m.data[6] = s.z; m.data[9] = TYPE(0);
-		m.data[1] = u.x; m.data[4] = u.y; m.data[7] = u.z; m.data[10] = TYPE(0);
-		m.data[2] = -f.x; m.data[5] = -f.y; m.data[8] = -f.z; m.data[11] = TYPE(0);
-		/*m.data[ 0]=s.x; m.data[ 1]=u.x; m.data[ 2]=-f.x; m.data[ 3]=TYPE(0);
+		m.data[ 0]=s.x; m.data[ 1]=u.x; m.data[ 2]=-f.x; m.data[ 3]=TYPE(0);
 		m.data[ 4]=s.y; m.data[ 5]=u.y; m.data[ 6]=-f.y; m.data[ 7]=TYPE(0);
-		m.data[ 8]=s.z; m.data[ 9]=u.z; m.data[10]=-f.z; m.data[11]=TYPE(0);*/
+		m.data[ 8]=s.z; m.data[ 9]=u.z; m.data[10]=-f.z; m.data[11]=TYPE(0);
 		Matrix4 t;
 		t.SetTrans(-pos);
 		*this = m * t;
