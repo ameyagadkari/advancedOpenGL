@@ -13,6 +13,7 @@ namespace cs6610
 			static std::bitset<256>keys;
 			static float xRot;
 			static float zRot;
+			static bool isCameraPerspective;
 		};
 	}
 }

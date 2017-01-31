@@ -2,6 +2,7 @@
 
 #include "../../External/cyCodeBase/cyPoint.h"
 #include "../Math/Functions.h"
+#include "../../External/cyCodeBase/cyMatrix.h"
 
 namespace cs6610
 {
@@ -10,11 +11,13 @@ namespace cs6610
 		class Camera
 		{
 		public:
-			explicit Camera(cyPoint3f i_position = cyPoint3f(0.0f, 0.0f, -5.0f), cyPoint3f i_eularAngles = cyPoint3f(0.0f, 0.0f, 0.0f), float i_fieldOfView = Math::ConvertDegreesToRadians(45.0f), float i_nearPlaneDistance = 0.1f, float i_farPlaneDistance = 1000.0f);
+			explicit Camera(cyPoint3f i_position = cyPoint3f(0.0f, 0.0f, -5.0f), cyPoint3f i_eularAngles = cyPoint3f(0.0f, 0.0f, 0.0f), float i_fieldOfView = Math::ConvertDegreesToRadians(45.0f), float i_nearPlaneDistance = 0.1f, float i_farPlaneDistance = 100.0f, float i_topPlaneDistance = 20.0f, float i_bottomPlaneDistance = -20.0f, float i_leftPlaneDistance = -40.0f, float i_rightPlaneDistance = 40.0f);
 			~Camera();
 
 			void UpdateCurrentCameraPosition();
 			void UpdateCurrentCameraOrientation(bool constrainPitch = true);
+
+			
 
 			static float ms_aspectRatio;
 
@@ -23,6 +26,7 @@ namespace cs6610
 #pragma endregion
 			
 #pragma region Gets
+			cyMatrix4f GetOrthographicProjectionMatrix()const;
 			cyPoint3f GetPosition()const;
 			float GetFieldOfView()const;
 			float GetNearPlaneDistance()const;
@@ -44,7 +48,15 @@ namespace cs6610
 			float m_nearPlaneDistance;
 			float m_farPlaneDistance;
 
+			float m_topPlaneDistance;
+			float m_bottomPlaneDistance;
+			float m_leftPlaneDistance;
+			float m_rightPlaneDistance;
+
+			cyMatrix4f m_orthographicProjection;
+
 			void UpdateLocalCameraAxes();
+			void CalculateOrthographicProjectionMatrix();
 		};
 	}
 }

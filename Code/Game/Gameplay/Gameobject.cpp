@@ -82,7 +82,7 @@ void cs6610::Gameplay::GameObject::SetMesh(const std::string i_meshRelativePath)
 	{
 		cyPoint3f minBounds, maxBounds;
 		m_mesh = new Graphics::Mesh(i_meshRelativePath, minBounds, maxBounds);
-		m_position += (maxBounds + minBounds) / -2.0f;
+		m_position += (maxBounds + minBounds) *-0.5f;
 	}
 	else
 	{

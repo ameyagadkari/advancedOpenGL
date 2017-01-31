@@ -24,6 +24,7 @@ namespace
 std::bitset<256> cs6610::UserInput::UserInput::keys;
 float cs6610::UserInput::UserInput::xRot = -90.0f;
 float cs6610::UserInput::UserInput::zRot = 0.0f;
+bool cs6610::UserInput::UserInput::isCameraPerspective = true;
 
 bool cs6610::UserInput::UserInput::Initialize(void)
 {
@@ -41,6 +42,10 @@ namespace
 {
 	void keyPress(unsigned char c, int x, int y)
 	{
+		if (c == 'p' && !cs6610::UserInput::UserInput::keys['p'])
+		{
+			cs6610::UserInput::UserInput::isCameraPerspective = !cs6610::UserInput::UserInput::isCameraPerspective;
+		}
 		if (c == VK_ESCAPE)
 		{
 			cs6610::MyGame::CleanUp();

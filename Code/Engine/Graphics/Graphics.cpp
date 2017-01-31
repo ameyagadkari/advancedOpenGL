@@ -59,15 +59,32 @@ void cs6610::Graphics::RenderFrame(void)
 	{
 		MyGame::ms_gameobjects[i]->GetEffect()->Bind();
 		cyGLSLProgram* program = MyGame::ms_gameobjects[i]->GetEffect()->GetProgram();
-		cyMatrix4f model = cyMatrix4f::MatrixScale(0.05f)*cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects[i]->GetPosition());
+		cyMatrix4f model;
+		if (UserInput::UserInput::isCameraPerspective)
+		{
+			model = cyMatrix4f::MatrixScale(0.05f)*cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects[i]->GetPosition());
+		}
+		else
+		{
+			const float scalingFactor = 1.0f / (MyGame::ms_gameobjects[i]->GetPosition() - MyGame::ms_camera->GetPosition()).Length();
+			model = cyMatrix4f::MatrixScale(scalingFactor)/**cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects[i]->GetPosition())*/;
+		}
 		program->SetUniform(0, model);
 		cyMatrix4f trans = cyMatrix4f::MatrixTrans(MyGame::ms_camera->GetPosition());
 		cyMatrix4f xrot = cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(UserInput::UserInput::xRot));
 		cyMatrix4f zrot = cyMatrix4f::MatrixRotationZ(Math::ConvertDegreesToRadians(UserInput::UserInput::zRot));
 		cyMatrix4f view = trans*zrot*xrot;
 		program->SetUniform(1, view);
-		cyMatrix4f persp = cyMatrix4f::MatrixPerspective(MyGame::ms_camera->GetFieldOfView(), Camera::Camera::ms_aspectRatio, MyGame::ms_camera->GetNearPlaneDistance(), MyGame::ms_camera->GetFarPlaneDistance());
-		program->SetUniform(2, persp);
+		cyMatrix4f projection;
+		if (UserInput::UserInput::isCameraPerspective)
+		{
+			projection = cyMatrix4f::MatrixPerspective(MyGame::ms_camera->GetFieldOfView(), Camera::Camera::ms_aspectRatio, MyGame::ms_camera->GetNearPlaneDistance(), MyGame::ms_camera->GetFarPlaneDistance());
+		}
+		else
+		{
+			projection = MyGame::ms_camera->GetOrthographicProjectionMatrix();
+		}
+		program->SetUniform(2, projection);
 		MyGame::ms_gameobjects[i]->GetMesh()->RenderMesh();
 	}
 

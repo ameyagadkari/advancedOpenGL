@@ -5,18 +5,27 @@
 float cs6610::Camera::Camera::ms_aspectRatio = 0.0f;
 
 cs6610::Camera::Camera::Camera(
-	cyPoint3f i_position, 
+	cyPoint3f i_position,
 	cyPoint3f i_eularAngles,
 	float i_fieldOfView,
 	float i_nearPlaneDistance,
-	float i_farPlaneDistance)
+	float i_farPlaneDistance,
+	float i_topPlaneDistance,
+	float i_bottomPlaneDistance,
+	float i_leftPlaneDistance,
+	float i_rightPlaneDistance)
 	:
 	m_position(i_position),
 	m_eularAngles(i_eularAngles),
 	m_fieldOfView(i_fieldOfView),
 	m_nearPlaneDistance(i_nearPlaneDistance),
-	m_farPlaneDistance(i_farPlaneDistance)
+	m_farPlaneDistance(i_farPlaneDistance),
+	m_topPlaneDistance(i_topPlaneDistance),
+	m_bottomPlaneDistance(i_bottomPlaneDistance),
+	m_leftPlaneDistance(i_leftPlaneDistance),
+	m_rightPlaneDistance(i_rightPlaneDistance)
 {
+	CalculateOrthographicProjectionMatrix();
 	UpdateLocalCameraAxes();
 }
 
@@ -38,6 +47,10 @@ float cs6610::Camera::Camera::GetNearPlaneDistance()const
 float cs6610::Camera::Camera::GetFarPlaneDistance()const
 {
 	return m_farPlaneDistance;
+}
+cyMatrix4f cs6610::Camera::Camera::GetOrthographicProjectionMatrix()const
+{
+	return m_orthographicProjection;
 }
 #pragma endregion
 
@@ -108,4 +121,19 @@ void cs6610::Camera::Camera::UpdateLocalCameraAxes()
 	m_localCameraAxis.m_front.Normalize();
 	m_localCameraAxis.m_right = (m_localCameraAxis.m_front.Cross(cyPoint3f(0.0f, 1.0f, 0.0f))).GetNormalized();
 	m_localCameraAxis.m_up = (m_localCameraAxis.m_right.Cross(m_localCameraAxis.m_front)).GetNormalized();
+}
+
+void cs6610::Camera::Camera::CalculateOrthographicProjectionMatrix()
+{
+	cyMatrix4f scale = cyMatrix4f::MatrixScale(
+		(2.0f / m_rightPlaneDistance - m_leftPlaneDistance),
+		(2.0f / m_topPlaneDistance - m_bottomPlaneDistance),
+		(2.0f / m_farPlaneDistance - m_nearPlaneDistance));
+
+	cyMatrix4f trans = cyMatrix4f::MatrixTrans(cyPoint3f(
+		(m_leftPlaneDistance + m_rightPlaneDistance)*-0.5f,
+		(m_topPlaneDistance + m_bottomPlaneDistance)*-0.5f,
+		(m_farPlaneDistance + m_nearPlaneDistance)*-0.5f));
+
+	m_orthographicProjection = scale*trans;
 }
