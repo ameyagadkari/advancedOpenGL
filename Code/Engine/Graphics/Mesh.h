@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "../../External/cyCodeBase/cyPoint.h"
 
 typedef unsigned int GLuint;
 
@@ -14,9 +15,9 @@ namespace cs6610
 	{
 		class Mesh
 		{
-		public:			
+		public:
 			void RenderMesh()const;
-			explicit Mesh(const std::string i_relativePath);
+			explicit Mesh(const std::string i_relativePath, cy::Point3f &o_minBounds, cy::Point3f &o_maxBounds);
 			~Mesh();
 		private:
 			uint32_t m_numberOfVertices;

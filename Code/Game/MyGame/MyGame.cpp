@@ -6,9 +6,10 @@
 #include "../../Engine/UserInput/UserInput.h"
 #include "../../Engine/Asserts/Asserts.h"
 #include "../Gameplay/Gameobject.h"
-//#include "../../Engine/Camera/Camera.h"
+#include "../../Engine/Camera/Camera.h"
 
 std::vector<cs6610::Gameplay::GameObject*> cs6610::MyGame::ms_gameobjects;
+cs6610::Camera::Camera* cs6610::MyGame::ms_camera;
 
 void cs6610::MyGame::Run(void)
 {
@@ -37,10 +38,10 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 		ms_gameobjects.back()->SetEffect("data/shaders/stdvertex.glsl", "data/shaders/stdfragment.glsl","u_model u_view u_pprojection");
 	}
 
-	//// Init Camera
-	//{
-	//	ms_camera = new Camera::Camera(cyPoint3f(0.0f, 0.0f, 10.0f));
-	//}
+	// Init Camera
+	{
+		ms_camera = new Camera::Camera();
+	}
 	return !wereThereErrors;
 }
 
@@ -53,4 +54,9 @@ void cs6610::MyGame::CleanUp(void)
 		ms_gameobjects[i] = nullptr;
 	}
 	ms_gameobjects.clear();
+	if(ms_camera)
+	{
+		delete ms_camera;
+		ms_camera = nullptr;
+	}
 }

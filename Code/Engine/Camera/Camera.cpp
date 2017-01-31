@@ -22,20 +22,46 @@ cs6610::Camera::Camera::Camera(
 
 cs6610::Camera::Camera::~Camera() {}
 
+#pragma region Gets
+cyPoint3f cs6610::Camera::Camera::GetPosition()const
+{
+	return m_position;
+}
+float cs6610::Camera::Camera::GetFieldOfView()const
+{
+	return m_fieldOfView;
+}
+float cs6610::Camera::Camera::GetNearPlaneDistance()const
+{
+	return m_nearPlaneDistance;
+}
+float cs6610::Camera::Camera::GetFarPlaneDistance()const
+{
+	return m_farPlaneDistance;
+}
+#pragma endregion
+
+#pragma region Sets
+void cs6610::Camera::Camera::SetPosition(cyPoint3f i_position)
+{
+	m_position = i_position;
+}
+#pragma endregion
+
 void cs6610::Camera::Camera::UpdateCurrentCameraPosition()
 {
 	cyPoint3f localOffset = cyPoint3f(0.0f);
 
 	if (UserInput::UserInput::keys['w'])
-		localOffset.x += 1.0f;
-	if (UserInput::UserInput::keys['s'])
-		localOffset.x -= 1.0f;
-	if (UserInput::UserInput::keys['d'])
-		localOffset.z += 1.0f;
-	if (UserInput::UserInput::keys['a'])
 		localOffset.z -= 1.0f;
+	if (UserInput::UserInput::keys['s'])
+		localOffset.z += 1.0f;
+	if (UserInput::UserInput::keys['d'])
+		localOffset.x += 1.0f;
+	if (UserInput::UserInput::keys['a'])
+		localOffset.x -= 1.0f;
 
-	const float speed_unitsPerSecond = 1.0f;
+	const float speed_unitsPerSecond = 5.0f;
 	const float offsetModifier = speed_unitsPerSecond * static_cast<float>(Time::GetElapsedTimeDuringPreviousFrame());
 	localOffset *= offsetModifier;
 

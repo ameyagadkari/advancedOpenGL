@@ -10,7 +10,7 @@ namespace
 {
 	cyTriMesh* s_meshData = nullptr;
 }
-cs6610::Graphics::Mesh::Mesh(const std::string i_relativePath) :
+cs6610::Graphics::Mesh::Mesh(const std::string i_relativePath, cy::Point3f &o_minBounds, cy::Point3f &o_maxBounds) :
 	m_vertexArrayId(0),
 	m_vertexBufferId(0)
 {
@@ -18,7 +18,10 @@ cs6610::Graphics::Mesh::Mesh(const std::string i_relativePath) :
 	s_meshData->LoadFromFileObj(i_relativePath.c_str());
 	m_numberOfVertices = s_meshData->NV();
 	Initialize(*s_meshData);
-	if(s_meshData)
+	s_meshData->ComputeBoundingBox();
+	o_minBounds = s_meshData->GetBoundMin();
+	o_maxBounds = s_meshData->GetBoundMax();
+	if (s_meshData)
 	{
 		delete s_meshData;
 		s_meshData = nullptr;

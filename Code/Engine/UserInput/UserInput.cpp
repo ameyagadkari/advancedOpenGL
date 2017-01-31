@@ -2,6 +2,8 @@
 #include "../../External/FreeGLUT/Includes/freeglut.h"
 #include "../../Game/MyGame/MyGame.h"
 #include "../Graphics/Effect.h"
+#include "../../External/cyCodeBase/cyPoint.h"
+#include "../Camera/Camera.h"
 
 namespace
 {
@@ -11,9 +13,17 @@ namespace
 	void keyReleaseSpecial(int key, int x, int y);
 	void mouse(int button, int state, int x, int y);
 	void close(void);
+	int xPosOnPress = 0, yPosOnPress = 0;
+	float xOffest = 0, yOffset = 0;
+	const float mouseSensitivity = 0.25f;
+	const float mouseSensitivityCam = 0.025f;
+	int yPosOnPressCam = 0;
+	float yOffsetCam = 0;
 }
 
 std::bitset<256> cs6610::UserInput::UserInput::keys;
+float cs6610::UserInput::UserInput::xRot = -90.0f;
+float cs6610::UserInput::UserInput::zRot = 0.0f;
 
 bool cs6610::UserInput::UserInput::Initialize(void)
 {
@@ -47,7 +57,44 @@ namespace
 	}
 	void mouse(int button, int state, int x, int y)
 	{
-		//Will be implemented afterwards for camera
+		if (button == GLUT_LEFT_BUTTON)
+		{
+			if (state == GLUT_DOWN)
+			{
+				xPosOnPress = x;
+				yPosOnPress = y;
+			}
+			else if (state == GLUT_UP)
+			{
+				xOffest = static_cast<float>(x - xPosOnPress);
+				yOffset = static_cast<float>(y - yPosOnPress);
+
+				xOffest *= mouseSensitivity;
+				yOffset *= mouseSensitivity;
+
+				cs6610::UserInput::UserInput::xRot += xOffest;
+				cs6610::UserInput::UserInput::zRot += yOffset;
+			}
+		}
+
+		if (button == GLUT_RIGHT_BUTTON)
+		{
+			if (state == GLUT_DOWN)
+			{
+				yPosOnPressCam = y;
+			}
+			else if (state == GLUT_UP)
+			{
+				yOffsetCam = static_cast<float>(y - yPosOnPressCam);
+
+				yOffsetCam *= mouseSensitivityCam;
+
+				cyPoint3f currentCameraPosition = cs6610::MyGame::ms_camera->GetPosition();
+				currentCameraPosition.z += yOffsetCam;
+
+				cs6610::MyGame::ms_camera->SetPosition(currentCameraPosition);
+			}
+		}
 	}
 	void close(void)
 	{

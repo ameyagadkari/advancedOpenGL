@@ -49,7 +49,7 @@ void cs6610::Gameplay::GameObject::SetEffect(const std::string i_relativePathVer
 	if (!m_effect)
 	{
 		m_effect = new Graphics::Effect(i_relativePathVertex, i_relativePathFragment);
-		if(i_names)
+		if (i_names)
 		{
 			m_effect->RegisterUniforms(i_names);
 		}
@@ -80,7 +80,9 @@ void cs6610::Gameplay::GameObject::SetMesh(const std::string i_meshRelativePath)
 {
 	if (!m_mesh)
 	{
-		m_mesh = new Graphics::Mesh(i_meshRelativePath);
+		cyPoint3f minBounds, maxBounds;
+		m_mesh = new Graphics::Mesh(i_meshRelativePath, minBounds, maxBounds);
+		m_position += (maxBounds + minBounds) / -2.0f;
 	}
 	else
 	{
