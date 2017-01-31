@@ -61,7 +61,7 @@ void cs6610::Graphics::RenderFrame(void)
 		MyGame::ms_gameobjects[i]->GetEffect()->GetProgram()->SetUniform(0, cyMatrix4f::MatrixScale(0.05f));
 		//MyGame::ms_gameobjects[i]->GetEffect()->GetProgram()->SetUniform(1, cyMatrix4f::MatrixView(s_camera.m_position, MyGame::ms_gameobjects[i]->GetPosition(), cyPoint3f(0.0f, 1.0f, 0.0f)));
 
-		MyGame::ms_gameobjects[i]->GetEffect()->GetProgram()->SetUniform(2, cyMatrix4f::MatrixPerspective(s_camera.m_fieldOfView, Camera::Camera::ms_aspectRatio, s_camera.m_nearPlaneDistance, s_camera.m_farPlaneDistance));
+		//MyGame::ms_gameobjects[i]->GetEffect()->GetProgram()->SetUniform(2, cyMatrix4f::MatrixPerspective(s_camera.m_fieldOfView, Camera::Camera::ms_aspectRatio, s_camera.m_nearPlaneDistance, s_camera.m_farPlaneDistance));
 		MyGame::ms_gameobjects[i]->GetMesh()->RenderMesh();
 	}
 	

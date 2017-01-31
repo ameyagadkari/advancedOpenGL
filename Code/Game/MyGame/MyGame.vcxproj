@@ -113,7 +113,7 @@
       <Inputs>$(TargetPath)</Inputs>
       <Command>copy "$(TargetPath)" "$(GameDir)$(TargetFileName)" /y
 mkdir "$(BuiltAssetDir)" 
-xcopy "$(AuthoredAssetDir)*.*" "$(BuiltAssetDir)" /e /s /y</Command>
+xcopy "$(AuthoredAssetDir)*.*" "$(BuiltAssetDir)" /d /e /s /y</Command>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -140,7 +140,7 @@ xcopy "$(AuthoredAssetDir)*.*" "$(BuiltAssetDir)" /e /s /y</Command>
       <Inputs>$(TargetPath)</Inputs>
       <Command>copy "$(TargetPath)" "$(GameDir)$(TargetFileName)" /y
 mkdir "$(BuiltAssetDir)" 
-xcopy "$(AuthoredAssetDir)*.*" "$(BuiltAssetDir)" /e /s /y</Command>
+xcopy "$(AuthoredAssetDir)*.*" "$(BuiltAssetDir)" /d /e /s /y</Command>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -171,7 +171,7 @@ xcopy "$(AuthoredAssetDir)*.*" "$(BuiltAssetDir)" /e /s /y</Command>
       <Inputs>$(TargetPath)</Inputs>
       <Command>copy "$(TargetPath)" "$(GameDir)$(TargetFileName)" /y
 mkdir "$(BuiltAssetDir)" 
-xcopy "$(AuthoredAssetDir)*.*" "$(BuiltAssetDir)" /e /s /y</Command>
+xcopy "$(AuthoredAssetDir)*.*" "$(BuiltAssetDir)" /d /e /s /y</Command>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -202,7 +202,7 @@ xcopy "$(AuthoredAssetDir)*.*" "$(BuiltAssetDir)" /e /s /y</Command>
       <Inputs>$(TargetPath)</Inputs>
       <Command>copy "$(TargetPath)" "$(GameDir)$(TargetFileName)" /y
 mkdir "$(BuiltAssetDir)" 
-xcopy "$(AuthoredAssetDir)*.*" "$(BuiltAssetDir)" /e /s /y</Command>
+xcopy "$(AuthoredAssetDir)*.*" "$(BuiltAssetDir)" /d /e /s /y</Command>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
