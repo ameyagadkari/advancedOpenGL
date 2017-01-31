@@ -52,18 +52,19 @@ void cs6610::Graphics::RenderFrame(void)
 	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to set clear color");
 	const GLbitfield clearColorBuffer = GL_COLOR_BUFFER_BIT;
 	glClear(clearColorBuffer);
+	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to clear color buffer");
 
 	size_t length = MyGame::ms_gameobjects.size();
 	for (size_t i = 0; i < length; i++)
 	{
 		MyGame::ms_gameobjects[i]->GetEffect()->Bind();
-		MyGame::ms_gameobjects[i]->GetEffect()->GetProgram()->SetUniform(0, cyMatrix4f::MatrixScale(1.0f));
-		MyGame::ms_gameobjects[i]->GetEffect()->GetProgram()->SetUniform(1, cyMatrix4f::MatrixView(s_camera.m_position, MyGame::ms_gameobjects[i]->GetPosition(), cyPoint3f(0.0f, 1.0f, 0.0f)));
+		MyGame::ms_gameobjects[i]->GetEffect()->GetProgram()->SetUniform(0, cyMatrix4f::MatrixScale(0.05f));
+		//MyGame::ms_gameobjects[i]->GetEffect()->GetProgram()->SetUniform(1, cyMatrix4f::MatrixView(s_camera.m_position, MyGame::ms_gameobjects[i]->GetPosition(), cyPoint3f(0.0f, 1.0f, 0.0f)));
+
 		MyGame::ms_gameobjects[i]->GetEffect()->GetProgram()->SetUniform(2, cyMatrix4f::MatrixPerspective(s_camera.m_fieldOfView, Camera::Camera::ms_aspectRatio, s_camera.m_nearPlaneDistance, s_camera.m_farPlaneDistance));
 		MyGame::ms_gameobjects[i]->GetMesh()->RenderMesh();
 	}
-
-	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to clear color buffer");
+	
 	glutSwapBuffers();
 }
 bool cs6610::Graphics::Initialize(int i_argumentCount, char** i_arguments)
@@ -101,8 +102,8 @@ namespace
 	{
 		if (cs6610::Time::GetElapsedTimeDuringPreviousFrame() > FPS)
 		{
-			s_camera.UpdateCurrentCameraOrientation();
-			s_camera.UpdateCurrentCameraPosition();
+			//s_camera.UpdateCurrentCameraOrientation();
+			//s_camera.UpdateCurrentCameraPosition();
 			glutPostWindowRedisplay(currentWindowID);
 		}
 	}

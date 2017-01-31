@@ -8,33 +8,21 @@
 
 namespace
 {
-	//cyTriMesh* s_meshData = nullptr;
-	float positions[] =
-	{
-		10.0f,10.0f,10.0f ,
-		-10.0,10.0,10.0f ,
-		-10.0,-10.0,10.0f,
-		10.0,-10.0,10.0f ,
-		10.0,10.0,-10.0f,
-		-10.0,10.0,-10.0f ,
-		-10.0,-10.0,-10.0f ,
-		10.0,-10.0,-10.0f
-	};
+	cyTriMesh* s_meshData = nullptr;
 }
 cs6610::Graphics::Mesh::Mesh(const std::string i_relativePath) :
 	m_vertexArrayId(0),
 	m_vertexBufferId(0)
 {
-	//s_meshData = new cyTriMesh();
-	//s_meshData->LoadFromFileObj(i_relativePath.c_str());
-	m_numberOfVertices = 8;
-	/*Initialize(*s_meshData);
+	s_meshData = new cyTriMesh();
+	s_meshData->LoadFromFileObj(i_relativePath.c_str());
+	m_numberOfVertices = s_meshData->NV();
+	Initialize(*s_meshData);
 	if(s_meshData)
 	{
 		delete s_meshData;
 		s_meshData = nullptr;
-	}*/
-	Initialize();
+	}
 }
 
 cs6610::Graphics::Mesh::~Mesh()
@@ -42,7 +30,7 @@ cs6610::Graphics::Mesh::~Mesh()
 	CS6610_ASSERTF(CleanUp(), "Mesh cleanup failed");
 }
 
-bool cs6610::Graphics::Mesh::Initialize(/*const cy::TriMesh& i_meshData*/)
+bool cs6610::Graphics::Mesh::Initialize(const cy::TriMesh& i_meshData)
 {
 	bool wereThereErrors = false;
 	// Create a vertex array object and make it active
@@ -65,6 +53,53 @@ bool cs6610::Graphics::Mesh::Initialize(/*const cy::TriMesh& i_meshData*/)
 		{
 			wereThereErrors = true;
 			CS6610_ASSERTF(false, "OpenGL failed to get an unused vertex array ID: %s", reinterpret_cast<const char*>(gluErrorString(errorCode)));
+			goto OnExit;
+		}
+	}
+
+	// Create a vertex buffer object and make it active
+	{
+		const GLsizei bufferCount = 1;
+		glGenBuffers(bufferCount, &m_vertexBufferId);
+		const GLenum errorCode = glGetError();
+		if (errorCode == GL_NO_ERROR)
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferId);
+			const GLenum errorCode = glGetError();
+			if (errorCode != GL_NO_ERROR)
+			{
+				wereThereErrors = true;
+				CS6610_ASSERTF(false, "OpenGL failed to bind the vertex buffer: %s", reinterpret_cast<const char*>(gluErrorString(errorCode)));
+				goto OnExit;
+			}
+		}
+		else
+		{
+			wereThereErrors = true;
+			CS6610_ASSERTF(false, "OpenGL failed to get an unused vertex buffer ID: %s", reinterpret_cast<const char*>(gluErrorString(errorCode)));
+			goto OnExit;
+		}
+	}
+
+	// Assign the data to the buffer
+	{
+		//Vextex Buffer init
+		const unsigned int vertexBufferSize = m_numberOfVertices * 3 * sizeof(float);
+		if (m_numberOfVertices > 0)
+		{
+			glBufferData(GL_ARRAY_BUFFER, vertexBufferSize, &i_meshData.V(0), GL_STATIC_DRAW);
+			const GLenum errorCode = glGetError();
+			if (errorCode != GL_NO_ERROR)
+			{
+				wereThereErrors = true;
+				CS6610_ASSERTF(false, "OpenGL failed to allocate the vertex buffer with data: %s", reinterpret_cast<const char*>(gluErrorString(errorCode)));
+				goto OnExit;
+			}
+		}
+		else
+		{
+			wereThereErrors = true;
+			CS6610_ASSERTF(false, "OpenGL failed to allocate the vertex buffer because there is no Vertex Data");
 			goto OnExit;
 		}
 	}
@@ -100,53 +135,6 @@ bool cs6610::Graphics::Mesh::Initialize(/*const cy::TriMesh& i_meshData*/)
 				CS6610_ASSERTF(false, "OpenGL failed to set the POSITION vertex attribute at location %u: %s", vertexElementLocation, reinterpret_cast<const char*>(gluErrorString(errorCode)));
 				goto OnExit;
 			}
-		}
-	}
-
-	// Create a vertex buffer object and make it active
-	{
-		const GLsizei bufferCount = 1;
-		glGenBuffers(bufferCount, &m_vertexBufferId);
-		const GLenum errorCode = glGetError();
-		if (errorCode == GL_NO_ERROR)
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferId);
-			const GLenum errorCode = glGetError();
-			if (errorCode != GL_NO_ERROR)
-			{
-				wereThereErrors = true;
-				CS6610_ASSERTF(false, "OpenGL failed to bind the vertex buffer: %s", reinterpret_cast<const char*>(gluErrorString(errorCode)));
-				goto OnExit;
-			}
-		}
-		else
-		{
-			wereThereErrors = true;
-			CS6610_ASSERTF(false, "OpenGL failed to get an unused vertex buffer ID: %s", reinterpret_cast<const char*>(gluErrorString(errorCode)));
-			goto OnExit;
-		}
-	}
-
-	// Assign the data to the buffer
-	{
-		//Vextex Buffer init
-		const unsigned int vertexBufferSize = m_numberOfVertices * 3 * sizeof(float);
-		if (m_numberOfVertices > 0)
-		{
-			glBufferData(GL_ARRAY_BUFFER, vertexBufferSize, &positions[0], GL_STATIC_DRAW);
-			const GLenum errorCode = glGetError();
-			if (errorCode != GL_NO_ERROR)
-			{
-				wereThereErrors = true;
-				CS6610_ASSERTF(false, "OpenGL failed to allocate the vertex buffer with data: %s", reinterpret_cast<const char*>(gluErrorString(errorCode)));
-				goto OnExit;
-			}
-		}
-		else
-		{
-			wereThereErrors = true;
-			CS6610_ASSERTF(false, "OpenGL failed to allocate the vertex buffer because there is no Vertex Data");
-			goto OnExit;
 		}
 	}
 

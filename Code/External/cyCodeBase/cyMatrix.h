@@ -1466,9 +1466,12 @@ public:
 		s.Normalize();
 		Point3<TYPE> u = s.Cross(f);
 		Matrix34<TYPE> m;
-		m.data[ 0]=s.x; m.data[ 1]=u.x; m.data[ 2]=-f.x; m.data[ 3]=TYPE(0);
+		m.data[0] = s.x; m.data[3] = s.y; m.data[6] = s.z; m.data[9] = TYPE(0);
+		m.data[1] = u.x; m.data[4] = u.y; m.data[7] = u.z; m.data[10] = TYPE(0);
+		m.data[2] = -f.x; m.data[5] = -f.y; m.data[8] = -f.z; m.data[11] = TYPE(0);
+		/*m.data[ 0]=s.x; m.data[ 1]=u.x; m.data[ 2]=-f.x; m.data[ 3]=TYPE(0);
 		m.data[ 4]=s.y; m.data[ 5]=u.y; m.data[ 6]=-f.y; m.data[ 7]=TYPE(0);
-		m.data[ 8]=s.z; m.data[ 9]=u.z; m.data[10]=-f.z; m.data[11]=TYPE(0);
+		m.data[ 8]=s.z; m.data[ 9]=u.z; m.data[10]=-f.z; m.data[11]=TYPE(0);*/
 		Matrix4 t;
 		t.SetTrans(-pos);
 		*this = m * t;
