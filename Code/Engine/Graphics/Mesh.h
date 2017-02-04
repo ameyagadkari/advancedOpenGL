@@ -4,11 +4,6 @@
 
 typedef unsigned int GLuint;
 
-namespace cy
-{
-	class TriMesh;
-}
-
 namespace cs6610
 {
 	namespace Graphics
@@ -21,7 +16,7 @@ namespace cs6610
 			~Mesh();
 		private:
 			uint32_t m_numberOfVertices;
-			bool Initialize(const cy::TriMesh& i_meshData);
+			bool Initialize();
 			bool CleanUp();
 			GLuint m_vertexArrayId;
 			GLuint m_vertexBufferId;

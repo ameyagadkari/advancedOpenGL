@@ -27,6 +27,7 @@
     <ClInclude Include="Effect.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="MeshData.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{44529237-8F91-4FFE-9335-67A712550333}</ProjectGuid>

@@ -3,12 +3,14 @@
 #define GLEW_STATIC
 #include "../../External/GLEW/glew.h"
 #include "../Asserts/Asserts.h"
+#include "MeshData.h"
 
 #include "../../External/cyCodeBase/cyTriMesh.h"
 
 namespace
 {
 	cyTriMesh* s_meshData = nullptr;
+	cs6610::Graphics::MeshData* s_meshData_inner = nullptr;
 }
 cs6610::Graphics::Mesh::Mesh(const std::string i_relativePath, cy::Point3f &o_minBounds, cy::Point3f &o_maxBounds) :
 	m_vertexArrayId(0),
@@ -16,8 +18,21 @@ cs6610::Graphics::Mesh::Mesh(const std::string i_relativePath, cy::Point3f &o_mi
 {
 	s_meshData = new cyTriMesh();
 	s_meshData->LoadFromFileObj(i_relativePath.c_str());
-	m_numberOfVertices = s_meshData->NV();
-	Initialize(*s_meshData);
+	m_numberOfVertices = s_meshData->NF() * 3;
+	s_meshData_inner = new MeshData(m_numberOfVertices);
+	size_t length = s_meshData->NF();
+	size_t index = 0;
+	for (size_t i = 0; i < length; i++)
+	{
+		int ii = static_cast<int>(i);
+		s_meshData_inner->vertexData[index].AddVertexData(s_meshData->V(s_meshData->F(ii).v[0]).x, s_meshData->V(s_meshData->F(ii).v[0]).y, s_meshData->V(s_meshData->F(ii).v[0]).z);
+		++index;
+		s_meshData_inner->vertexData[index].AddVertexData(s_meshData->V(s_meshData->F(ii).v[1]).x, s_meshData->V(s_meshData->F(ii).v[1]).y, s_meshData->V(s_meshData->F(ii).v[1]).z);
+		++index;
+		s_meshData_inner->vertexData[index].AddVertexData(s_meshData->V(s_meshData->F(ii).v[2]).x, s_meshData->V(s_meshData->F(ii).v[2]).y, s_meshData->V(s_meshData->F(ii).v[2]).z);
+		++index;
+	}
+	Initialize();
 	s_meshData->ComputeBoundingBox();
 	o_minBounds = s_meshData->GetBoundMin();
 	o_maxBounds = s_meshData->GetBoundMax();
@@ -25,6 +40,11 @@ cs6610::Graphics::Mesh::Mesh(const std::string i_relativePath, cy::Point3f &o_mi
 	{
 		delete s_meshData;
 		s_meshData = nullptr;
+	}
+	if (s_meshData_inner)
+	{
+		delete s_meshData_inner;
+		s_meshData_inner = nullptr;
 	}
 }
 
@@ -36,7 +56,7 @@ cs6610::Graphics::Mesh::~Mesh()
 	}
 }
 
-bool cs6610::Graphics::Mesh::Initialize(const cy::TriMesh& i_meshData)
+bool cs6610::Graphics::Mesh::Initialize()
 {
 	bool wereThereErrors = false;
 	// Create a vertex array object and make it active
@@ -90,10 +110,10 @@ bool cs6610::Graphics::Mesh::Initialize(const cy::TriMesh& i_meshData)
 	// Assign the data to the buffer
 	{
 		//Vextex Buffer init
-		const unsigned int vertexBufferSize = m_numberOfVertices * 3 * sizeof(float);
+		const unsigned int vertexBufferSize = m_numberOfVertices * sizeof(MeshData::Vertex);
 		if (m_numberOfVertices > 0)
 		{
-			glBufferData(GL_ARRAY_BUFFER, vertexBufferSize, &i_meshData.V(0), GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, vertexBufferSize, reinterpret_cast<GLvoid*>(s_meshData_inner->vertexData), GL_STATIC_DRAW);
 			const GLenum errorCode = glGetError();
 			if (errorCode != GL_NO_ERROR)
 			{
@@ -112,7 +132,7 @@ bool cs6610::Graphics::Mesh::Initialize(const cy::TriMesh& i_meshData)
 
 	// Initialize Vertex Array Object
 	{
-		const GLsizei stride = sizeof(cyPoint3f);
+		const GLsizei stride = sizeof(MeshData::Vertex);
 		// Position at 0
 		{
 			const GLuint vertexElementLocation = 0;
@@ -120,7 +140,7 @@ bool cs6610::Graphics::Mesh::Initialize(const cy::TriMesh& i_meshData)
 			const GLboolean isNormalized = GL_FALSE;
 
 			glVertexAttribPointer(vertexElementLocation, elementCount, GL_FLOAT, isNormalized, stride,
-				reinterpret_cast<GLvoid*>(offsetof(cyPoint3f, x)));
+				reinterpret_cast<GLvoid*>(offsetof(MeshData::Vertex, x)));
 
 			const GLenum errorCode = glGetError();
 			if (errorCode == GL_NO_ERROR)
@@ -210,7 +230,7 @@ void cs6610::Graphics::Mesh::RenderMesh()const
 
 	//Drawing data as points
 	{
-		const GLenum mode = GL_POINTS;
+		const GLenum mode = GL_TRIANGLES;
 		const GLint first = 0;
 		glDrawArrays(mode, first, m_numberOfVertices);
 		CS6610_ASSERT(glGetError() == GL_NO_ERROR);

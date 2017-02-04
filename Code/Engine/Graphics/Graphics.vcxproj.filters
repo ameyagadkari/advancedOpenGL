@@ -9,5 +9,6 @@
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Effect.h" />
+    <ClInclude Include="MeshData.h" />
   </ItemGroup>
 </Project>
