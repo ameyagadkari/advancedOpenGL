@@ -66,11 +66,10 @@ void cs6610::Graphics::RenderFrame(void)
 			model = cyMatrix4f::MatrixScale(0.05f)*cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects[i]->GetPosition());
 
 			cyMatrix4f trans = cyMatrix4f::MatrixTrans(MyGame::ms_pcamera->GetPosition());
-			cyMatrix4f xrot = cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(UserInput::UserInput::xRot));
-			cyMatrix4f yrot = cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(UserInput::UserInput::yRot));
+			cyMatrix4f xrot = cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(MyGame::ms_pcamera->GetEularAngles().x));
+			cyMatrix4f yrot = cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(MyGame::ms_pcamera->GetEularAngles().y));
 			view = trans*yrot*xrot;
-
-			projection = cyMatrix4f::MatrixPerspective(MyGame::ms_pcamera->GetFieldOfView(), Camera::Camera::ms_aspectRatio, MyGame::ms_pcamera->GetNearPlaneDistance(), MyGame::ms_pcamera->GetFarPlaneDistance());
+			projection = MyGame::ms_pcamera->GetPerspectiveProjectionMatrix();
 		}
 		else
 		{
@@ -78,8 +77,8 @@ void cs6610::Graphics::RenderFrame(void)
 			model = cyMatrix4f::MatrixScale(scalingFactor)*cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects[i]->GetPosition());
 
 			cyMatrix4f trans = cyMatrix4f::MatrixTrans(MyGame::ms_ocamera->GetPosition());
-			cyMatrix4f xrot = cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(UserInput::UserInput::xRot));
-			cyMatrix4f yrot = cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(UserInput::UserInput::yRot));
+			cyMatrix4f xrot = cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(MyGame::ms_ocamera->GetEularAngles().x));
+			cyMatrix4f yrot = cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(MyGame::ms_ocamera->GetEularAngles().y));
 			view = trans*yrot*xrot;
 
 			projection = MyGame::ms_ocamera->GetOrthographicProjectionMatrix();
@@ -135,8 +134,7 @@ namespace
 	void CallingRedisplay(void)
 	{
 		if (cs6610::Time::GetElapsedTimeDuringPreviousFrame() > FPS)
-		{
-			//s_camera.UpdateCurrentCameraOrientation();
+		{			
 			//cs6610::MyGame::ms_pcamera->UpdateCurrentCameraPosition();
 			glutPostWindowRedisplay(currentWindowID);
 		}

@@ -36,6 +36,10 @@ cyPoint3f cs6610::Camera::Camera::GetPosition()const
 {
 	return m_position;
 }
+cyPoint3f cs6610::Camera::Camera::GetEularAngles() const
+{
+	return m_eularAngles;
+}
 float cs6610::Camera::Camera::GetFieldOfView()const
 {
 	return m_fieldOfView;
@@ -52,6 +56,10 @@ cyMatrix4f cs6610::Camera::Camera::GetOrthographicProjectionMatrix()const
 {
 	return m_orthographicProjection;
 }
+cyMatrix4f cs6610::Camera::Camera::GetPerspectiveProjectionMatrix()const
+{
+	return cyMatrix4f::MatrixPerspective(m_fieldOfView, ms_aspectRatio, m_nearPlaneDistance, m_farPlaneDistance);
+}
 #pragma endregion
 
 #pragma region Sets
@@ -61,37 +69,23 @@ void cs6610::Camera::Camera::SetPosition(cyPoint3f i_position)
 }
 #pragma endregion
 
-void cs6610::Camera::Camera::UpdateCurrentCameraPosition()
+void cs6610::Camera::Camera::UpdateCurrentCameraPosition(float zOffset)
 {
 	cyPoint3f localOffset = cyPoint3f(0.0f);
 
-	if (UserInput::UserInput::keys['w'])
-		localOffset.z -= 1.0f;
-	if (UserInput::UserInput::keys['s'])
-		localOffset.z += 1.0f;
-	if (UserInput::UserInput::keys['d'])
-		localOffset.x += 1.0f;
-	if (UserInput::UserInput::keys['a'])
-		localOffset.x -= 1.0f;
+	localOffset.z += zOffset;
 
-	const float speed_unitsPerSecond = 5.0f;
+	const float speed_unitsPerSecond = 1.0f;
 	const float offsetModifier = speed_unitsPerSecond * static_cast<float>(Time::GetElapsedTimeDuringPreviousFrame());
 	localOffset *= offsetModifier;
-
 	m_position += localOffset;
 }
-void cs6610::Camera::Camera::UpdateCurrentCameraOrientation(bool constrainPitch)
+void cs6610::Camera::Camera::UpdateCurrentCameraOrientation(float xOffset, float yOffset, bool constrainPitch)
 {
 	cyPoint3f localOffset = cyPoint3f(0.0f);
 
-	if (UserInput::UserInput::keys['H'])
-		localOffset.y += 1.0f;
-	if (UserInput::UserInput::keys['F'])
-		localOffset.y -= 1.0f;
-	if (UserInput::UserInput::keys['G'])
-		localOffset.x += 1.0f;
-	if (UserInput::UserInput::keys['T'])
-		localOffset.x -= 1.0f;
+	localOffset.y += xOffset;
+	localOffset.x += yOffset;
 
 	const float speed_unitsPerSecond = 10.0f;
 	const float offsetModifier = speed_unitsPerSecond * static_cast<float>(Time::GetElapsedTimeDuringPreviousFrame());
@@ -110,6 +104,11 @@ void cs6610::Camera::Camera::UpdateCurrentCameraOrientation(bool constrainPitch)
 		}
 	}*/
 	UpdateLocalCameraAxes();
+}
+
+cyMatrix4f cs6610::Camera::Camera::GetViewMatrix() const
+{
+	return cyMatrix4f::MatrixView(m_position, m_position + m_localCameraAxis.m_front, const_cast<cyPoint3f&> (m_localCameraAxis.m_up));
 }
 
 void cs6610::Camera::Camera::UpdateLocalCameraAxes()

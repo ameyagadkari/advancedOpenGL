@@ -12,18 +12,21 @@ namespace
 	void keyPressSpecial(int key, int x, int y);
 	void keyReleaseSpecial(int key, int x, int y);
 	void mouse(int button, int state, int x, int y);
+	void mouseMotion(int x, int y);
 	void close(void);
 	int xPosOnPress = 0, yPosOnPress = 0;
-	float xOffest = 0, yOffset = 0;
+	float xOffset = 0, yOffset = 0;
 	const float mouseSensitivity = 0.25f;
 	const float mouseSensitivityCam = 0.025f;
 	int yPosOnPressCam = 0;
 	float yOffsetCam = 0;
+	bool lmbFirstPress = true;
+	bool lmbStillPressed = false;
+	bool rmbFirstPress = true;
+	bool rmbStillPressed = false;
 }
 
 std::bitset<256> cs6610::UserInput::UserInput::keys;
-float cs6610::UserInput::UserInput::xRot = -90.0f;
-float cs6610::UserInput::UserInput::yRot = 0.0f;
 bool cs6610::UserInput::UserInput::isCameraPerspective = true;
 
 bool cs6610::UserInput::UserInput::Initialize(void)
@@ -34,6 +37,7 @@ bool cs6610::UserInput::UserInput::Initialize(void)
 	glutSpecialFunc(keyPressSpecial);
 	glutSpecialUpFunc(keyReleaseSpecial);
 	glutMouseFunc(mouse);
+	glutMotionFunc(mouseMotion);
 	glutCloseFunc(close);
 	return true;
 }
@@ -66,19 +70,18 @@ namespace
 		{
 			if (state == GLUT_DOWN)
 			{
-				xPosOnPress = x;
-				yPosOnPress = y;
+				if (lmbFirstPress)
+				{
+					xPosOnPress = x;
+					yPosOnPress = y;
+					lmbFirstPress = false;
+					lmbStillPressed = true;
+				}
 			}
 			else if (state == GLUT_UP)
 			{
-				xOffest = static_cast<float>(x - xPosOnPress);
-				yOffset = static_cast<float>(y - yPosOnPress);
-
-				xOffest *= mouseSensitivity;
-				yOffset *= mouseSensitivity;
-
-				cs6610::UserInput::UserInput::yRot += xOffest;
-				cs6610::UserInput::UserInput::xRot += yOffset;
+				lmbFirstPress = true;
+				lmbStillPressed = false;
 			}
 		}
 
@@ -86,19 +89,35 @@ namespace
 		{
 			if (state == GLUT_DOWN)
 			{
-				yPosOnPressCam = y;
+				if (lmbFirstPress)
+				{
+					yPosOnPressCam = y;
+					rmbFirstPress = false;
+					rmbStillPressed = true;
+				}
 			}
 			else if (state == GLUT_UP)
 			{
-				yOffsetCam = static_cast<float>(y - yPosOnPressCam);
-
-				yOffsetCam *= mouseSensitivityCam;
-
-				cyPoint3f currentCameraPosition = cs6610::MyGame::ms_pcamera->GetPosition();
-				currentCameraPosition.z += yOffsetCam;
-
-				cs6610::MyGame::ms_pcamera->SetPosition(currentCameraPosition);
+				rmbFirstPress = true;
+				rmbStillPressed = false;
 			}
+		}
+	}
+	void mouseMotion(int x, int y)
+	{
+		if (lmbStillPressed)
+		{
+			xOffset = static_cast<float>(x - xPosOnPress);
+			yOffset = static_cast<float>(y - yPosOnPress);
+			xPosOnPress = x;
+			yPosOnPress = y;
+			cs6610::UserInput::UserInput::isCameraPerspective ? cs6610::MyGame::ms_pcamera->UpdateCurrentCameraOrientation(xOffset, yOffset) : cs6610::MyGame::ms_ocamera->UpdateCurrentCameraOrientation(xOffset, yOffset);
+		}
+		if (rmbStillPressed)
+		{
+			yOffsetCam = static_cast<float>(y - yPosOnPressCam);
+			yPosOnPressCam = y;
+			cs6610::UserInput::UserInput::isCameraPerspective ? cs6610::MyGame::ms_pcamera->UpdateCurrentCameraPosition(yOffsetCam) : cs6610::MyGame::ms_ocamera->UpdateCurrentCameraPosition(yOffsetCam);
 		}
 	}
 	void close(void)

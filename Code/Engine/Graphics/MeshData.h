@@ -12,11 +12,15 @@ namespace cs6610
 			struct Vertex
 			{
 				float x, y, z;
-				void AddVertexData(const float i_x, const float i_y, const float i_z)
+				float nx, ny, nz;
+				void AddVertexData(const float i_x, const float i_y, const float i_z, const float i_nx, const float i_ny, const float i_nz)
 				{
 					x = i_x;
 					y = i_y;
 					z = i_z;
+					nx = i_nx;
+					ny = i_ny;
+					nz = i_nz;
 				}
 			};
 			Vertex *vertexData;

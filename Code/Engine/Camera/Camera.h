@@ -11,29 +11,32 @@ namespace cs6610
 		class Camera
 		{
 		public:
-			explicit Camera(cyPoint3f i_position = cyPoint3f(0.0f, 0.0f, -5.0f), cyPoint3f i_eularAngles = cyPoint3f(0.0f, 0.0f, 0.0f), float i_fieldOfView = Math::ConvertDegreesToRadians(45.0f), float i_nearPlaneDistance = 0.1f, float i_farPlaneDistance = 100.0f, float i_topPlaneDistance = 20.0f, float i_bottomPlaneDistance = -20.0f, float i_leftPlaneDistance = -40.0f, float i_rightPlaneDistance = 40.0f);
+			explicit Camera(cyPoint3f i_position = cyPoint3f(0.0f, 0.0f, -5.0f), cyPoint3f i_eularAngles = cyPoint3f(-90.0f, 0.0f, 0.0f), float i_fieldOfView = Math::ConvertDegreesToRadians(45.0f), float i_nearPlaneDistance = 0.1f, float i_farPlaneDistance = 100.0f, float i_topPlaneDistance = 20.0f, float i_bottomPlaneDistance = -20.0f, float i_leftPlaneDistance = -40.0f, float i_rightPlaneDistance = 40.0f);
 			~Camera();
 
-			void UpdateCurrentCameraPosition();
-			void UpdateCurrentCameraOrientation(bool constrainPitch = true);
+			void UpdateCurrentCameraPosition(float zOffset);
+			void UpdateCurrentCameraOrientation(float xOffset, float yOffset, bool constrainPitch = true);
 
-			
+
 
 			static float ms_aspectRatio;
 
 #pragma region Sets
 			void SetPosition(cyPoint3f i_position);
 #pragma endregion
-			
+
 #pragma region Gets
 			cyMatrix4f GetOrthographicProjectionMatrix()const;
+			cyMatrix4f GetPerspectiveProjectionMatrix()const;
 			cyPoint3f GetPosition()const;
+			cyPoint3f GetEularAngles()const;
 			float GetFieldOfView()const;
 			float GetNearPlaneDistance()const;
 			float GetFarPlaneDistance()const;
+			cyMatrix4f GetViewMatrix()const;
 #pragma endregion
-			
-			private:
+
+		private:
 			cyPoint3f m_position;
 			cyPoint3f m_eularAngles;
 

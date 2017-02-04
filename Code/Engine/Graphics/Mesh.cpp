@@ -20,16 +20,35 @@ cs6610::Graphics::Mesh::Mesh(const std::string i_relativePath, cy::Point3f &o_mi
 	s_meshData->LoadFromFileObj(i_relativePath.c_str());
 	m_numberOfVertices = s_meshData->NF() * 3;
 	s_meshData_inner = new MeshData(m_numberOfVertices);
+	s_meshData->ComputeNormals();
 	size_t length = s_meshData->NF();
 	size_t index = 0;
 	for (size_t i = 0; i < length; i++)
 	{
 		int ii = static_cast<int>(i);
-		s_meshData_inner->vertexData[index].AddVertexData(s_meshData->V(s_meshData->F(ii).v[0]).x, s_meshData->V(s_meshData->F(ii).v[0]).y, s_meshData->V(s_meshData->F(ii).v[0]).z);
+		s_meshData_inner->vertexData[index].AddVertexData(
+			s_meshData->V(s_meshData->F(ii).v[0]).x,
+			s_meshData->V(s_meshData->F(ii).v[0]).y, 
+			s_meshData->V(s_meshData->F(ii).v[0]).z,
+			s_meshData->VN(s_meshData->FN(ii).v[0]).x,
+			s_meshData->VN(s_meshData->FN(ii).v[0]).y,
+			s_meshData->VN(s_meshData->FN(ii).v[0]).z);
 		++index;
-		s_meshData_inner->vertexData[index].AddVertexData(s_meshData->V(s_meshData->F(ii).v[1]).x, s_meshData->V(s_meshData->F(ii).v[1]).y, s_meshData->V(s_meshData->F(ii).v[1]).z);
+		s_meshData_inner->vertexData[index].AddVertexData(
+			s_meshData->V(s_meshData->F(ii).v[1]).x, 
+			s_meshData->V(s_meshData->F(ii).v[1]).y, 
+			s_meshData->V(s_meshData->F(ii).v[1]).z,
+			s_meshData->VN(s_meshData->FN(ii).v[1]).x,
+			s_meshData->VN(s_meshData->FN(ii).v[1]).y,
+			s_meshData->VN(s_meshData->FN(ii).v[1]).z);
 		++index;
-		s_meshData_inner->vertexData[index].AddVertexData(s_meshData->V(s_meshData->F(ii).v[2]).x, s_meshData->V(s_meshData->F(ii).v[2]).y, s_meshData->V(s_meshData->F(ii).v[2]).z);
+		s_meshData_inner->vertexData[index].AddVertexData(
+			s_meshData->V(s_meshData->F(ii).v[2]).x, 
+			s_meshData->V(s_meshData->F(ii).v[2]).y, 
+			s_meshData->V(s_meshData->F(ii).v[2]).z,
+			s_meshData->VN(s_meshData->FN(ii).v[2]).x,
+			s_meshData->VN(s_meshData->FN(ii).v[2]).y,
+			s_meshData->VN(s_meshData->FN(ii).v[2]).z);
 		++index;
 	}
 	Initialize();
@@ -151,6 +170,35 @@ bool cs6610::Graphics::Mesh::Initialize()
 				{
 					wereThereErrors = true;
 					CS6610_ASSERTF(false, "OpenGL failed to enable the POSITION vertex attribute at location %u: %s",
+						vertexElementLocation, reinterpret_cast<const char*>(gluErrorString(errorCode)));
+					goto OnExit;
+				}
+			}
+			else
+			{
+				wereThereErrors = true;
+				CS6610_ASSERTF(false, "OpenGL failed to set the POSITION vertex attribute at location %u: %s", vertexElementLocation, reinterpret_cast<const char*>(gluErrorString(errorCode)));
+				goto OnExit;
+			}
+		}
+		// Normal at 1
+		{
+			const GLuint vertexElementLocation = 1;
+			const GLint elementCount = 3;
+			const GLboolean isNormalized = GL_FALSE;
+
+			glVertexAttribPointer(vertexElementLocation, elementCount, GL_FLOAT, isNormalized, stride,
+				reinterpret_cast<GLvoid*>(offsetof(MeshData::Vertex, nx)));
+
+			const GLenum errorCode = glGetError();
+			if (errorCode == GL_NO_ERROR)
+			{
+				glEnableVertexAttribArray(vertexElementLocation);
+				const GLenum errorCode = glGetError();
+				if (errorCode != GL_NO_ERROR)
+				{
+					wereThereErrors = true;
+					CS6610_ASSERTF(false, "OpenGL failed to enable the NORMAL vertex attribute at location %u: %s",
 						vertexElementLocation, reinterpret_cast<const char*>(gluErrorString(errorCode)));
 					goto OnExit;
 				}

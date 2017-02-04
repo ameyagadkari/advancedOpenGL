@@ -11,8 +11,6 @@ namespace cs6610
 		public:
 			static bool Initialize(void);
 			static std::bitset<256>keys;
-			static float xRot;
-			static float yRot;
 			static bool isCameraPerspective;
 		};
 	}
