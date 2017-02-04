@@ -37,10 +37,6 @@ namespace
 #endif
 		;
 	int currentWindowID = 0;
-	struct
-	{
-		GLclampf r = 0.0f, g = 0.0f, b = 0.0f, a = 1.0f;
-	}clearColor;
 	void CallingRedisplay(void);
 	void ReShapeCallback(int width, int height);
 }
@@ -48,11 +44,15 @@ namespace
 void cs6610::Graphics::RenderFrame(void)
 {
 	Time::OnNewFrame();
-	glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to set clear color");
-	const GLbitfield clearColorBuffer = GL_COLOR_BUFFER_BIT;
-	glClear(clearColorBuffer);
-	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to clear color buffer");
+	glDepthMask(GL_TRUE);
+	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to set depth mask");
+	glClearDepth(1.0f);
+	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to set clear depth");
+	const GLbitfield clearColorAndDepth = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
+	glClear(clearColorAndDepth);
+	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to clear color buffer and depth buffer");
 
 	size_t length = MyGame::ms_gameobjects.size();
 	for (size_t i = 0; i < length; i++)
@@ -85,7 +85,7 @@ void cs6610::Graphics::RenderFrame(void)
 			projection = MyGame::ms_ocamera->GetOrthographicProjectionMatrix();
 		}
 		cyGLSLProgram* program = MyGame::ms_gameobjects[i]->GetEffect()->GetProgram();
-		program->SetUniform(0, model);		
+		program->SetUniform(0, model);
 		program->SetUniform(1, view);
 		program->SetUniform(2, projection);
 		MyGame::ms_gameobjects[i]->GetMesh()->RenderMesh();
@@ -97,8 +97,8 @@ bool cs6610::Graphics::Initialize(int i_argumentCount, char** i_arguments)
 {
 	bool wereThereErrors = false;
 	glutInit(&i_argumentCount, i_arguments);
-	const GLbitfield enableRGBAChannelsAndDoubleBuffer = GLUT_RGBA | GLUT_DOUBLE;
-	glutInitDisplayMode(enableRGBAChannelsAndDoubleBuffer);
+	const GLbitfield enableRGBAChannelsAndDepthAndDoubleBuffer = GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE;
+	glutInitDisplayMode(enableRGBAChannelsAndDepthAndDoubleBuffer);
 	glutInitWindowPosition(windowPositionX, windowPositionY);
 	glutInitWindowSize(windowWidth, windowHeight);
 	currentWindowID = glutCreateWindow(windowTitle.c_str());
@@ -112,6 +112,14 @@ bool cs6610::Graphics::Initialize(int i_argumentCount, char** i_arguments)
 	{
 		CS6610_ASSERTF(false, "Failed to initialize GLEW");
 		wereThereErrors = true;
+	}
+	{
+		glEnable(GL_DEPTH_TEST);
+		CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to enable depth buffer");
+		glDepthFunc(GL_LESS);
+		CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to set depth func");
+		glDepthMask(GL_TRUE);
+		CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to set depth mask");
 	}
 	glutReshapeFunc(ReShapeCallback);
 	glutDisplayFunc(RenderFrame);
