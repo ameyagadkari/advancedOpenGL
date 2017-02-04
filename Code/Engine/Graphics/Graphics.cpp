@@ -61,6 +61,7 @@ void cs6610::Graphics::RenderFrame(void)
 		cyMatrix4f model;
 		cyMatrix4f view;
 		cyMatrix4f projection;
+		cyMatrix3f normal;
 		if (UserInput::UserInput::isCameraPerspective)
 		{
 			model = cyMatrix4f::MatrixScale(0.05f)*cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects[i]->GetPosition());
@@ -69,6 +70,9 @@ void cs6610::Graphics::RenderFrame(void)
 			cyMatrix4f xrot = cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(MyGame::ms_pcamera->GetEularAngles().x));
 			cyMatrix4f yrot = cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(MyGame::ms_pcamera->GetEularAngles().y));
 			view = trans*yrot*xrot;
+
+			normal = cyMatrix3f(((view*model).GetInverse()).GetTranspose());
+
 			projection = MyGame::ms_pcamera->GetPerspectiveProjectionMatrix();
 		}
 		else
@@ -81,12 +85,15 @@ void cs6610::Graphics::RenderFrame(void)
 			cyMatrix4f yrot = cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(MyGame::ms_ocamera->GetEularAngles().y));
 			view = trans*yrot*xrot;
 
+			normal = cyMatrix3f(((view*model).GetInverse()).GetTranspose());
+
 			projection = MyGame::ms_ocamera->GetOrthographicProjectionMatrix();
 		}
 		cyGLSLProgram* program = MyGame::ms_gameobjects[i]->GetEffect()->GetProgram();
 		program->SetUniform(0, model);
 		program->SetUniform(1, view);
 		program->SetUniform(2, projection);
+		program->SetUniform(3, normal);
 		MyGame::ms_gameobjects[i]->GetMesh()->RenderMesh();
 	}
 

@@ -8,6 +8,7 @@ layout( location = 0 ) out vec3 o_vertexNormal;
 uniform mat4 u_model;
 uniform mat4 u_view;
 uniform mat4 u_projection;
+uniform mat3 u_normal;
 
 void main()
 {
@@ -18,6 +19,6 @@ void main()
 		gl_Position = u_projection * vertexPosition_camera;
 	}
 	{
-		o_vertexNormal = i_vertexNormal;
+		o_vertexNormal = normalize(u_normal*i_vertexNormal);
 	}
 }
