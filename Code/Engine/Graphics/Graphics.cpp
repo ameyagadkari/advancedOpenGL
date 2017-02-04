@@ -94,6 +94,7 @@ void cs6610::Graphics::RenderFrame(void)
 		program->SetUniform(1, view);
 		program->SetUniform(2, projection);
 		program->SetUniform(3, normal);
+		program->SetUniform(4, cyPoint3f(0.0f,-10.0f,0.0f));
 		MyGame::ms_gameobjects[i]->GetMesh()->RenderMesh();
 	}
 

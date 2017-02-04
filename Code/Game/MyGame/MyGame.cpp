@@ -34,9 +34,9 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 
 	// Init all gameobjects
 	{
-		ms_gameobjects.push_back(new Gameplay::GameObject());
+		ms_gameobjects.push_back(new Gameplay::GameObject(cyPoint3f(0.0f, 0.0f, 0.0f)));
 		ms_gameobjects.back()->SetMesh("data/meshes/teapot.mesh");
-		ms_gameobjects.back()->SetEffect("data/shaders/stdvertex.glsl", "data/shaders/stdfragment.glsl","u_model u_view u_projection u_normal");
+		ms_gameobjects.back()->SetEffect("data/shaders/stdvertex.glsl", "data/shaders/stdfragment.glsl","u_model u_view u_projection u_normal u_lightPosition");
 	}
 
 	// Init Camera
