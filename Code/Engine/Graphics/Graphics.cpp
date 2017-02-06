@@ -54,48 +54,68 @@ void cs6610::Graphics::RenderFrame(void)
 	glClear(clearColorAndDepth);
 	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to clear color buffer and depth buffer");
 
-	size_t length = MyGame::ms_gameobjects.size();
-	for (size_t i = 0; i < length; i++)
+	// Calculation light pos
+	/*cyMatrix4f model =
+		cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects.at("Teapot")->GetPosition())*
+		/*cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects.at("Light")->GetPosition())*
+		cyMatrix4f::MatrixRotationZ(Math::ConvertDegreesToRadians(MyGame::ms_gameobjects.at("Light")->GetOrientationEular().z))*
+		cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(MyGame::ms_gameobjects.at("Light")->GetOrientationEular().x))*
+		cyMatrix4f::MatrixTrans(-MyGame::ms_gameobjects.at("Teapot")->GetPosition());
+
+	cyPoint3f lightPositionWorld = cyPoint3f(model*cyPoint4f(MyGame::ms_gameobjects.at("Light")->GetPosition(), 1.0f));*/
+	cyMatrix4f model;
+	cyMatrix4f view;
+	cyMatrix4f projection;
+	cyMatrix3f normal;
+	cyPoint3f lightPositionWorld;
+	// Draw the light
 	{
-		MyGame::ms_gameobjects[i]->GetEffect()->Bind();
-		cyMatrix4f model;
-		cyMatrix4f view;
-		cyMatrix4f projection;
-		cyMatrix3f normal;
-		if (UserInput::UserInput::isCameraPerspective)
-		{
-			model = cyMatrix4f::MatrixScale(0.05f)*cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects[i]->GetPosition());
+		Gameplay::GameObject* light = MyGame::ms_gameobjects.at("Light");
+		Effect* lightEffect = light->GetEffect();
+		lightEffect->Bind();
+		model =
+			cyMatrix4f::MatrixScale(0.1f)*
+			cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects.at("Light")->GetPosition())*
+			cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects.at("Teapot")->GetPosition())*	
+			cyMatrix4f::MatrixRotationZ(Math::ConvertDegreesToRadians(MyGame::ms_gameobjects.at("Light")->GetOrientationEular().z))*
+			cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(MyGame::ms_gameobjects.at("Light")->GetOrientationEular().x))*
+			cyMatrix4f::MatrixTrans(-MyGame::ms_gameobjects.at("Teapot")->GetPosition());
 
-			cyMatrix4f trans = cyMatrix4f::MatrixTrans(MyGame::ms_pcamera->GetPosition());
-			cyMatrix4f xrot = cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(MyGame::ms_pcamera->GetEularAngles().x));
-			cyMatrix4f yrot = cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(MyGame::ms_pcamera->GetEularAngles().y));
-			view = trans*yrot*xrot;
+		lightPositionWorld = cyPoint3f(model*cyPoint4f(MyGame::ms_gameobjects.at("Light")->GetPosition(),1.0f));
 
-			normal = cyMatrix3f(((view*model).GetInverse()).GetTranspose());
+		view = MyGame::ms_pcamera->GetViewMatrix();
+		projection = MyGame::ms_pcamera->GetPerspectiveProjectionMatrix();
 
-			projection = MyGame::ms_pcamera->GetPerspectiveProjectionMatrix();
-		}
-		else
-		{
-			const float scalingFactor = 1.0f / (MyGame::ms_gameobjects[i]->GetPosition() - MyGame::ms_ocamera->GetPosition()).Length();
-			model = cyMatrix4f::MatrixScale(scalingFactor)*cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects[i]->GetPosition());
+		cyGLSLProgram* program = lightEffect->GetProgram();
+		program->SetUniform(0, model);
+		program->SetUniform(1, view);
+		program->SetUniform(2, projection);
 
-			cyMatrix4f trans = cyMatrix4f::MatrixTrans(MyGame::ms_ocamera->GetPosition());
-			cyMatrix4f xrot = cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(MyGame::ms_ocamera->GetEularAngles().x));
-			cyMatrix4f yrot = cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(MyGame::ms_ocamera->GetEularAngles().y));
-			view = trans*yrot*xrot;
+		light->GetMesh()->RenderMesh();
+	}
 
-			normal = cyMatrix3f(((view*model).GetInverse()).GetTranspose());
+	// Draw Teapot
+	{
+		Gameplay::GameObject* teapot = MyGame::ms_gameobjects.at("Teapot");
+		Effect* teapotEffect = teapot->GetEffect();
+		teapotEffect->Bind();
 
-			projection = MyGame::ms_ocamera->GetOrthographicProjectionMatrix();
-		}
-		cyGLSLProgram* program = MyGame::ms_gameobjects[i]->GetEffect()->GetProgram();
+		model =
+			cyMatrix4f::MatrixScale(0.05f)*
+			cyMatrix4f::MatrixTrans(teapot->GetPosition())*
+			cyMatrix4f::MatrixRotationZ(Math::ConvertDegreesToRadians(teapot->GetOrientationEular().z))*
+			cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(teapot->GetOrientationEular().x));
+		/*view = MyGame::ms_pcamera->GetViewMatrix();
+		projection = MyGame::ms_pcamera->GetPerspectiveProjectionMatrix();*/
+		normal = cyMatrix3f(((view*model).GetInverse()).GetTranspose());
+		cyGLSLProgram* program = teapotEffect->GetProgram();
 		program->SetUniform(0, model);
 		program->SetUniform(1, view);
 		program->SetUniform(2, projection);
 		program->SetUniform(3, normal);
-		program->SetUniform(4, cyPoint3f(0.0f,-10.0f,0.0f));
-		MyGame::ms_gameobjects[i]->GetMesh()->RenderMesh();
+		program->SetUniform(4, lightPositionWorld);
+
+		teapot->GetMesh()->RenderMesh();
 	}
 
 	glutSwapBuffers();
@@ -142,8 +162,7 @@ namespace
 	void CallingRedisplay(void)
 	{
 		if (cs6610::Time::GetElapsedTimeDuringPreviousFrame() > FPS)
-		{			
-			//cs6610::MyGame::ms_pcamera->UpdateCurrentCameraPosition();
+		{
 			glutPostWindowRedisplay(currentWindowID);
 		}
 	}

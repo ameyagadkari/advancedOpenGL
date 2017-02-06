@@ -4,6 +4,7 @@
 #include "../Graphics/Effect.h"
 #include "../../External/cyCodeBase/cyPoint.h"
 #include "../Camera/Camera.h"
+#include "../../Game/Gameplay/Gameobject.h"
 
 namespace
 {
@@ -14,16 +15,18 @@ namespace
 	void mouse(int button, int state, int x, int y);
 	void mouseMotion(int x, int y);
 	void close(void);
-	int xPosOnPress = 0, yPosOnPress = 0;
-	float xOffset = 0, yOffset = 0;
-	const float mouseSensitivity = 0.25f;
-	const float mouseSensitivityCam = 0.025f;
-	int yPosOnPressCam = 0;
-	float yOffsetCam = 0;
+
+	int xPosOnPressLMB = 0, yPosOnPressLMB = 0;
 	bool lmbFirstPress = true;
 	bool lmbStillPressed = false;
+
+	int yPosOnPressRMB = 0;
 	bool rmbFirstPress = true;
 	bool rmbStillPressed = false;
+
+	int xPosOnPressCtrlLMB = 0, yPosOnPressCtrlLMB = 0;
+	bool ctrlLMBFirstPress = true;
+	bool ctrlLMBStillPressed = false;
 }
 
 std::bitset<256> cs6610::UserInput::UserInput::keys;
@@ -70,18 +73,34 @@ namespace
 		{
 			if (state == GLUT_DOWN)
 			{
-				if (lmbFirstPress)
+				if (glutGetModifiers() == GLUT_ACTIVE_CTRL)
 				{
-					xPosOnPress = x;
-					yPosOnPress = y;
-					lmbFirstPress = false;
-					lmbStillPressed = true;
+					if (ctrlLMBFirstPress)
+					{
+						xPosOnPressCtrlLMB = x;
+						yPosOnPressCtrlLMB = y;
+						ctrlLMBFirstPress = false;
+						ctrlLMBStillPressed = true;
+					}
+				}
+				else
+				{
+					if (lmbFirstPress)
+					{
+						xPosOnPressLMB = x;
+						yPosOnPressLMB = y;
+						lmbFirstPress = false;
+						lmbStillPressed = true;
+					}
 				}
 			}
 			else if (state == GLUT_UP)
 			{
 				lmbFirstPress = true;
 				lmbStillPressed = false;
+
+				ctrlLMBFirstPress = true;
+				ctrlLMBStillPressed = false;
 			}
 		}
 
@@ -91,7 +110,7 @@ namespace
 			{
 				if (lmbFirstPress)
 				{
-					yPosOnPressCam = y;
+					yPosOnPressRMB = y;
 					rmbFirstPress = false;
 					rmbStillPressed = true;
 				}
@@ -107,17 +126,25 @@ namespace
 	{
 		if (lmbStillPressed)
 		{
-			xOffset = static_cast<float>(x - xPosOnPress);
-			yOffset = static_cast<float>(y - yPosOnPress);
-			xPosOnPress = x;
-			yPosOnPress = y;
-			cs6610::UserInput::UserInput::isCameraPerspective ? cs6610::MyGame::ms_pcamera->UpdateCurrentCameraOrientation(xOffset, yOffset) : cs6610::MyGame::ms_ocamera->UpdateCurrentCameraOrientation(xOffset, yOffset);
+			float xOffsetLMB = static_cast<float>(x - xPosOnPressLMB);
+			float yOffsetLMB = static_cast<float>(yPosOnPressLMB - y);
+			xPosOnPressLMB = x;
+			yPosOnPressLMB = y;
+			cs6610::MyGame::ms_gameobjects.at("Teapot")->UpdateOrientation(xOffsetLMB, yOffsetLMB);
 		}
 		if (rmbStillPressed)
 		{
-			yOffsetCam = static_cast<float>(y - yPosOnPressCam);
-			yPosOnPressCam = y;
-			cs6610::UserInput::UserInput::isCameraPerspective ? cs6610::MyGame::ms_pcamera->UpdateCurrentCameraPosition(yOffsetCam) : cs6610::MyGame::ms_ocamera->UpdateCurrentCameraPosition(yOffsetCam);
+			float yOffsetRMB = static_cast<float>(yPosOnPressRMB - y);
+			yPosOnPressRMB = y;
+			cs6610::MyGame::ms_gameobjects.at("Teapot")->UpdatePosition(yOffsetRMB);
+		}
+		if (ctrlLMBStillPressed)
+		{
+			float xOffsetCtrlLMB = static_cast<float>(x - xPosOnPressCtrlLMB);
+			float yOffsetCtrlLMB = static_cast<float>(yPosOnPressCtrlLMB - y);
+			xPosOnPressCtrlLMB = x;
+			yPosOnPressCtrlLMB = y;
+			cs6610::MyGame::ms_gameobjects.at("Light")->UpdateOrientation(xOffsetCtrlLMB, yOffsetCtrlLMB);
 		}
 	}
 	void close(void)

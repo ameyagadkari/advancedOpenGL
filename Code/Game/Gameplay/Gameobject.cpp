@@ -3,6 +3,7 @@
 #include "../../Engine/Graphics/Mesh.h"
 #include "../../Engine/Asserts/Asserts.h"
 #include "../../Engine/Graphics/Effect.h"
+#include "../../Engine/Time/Time.h"
 
 cs6610::Gameplay::GameObject::GameObject(const cyPoint3f i_position, const cyPoint3f i_eularAngles) :
 	m_mesh(nullptr),
@@ -22,6 +23,31 @@ cs6610::Gameplay::GameObject::~GameObject()
 		delete m_effect;
 		m_effect = nullptr;
 	}
+}
+
+void cs6610::Gameplay::GameObject::UpdatePosition(float zOffset)
+{
+	cyPoint3f localOffset = cyPoint3f(0.0f);
+
+	localOffset.y += zOffset;
+
+	const float speed_unitsPerSecond = 10.0f;
+	const float offsetModifier = speed_unitsPerSecond * static_cast<float>(Time::GetElapsedTimeDuringPreviousFrame());
+	localOffset *= offsetModifier;
+	m_position += localOffset;
+}
+
+void cs6610::Gameplay::GameObject::UpdateOrientation(float xOffset, float yOffset)
+{
+	cyPoint3f localOffset = cyPoint3f(0.0f);
+
+	localOffset.z += xOffset;
+	localOffset.x += yOffset;
+
+	const float speed_unitsPerSecond = 10.0f;
+	const float offsetModifier = speed_unitsPerSecond * static_cast<float>(Time::GetElapsedTimeDuringPreviousFrame());
+	localOffset *= offsetModifier;
+	m_eularAngles += localOffset;
 }
 
 #pragma region Gets
@@ -82,7 +108,7 @@ void cs6610::Gameplay::GameObject::SetMesh(const std::string i_meshRelativePath)
 	{
 		cyPoint3f minBounds, maxBounds;
 		m_mesh = new Graphics::Mesh(i_meshRelativePath, minBounds, maxBounds);
-		m_position += (maxBounds + minBounds) *-0.5f;
+		m_position += (maxBounds + minBounds) *0.5f;
 	}
 	else
 	{

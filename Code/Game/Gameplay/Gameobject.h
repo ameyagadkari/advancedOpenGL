@@ -22,6 +22,8 @@ namespace cs6610
 		public:
 			explicit GameObject(const cyPoint3f i_position = cyPoint3f(0.0f, 0.0f, 0.0f), const cyPoint3f i_eularAngles = cyPoint3f(0.0f, 0.0f, 0.0f));
 			~GameObject();
+			void UpdatePosition(float zOffset);
+			void UpdateOrientation(float xOffset, float yOffset);
 #pragma region Gets
 			Graphics::Effect* GetEffect()const;
 			Graphics::Mesh* GetMesh()const;

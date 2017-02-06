@@ -8,7 +8,7 @@
 #include "../Gameplay/Gameobject.h"
 #include "../../Engine/Camera/Camera.h"
 
-std::vector<cs6610::Gameplay::GameObject*> cs6610::MyGame::ms_gameobjects;
+std::map<std::string, cs6610::Gameplay::GameObject*> cs6610::MyGame::ms_gameobjects;
 cs6610::Camera::Camera* cs6610::MyGame::ms_pcamera;
 cs6610::Camera::Camera* cs6610::MyGame::ms_ocamera;
 
@@ -22,41 +22,45 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 	bool wereThereErrors = false;
 	Time::Initialize();
 	if (!Graphics::Initialize(i_argumentCount, i_arguments))
-	{		
+	{
 		CS6610_ASSERTF(false, "Graphics Initialization failed");
 		wereThereErrors = true;
 	}
 	if (!UserInput::UserInput::Initialize())
-	{		
+	{
 		CS6610_ASSERTF(false, "UserInput Initialization failed");
 		wereThereErrors = true;
 	}
 
 	// Init all gameobjects
 	{
-		ms_gameobjects.push_back(new Gameplay::GameObject(cyPoint3f(0.0f, 0.0f, 0.0f)));
-		ms_gameobjects.back()->SetMesh("data/meshes/teapot.mesh");
-		ms_gameobjects.back()->SetEffect("data/shaders/stdvertex.glsl", "data/shaders/stdfragment.glsl","u_model u_view u_projection u_normal u_lightPosition");
+		ms_gameobjects["Teapot"] = new Gameplay::GameObject(cyPoint3f(0.0f, 0.0f, 0.0f), cyPoint3f(180.0f, 0.0f, 180.0f));
+		ms_gameobjects.at("Teapot")->SetMesh("data/meshes/teapot.mesh");
+		ms_gameobjects.at("Teapot")->SetEffect("data/shaders/stdvertex.glsl", "data/shaders/stdfragment.glsl", "u_model u_view u_projection u_normal u_lightPosition");
+		ms_gameobjects["Light"] = new Gameplay::GameObject(cyPoint3f(0.0f, -10.0f, 0.0f));
+		ms_gameobjects.at("Light")->SetMesh("data/meshes/light.mesh");
+		ms_gameobjects.at("Light")->SetEffect("data/shaders/lightvertex.glsl", "data/shaders/lightfragment.glsl", "u_model u_view u_projection");
 	}
 
 	// Init Camera
 	{
 		ms_pcamera = new Camera::Camera();
-		ms_ocamera = new Camera::Camera(cyPoint3f(0.0f, 0.0f, -10.0f), cyPoint3f(0.0f, 0.0f, 0.0f), Math::ConvertDegreesToRadians(45.0f), -20.0f, 20.0f);
+		ms_ocamera = new Camera::Camera(cyPoint3f(0.0f, 0.0f, 0.0f), cyPoint3f(0.0f, 0.0f, 0.0f), Math::ConvertDegreesToRadians(45.0f), -20.0f, 20.0f);
 	}
 	return !wereThereErrors;
 }
 
 void cs6610::MyGame::CleanUp(void)
 {
-	size_t length = ms_gameobjects.size();
-	for (size_t i = 0; i < length; i++)
+	auto begin = ms_gameobjects.begin();
+	auto end = ms_gameobjects.end();
+	for (auto it = begin; it != end; ++it)
 	{
-		delete ms_gameobjects[i];
-		ms_gameobjects[i] = nullptr;
+		delete it->second;
+		it->second = nullptr;
 	}
 	ms_gameobjects.clear();
-	if(ms_pcamera)
+	if (ms_pcamera)
 	{
 		delete ms_pcamera;
 		ms_pcamera = nullptr;

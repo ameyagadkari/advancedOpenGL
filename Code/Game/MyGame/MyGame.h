@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <map>
 
 namespace cs6610
 {
@@ -26,7 +26,7 @@ namespace cs6610
 		static void Run(void);
 		static bool Initialize(int i_argumentCount, char** i_arguments);
 		static void CleanUp(void);
-		static std::vector<Gameplay::GameObject*> ms_gameobjects;
+		static std::map<std::string, Gameplay::GameObject*> ms_gameobjects;
 		static Camera::Camera *ms_pcamera;
 		static Camera::Camera *ms_ocamera;
 	};
