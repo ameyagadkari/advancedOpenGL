@@ -54,15 +54,6 @@ void cs6610::Graphics::RenderFrame(void)
 	glClear(clearColorAndDepth);
 	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to clear color buffer and depth buffer");
 
-	// Calculation light pos
-	/*cyMatrix4f model =
-		cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects.at("Teapot")->GetPosition())*
-		/*cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects.at("Light")->GetPosition())*
-		cyMatrix4f::MatrixRotationZ(Math::ConvertDegreesToRadians(MyGame::ms_gameobjects.at("Light")->GetOrientationEular().z))*
-		cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(MyGame::ms_gameobjects.at("Light")->GetOrientationEular().x))*
-		cyMatrix4f::MatrixTrans(-MyGame::ms_gameobjects.at("Teapot")->GetPosition());
-
-	cyPoint3f lightPositionWorld = cyPoint3f(model*cyPoint4f(MyGame::ms_gameobjects.at("Light")->GetPosition(), 1.0f));*/
 	cyMatrix4f model;
 	cyMatrix4f view;
 	cyMatrix4f projection;
@@ -75,13 +66,12 @@ void cs6610::Graphics::RenderFrame(void)
 		lightEffect->Bind();
 		model =
 			cyMatrix4f::MatrixScale(0.1f)*
-			cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects.at("Light")->GetPosition())*
-			cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects.at("Teapot")->GetPosition())*	
+			cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects.at("Teapot")->GetPosition())*
 			cyMatrix4f::MatrixRotationZ(Math::ConvertDegreesToRadians(MyGame::ms_gameobjects.at("Light")->GetOrientationEular().z))*
 			cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(MyGame::ms_gameobjects.at("Light")->GetOrientationEular().x))*
-			cyMatrix4f::MatrixTrans(-MyGame::ms_gameobjects.at("Teapot")->GetPosition());
+			cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects.at("Light")->GetPosition() - MyGame::ms_gameobjects.at("Teapot")->GetPosition());
 
-		lightPositionWorld = cyPoint3f(model*cyPoint4f(MyGame::ms_gameobjects.at("Light")->GetPosition(),1.0f));
+		lightPositionWorld = cyPoint3f(model*cyPoint4f(MyGame::ms_gameobjects.at("Light")->GetPosition(), 1.0f));
 
 		view = MyGame::ms_pcamera->GetViewMatrix();
 		projection = MyGame::ms_pcamera->GetPerspectiveProjectionMatrix();
