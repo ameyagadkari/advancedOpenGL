@@ -39,8 +39,9 @@
 #include "cyPoint.h"
 #include <stdio.h>
 #include <ctype.h>
-#include <string.h>
+#include <string>
 #include <vector>
+#include <iostream>
 
 //-------------------------------------------------------------------------------
 namespace cy {
@@ -60,13 +61,7 @@ public:
 	//! Material definition
 	struct Mtl
 	{
-		//! Texture map information
-		struct Map
-		{
-			char name[256];	//!< filename of the texture map
-			Map() { name[0] = '\0'; }
-		};
-		char name[256];	//!< Material name
+		char *name;		//!< Material name
 		float Ka[3];	//!< Ambient color
 		float Kd[3];	//!< Diffuse color
 		float Ks[3];	//!< Specular color
@@ -74,13 +69,17 @@ public:
 		float Ns;		//!< Specular exponent
 		float Ni;		//!< Index of refraction
 		int illum;		//!< Illumination model
-		Map map_Ka;		//!< Ambient texture map
-		Map map_Kd;		//!< Diffuse texture map
-		Map map_Ks;		//!< Specular texture map
+		char *map_Ka;	//!< Ambient color texture map
+		char *map_Kd;	//!< Diffuse color texture map
+		char *map_Ks;	//!< Specular color texture map
+		char *map_Ns;	//!< Specular exponent texture map
+		char *map_d;	//!< Alpha texture map
+		char *map_bump;	//!< Bump texture map
+		char *map_disp;	//!< Displacement texture map
 
 		Mtl()
 		{
-			name[0] = '\0';
+			name = nullptr;
 			Ka[0]=Ka[1]=Ka[2]=0;
 			Kd[0]=Kd[1]=Kd[2]=1;
 			Ks[0]=Ks[1]=Ks[2]=0;
@@ -88,6 +87,24 @@ public:
 			Ns=0;
 			Ni=1;
 			illum=2;
+			map_Ka   = nullptr;
+			map_Kd   = nullptr;
+			map_Ks   = nullptr;
+			map_Ns   = nullptr;
+			map_d    = nullptr;
+			map_bump = nullptr;
+			map_disp = nullptr;
+		}
+		~Mtl()
+		{
+			if ( name     ) delete [] name;
+			if ( map_Ka   ) delete [] map_Ka;
+			if ( map_Kd   ) delete [] map_Kd;
+			if ( map_Ks   ) delete [] map_Ks;
+			if ( map_Ns   ) delete [] map_Ns;
+			if ( map_d    ) delete [] map_d;
+			if ( map_bump ) delete [] map_bump;
+			if ( map_disp ) delete [] map_disp;
 		}
 	};
 
@@ -115,7 +132,7 @@ protected:
 public:
 
 	//!@name Constructor and destructor
-	TriMesh() : v(NULL), f(NULL), vn(NULL), fn(NULL), vt(NULL), ft(NULL), m(NULL), mcfc(NULL)
+	TriMesh() : v(nullptr), f(nullptr), vn(nullptr), fn(nullptr), vt(nullptr), ft(nullptr), m(nullptr), mcfc(nullptr)
 				, nv(0), nf(0), nvn(0), nvt(0), nm(0),boundMin(0,0,0), boundMax(0,0,0) {}
 	virtual ~TriMesh() { Clear(); }
 
@@ -148,8 +165,8 @@ public:
 	void Clear() { SetNumVertex(0); SetNumFaces(0); SetNumNormals(0); SetNumTexVerts(0); SetNumMtls(0); boundMin.Zero(); boundMax.Zero(); }
 	void SetNumVertex  (unsigned int n) { Allocate(n,v,nv); }
 	void SetNumFaces   (unsigned int n) { Allocate(n,f,nf); if (fn||vn) Allocate(n,fn); if (ft||vt) Allocate(n,ft); }
-	void SetNumNormals (unsigned int n) { Allocate(n,vn,nvn); if (!fn) Allocate(nf,fn); }
-	void SetNumTexVerts(unsigned int n) { Allocate(n,vt,nvt); if (!ft) Allocate(nf,ft); }
+	void SetNumNormals (unsigned int n) { Allocate(n,vn,nvn); Allocate(n==0?0:nf,fn); }
+	void SetNumTexVerts(unsigned int n) { Allocate(n,vt,nvt); Allocate(n==0?0:nf,ft); }
 	void SetNumMtls    (unsigned int n) { Allocate(n,m,nm); Allocate(n,mcfc); }
 
 	//!@name Get Property Methods
@@ -168,22 +185,23 @@ public:
 	void ComputeNormals(bool clockwise=false);		//!< Computes and stores vertex normals
 
 	//!@name Load and Save methods
-	bool LoadFromFileObj( const char *filename, bool loadMtl=true );	//!< Loads the mesh from an OBJ file. Automatically converts all faces to triangles.
-	bool SaveToFileObj( const char *filename );
+	bool LoadFromFileObj( const char *filename, bool loadMtl=true, std::ostream *outStream=&std::cout );	//!< Loads the mesh from an OBJ file. Automatically converts all faces to triangles.
+	bool SaveToFileObj( const char *filename, std::ostream *outStream );									//!< Saves the mesh to an OBJ file with the given name.
 
 private:
-	template <class T> void Allocate(unsigned int n, T* &t) { if (t) delete [] t; if (n>0) t = new T[n]; else t=NULL; }
+	template <class T> void Allocate(unsigned int n, T* &t) { if (t) delete [] t; if (n>0) t = new T[n]; else t=nullptr; }
 	template <class T> bool Allocate(unsigned int n, T* &t, unsigned int &nt) { if (n==nt) return false; nt=n; Allocate(n,t); return true; }
 	static Point3f Interpolate( int i, const Point3f *v, const TriFace *f, const Point3f &bc ) { return v[f[i].v[0]]*bc.x + v[f[i].v[1]]*bc.y + v[f[i].v[2]]*bc.z; }
 
+	// Temporary structures
 	struct MtlData
 	{
-		char mtlName[256];
+		std::string mtlName;
 		unsigned int firstFace;
 		unsigned int faceCount;
-		MtlData() { mtlName[0]='\0'; faceCount=0; firstFace=0; }
+		MtlData() { faceCount=0; firstFace=0; }
 	};
-	struct MtlLibName { char filename[1024]; };
+	struct MtlLibName { std::string filename; };
 };
 
 //-------------------------------------------------------------------------------
@@ -225,10 +243,13 @@ inline void TriMesh::ComputeNormals(bool clockwise)
 	for ( unsigned int i=0; i<nvn; i++ ) vn[i].Normalize();
 }
 
-inline bool TriMesh::LoadFromFileObj( const char *filename, bool loadMtl )
+inline bool TriMesh::LoadFromFileObj( const char *filename, bool loadMtl, std::ostream *outStream )
 {
 	FILE *fp = fopen(filename,"r");
-	if ( !fp ) return false;
+	if ( !fp ) {
+		if ( outStream ) *outStream << "ERROR: Cannot open file " << filename << std::endl;
+		return false;
+	}
 
 	Clear();
 
@@ -275,9 +296,15 @@ inline bool TriMesh::LoadFromFileObj( const char *filename, bool loadMtl )
 			}
 			return (data[i]=='\0' || data[i]==' ');
 		}
-		void Copy( char *a, int count, int start=0 ) const {
-			strncpy( a, data+start, count-1 );
-			a[count-1] = '\0';
+		const char* Data(int start=0) { return data+start; }
+		void Copy( char * &str, int start=0 )
+		{
+			while ( data[start] != '\0' && data[start] <= ' ' ) start++;
+			if ( str ) delete [] str;
+			size_t len = strlen( Data(start) );
+			str = new char[len+1];
+			strncpy( str, Data(start), len );
+			str[len] = '\0';
 		}
 	};
 	Buffer buffer;
@@ -288,7 +315,7 @@ inline bool TriMesh::LoadFromFileObj( const char *filename, bool loadMtl )
 		int GetMtlIndex(const char *mtlName)
 		{
 			for ( unsigned int i=0; i<mtlData.size(); i++ ) {
-				if ( strcmp(mtlName,mtlData[i].mtlName) == 0 ) return (int)i;
+				if ( mtlData[i].mtlName == mtlName ) return (int)i;
 			}
 			return -1;
 		}
@@ -298,14 +325,14 @@ inline bool TriMesh::LoadFromFileObj( const char *filename, bool loadMtl )
 			int i = GetMtlIndex(mtlName);
 			if ( i >= 0 ) return i;
 			MtlData m;
-			strncpy(m.mtlName,mtlName,256);
+			m.mtlName = mtlName;
 			m.firstFace = firstFace;
 			mtlData.push_back(m);
 			return (int)mtlData.size()-1;
 		}
 	};
 	MtlList mtlList;
-	MtlData *currentMtlData = NULL;
+
 	std::vector<Point3f>	_v;		// vertices
 	std::vector<TriFace>	_f;		// faces
 	std::vector<Point3f>	_vn;	// vertex normal
@@ -339,6 +366,7 @@ inline bool TriMesh::LoadFromFileObj( const char *filename, bool loadMtl )
 		else if ( buffer.IsCommand("f") ) {
 			int facevert = -1;
 			bool inspace = true;
+			bool negative = false;
 			int type = 0;
 			unsigned int index;
 			TriFace face, textureFace, normalFace;
@@ -348,6 +376,7 @@ inline bool TriMesh::LoadFromFileObj( const char *filename, bool loadMtl )
 				else {
 					if ( inspace ) {
 						inspace=false;
+						negative = false;
 						type=0;
 						index=0;
 						switch ( facevert ) {
@@ -355,7 +384,7 @@ inline bool TriMesh::LoadFromFileObj( const char *filename, bool loadMtl )
 								// initialize face
 								face.v[0] = face.v[1] = face.v[2] = 0;
 								textureFace.v[0] = textureFace.v[1] = textureFace.v[2] = 0;
-								normalFace.v[0] = normalFace.v[1] = normalFace.v[2] = 0;
+								normalFace. v[0] = normalFace. v[1] = normalFace. v[2] = 0;
 							case 0:
 							case 1:
 								facevert++;
@@ -377,12 +406,13 @@ inline bool TriMesh::LoadFromFileObj( const char *filename, bool loadMtl )
 						}
 					}
 					if ( buffer[i] == '/' ) { type++; index=0; }
+					if ( buffer[i] == '-' ) negative = true;
 					if ( buffer[i] >= '0' && buffer[i] <= '9' ) {
 						index = index*10 + (buffer[i]-'0');
 						switch ( type ) {
-							case 0: face.v[facevert] = index-1; break;
-							case 1: textureFace.v[facevert] = index-1; hasTextures=true; break;
-							case 2: normalFace.v[facevert] = index-1; hasNormals=true; break;
+							case 0: face.v       [facevert] = negative ? (unsigned int)_v. size()-index : index-1; break;
+							case 1: textureFace.v[facevert] = negative ? (unsigned int)_vt.size()-index : index-1; hasTextures=true; break;
+							case 2: normalFace.v [facevert] = negative ? (unsigned int)_vn.size()-index : index-1; hasNormals =true; break;
 						}
 					}
 				}
@@ -395,13 +425,11 @@ inline bool TriMesh::LoadFromFileObj( const char *filename, bool loadMtl )
 		}
 		else if ( loadMtl ) {
 			if ( buffer.IsCommand("usemtl") ) {
-				char mtlName[256];
-				buffer.Copy(mtlName,256,7);
-				currentMtlIndex = mtlList.CreateMtl(mtlName, (unsigned int)_f.size());
+				currentMtlIndex = mtlList.CreateMtl(buffer.Data(7), (unsigned int)_f.size());
 			}
 			if ( buffer.IsCommand("mtllib") ) {
 				MtlLibName libName;
-				buffer.Copy(libName.filename,1024,7);
+				libName.filename = buffer.Data(7);
 				mtlFiles.push_back(libName);
 			}
 		}
@@ -432,8 +460,10 @@ inline bool TriMesh::LoadFromFileObj( const char *filename, bool loadMtl )
 					if ( fn ) fn[fid] = _fn[i];
 					if ( ft ) ft[fid] = _ft[i];
 					fid++;
+					j++;
 				}
 			}
+			mcfc[m] = fid;
 		}
 		if ( fid <_f.size() ) {
 			for ( unsigned int i=0; i<_f.size(); i++ ) {
@@ -455,30 +485,27 @@ inline bool TriMesh::LoadFromFileObj( const char *filename, bool loadMtl )
 	// Load the .mtl files
 	if ( loadMtl ) {
 		// get the path from filename
-		char *mtlFullFilename = NULL;
-		char *mtlFilename = NULL;
+		char *mtlPathName = nullptr;
 		const char* pathEnd = strrchr(filename,'\\');
 		if ( !pathEnd ) pathEnd = strrchr(filename,'/');
 		if ( pathEnd ) {
 			int n = int(pathEnd-filename) + 1;
-			mtlFullFilename = new char[n+1024];
-			strncpy(mtlFullFilename,filename,n);
-			mtlFilename = &mtlFullFilename[n];
-		} else {
-			mtlFullFilename = new char[1024];
-			mtlFilename = mtlFullFilename;
+			mtlPathName = new char[n+1];
+			strncpy(mtlPathName,filename,n);
+			mtlPathName[n] = '\0';
 		}
 		for ( unsigned int mi=0; mi<mtlFiles.size(); mi++ ) {
-			strncpy( mtlFilename, mtlFiles[mi].filename, 1024 );
-			FILE *fp = fopen(mtlFullFilename,"r");
-			if ( !fp ) continue;
+			std::string mtlFilename = ( mtlPathName ) ? std::string(mtlPathName) + mtlFiles[mi].filename : mtlFiles[mi].filename;
+			FILE *fp = fopen(mtlFilename.data(),"r");
+			if ( !fp ) {
+				if ( outStream ) *outStream << "ERROR: Cannot open file " << mtlFilename << std::endl;
+				continue;
+			}
 			int mtlID = -1;
-			while ( int rb = buffer.ReadLine(fp) ) {
+			while ( buffer.ReadLine(fp) ) {
 				if ( buffer.IsCommand("newmtl") ) {
-					char mtlName[256];
-					buffer.Copy(mtlName,256,7);
-					mtlID = mtlList.GetMtlIndex(mtlName);
-					if ( mtlID >= 0 ) strncpy(m[mtlID].name,mtlName,256);
+					mtlID = mtlList.GetMtlIndex(buffer.Data(7));
+					if ( mtlID >= 0 ) buffer.Copy( m[mtlID].name, 7 );
 				} else if ( mtlID >= 0 ) {
 					if ( buffer.IsCommand("Ka") ) buffer.ReadFloat3( m[mtlID].Ka );
 					else if ( buffer.IsCommand("Kd") ) buffer.ReadFloat3( m[mtlID].Kd );
@@ -487,14 +514,20 @@ inline bool TriMesh::LoadFromFileObj( const char *filename, bool loadMtl )
 					else if ( buffer.IsCommand("Ns") ) buffer.ReadFloat( &m[mtlID].Ns );
 					else if ( buffer.IsCommand("Ni") ) buffer.ReadFloat( &m[mtlID].Ni );
 					else if ( buffer.IsCommand("illum") ) buffer.ReadInt( &m[mtlID].illum, 5 );
-					else if ( buffer.IsCommand("map_Ka") ) buffer.Copy( m[mtlID].map_Ka.name, 256, 7 );
-					else if ( buffer.IsCommand("map_Kd") ) buffer.Copy( m[mtlID].map_Kd.name, 256, 7 );
-					else if ( buffer.IsCommand("map_Ks") ) buffer.Copy( m[mtlID].map_Ks.name, 256, 7 );
+					else if ( buffer.IsCommand("map_Ka"  ) ) buffer.Copy( m[mtlID].map_Ka,   7 );
+					else if ( buffer.IsCommand("map_Kd"  ) ) buffer.Copy( m[mtlID].map_Kd,   7 );
+					else if ( buffer.IsCommand("map_Ks"  ) ) buffer.Copy( m[mtlID].map_Ks,   7 );
+					else if ( buffer.IsCommand("map_Ns"  ) ) buffer.Copy( m[mtlID].map_Ns,   7 );
+					else if ( buffer.IsCommand("map_d"   ) ) buffer.Copy( m[mtlID].map_d,    6 );
+					else if ( buffer.IsCommand("map_bump") ) buffer.Copy( m[mtlID].map_bump, 9 );
+					else if ( buffer.IsCommand("bump"    ) ) buffer.Copy( m[mtlID].map_bump, 5 );
+					else if ( buffer.IsCommand("map_disp") ) buffer.Copy( m[mtlID].map_disp, 9 );
+					else if ( buffer.IsCommand("disp"    ) ) buffer.Copy( m[mtlID].map_disp, 5 );
 				}
 			}
 			fclose(fp);
 		}
-		delete [] mtlFullFilename;
+		if ( mtlPathName ) delete [] mtlPathName;
 	}
 
 	return true;
@@ -502,10 +535,13 @@ inline bool TriMesh::LoadFromFileObj( const char *filename, bool loadMtl )
 
 //-------------------------------------------------------------------------------
 
-inline bool TriMesh::SaveToFileObj( const char *filename )
+inline bool TriMesh::SaveToFileObj( const char *filename, std::ostream *outStream )
 {
 	FILE *fp = fopen(filename,"w");
-	if ( !fp ) return false;
+	if ( !fp ) {
+		if ( outStream ) *outStream << "ERROR: Cannot create file " << filename << std::endl;
+		return false;
+	}
 
 	for ( unsigned int i=0; i<nv; i++ ) {
 		fprintf(fp,"v %f %f %f\n",v[i].x, v[i].y, v[i].z);

@@ -126,8 +126,8 @@ namespace
 	{
 		if (lmbStillPressed)
 		{
-			float xOffsetLMB = static_cast<float>(x - xPosOnPressLMB);
-			float yOffsetLMB = static_cast<float>(yPosOnPressLMB - y);
+			float xOffsetLMB = static_cast<float>(xPosOnPressLMB - x);
+			float yOffsetLMB = static_cast<float>(y - yPosOnPressLMB);
 			xPosOnPressLMB = x;
 			yPosOnPressLMB = y;
 			cs6610::MyGame::ms_gameobjects.at("Teapot")->UpdateOrientation(xOffsetLMB, yOffsetLMB);
@@ -140,7 +140,7 @@ namespace
 		}
 		if (ctrlLMBStillPressed)
 		{
-			float xOffsetCtrlLMB = static_cast<float>(x - xPosOnPressCtrlLMB);
+			float xOffsetCtrlLMB = static_cast<float>(xPosOnPressCtrlLMB - x);
 			float yOffsetCtrlLMB = static_cast<float>(yPosOnPressCtrlLMB - y);
 			xPosOnPressCtrlLMB = x;
 			yPosOnPressCtrlLMB = y;

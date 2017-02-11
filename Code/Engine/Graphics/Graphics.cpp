@@ -13,7 +13,6 @@
 #include "../../External/cyCodeBase/cyPoint.h"
 #include "../../External/cyCodeBase/cyMatrix.h"
 #include "../../External/cyCodeBase/cyGL.h"
-#include "../UserInput/UserInput.h"
 
 namespace
 {

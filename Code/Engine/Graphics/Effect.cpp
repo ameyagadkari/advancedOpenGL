@@ -1,5 +1,7 @@
 #include "Effect.h"
 
+#define GLEW_STATIC
+#include "../../External/GLEW/glew.h"
 #include "../../External/cyCodeBase/cyGL.h"
 #include "../Asserts/Asserts.h"
 
