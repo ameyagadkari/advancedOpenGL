@@ -9,18 +9,13 @@
 #include "UniformBuffer.h"
 #include "UniformBufferData.h"
 
-namespace
-{
-	size_t numbeOfTextures = 0;
-}
-
 cs6610::Graphics::Material::Material(const cyTriMesh& i_meshData, const std::vector<std::string> i_shaderPaths, const std::vector<std::string> i_texturePaths) :
 	m_materialBuffer(nullptr),
-	m_effect(new Effect(i_shaderPaths))
+	m_effect(new Effect(i_shaderPaths)),
+	m_numbeOfTextures(i_texturePaths.size())
 {
-	numbeOfTextures = i_texturePaths.size();
-	m_textures = numbeOfTextures > 0 ? new cyGLTexture2D[numbeOfTextures] : nullptr;
-	for (size_t i = 0; i < numbeOfTextures; i++)
+	m_textures = m_numbeOfTextures > 0 ? new cyGLTexture2D[m_numbeOfTextures] : nullptr;
+	for (size_t i = 0; i < m_numbeOfTextures; i++)
 	{
 		m_textures[i].Initialize();
 		const GLenum wrapModeForTextures = GL_REPEAT;
@@ -65,7 +60,7 @@ void cs6610::Graphics::Material::Bind()const
 {
 	m_effect->Bind();
 	m_materialBuffer->Bind();
-	for (size_t i = 0; i < numbeOfTextures; i++)
+	for (size_t i = 0; i < m_numbeOfTextures; i++)
 	{
 		m_textures->Bind(static_cast<int>(i));
 	}
