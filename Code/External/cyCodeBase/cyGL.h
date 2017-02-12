@@ -228,6 +228,7 @@ private:
 public:
 	GLTexture() : textureID(CY_GL_INVALID_ID) {}	//!< Constructor.
 
+	~GLTexture() { Delete(); }	//!< Destructor.
 	//!@name General Methods
 
 	void   Delete() { if ( textureID != CY_GL_INVALID_ID ) glDeleteTextures(1,&textureID); textureID = CY_GL_INVALID_ID; }	//!< Deletes the texture.
