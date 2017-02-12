@@ -137,7 +137,7 @@ public:
 	virtual ~TriMesh() { Clear(); }
 
 	//!@name Component Access Methods
-	const Point3f& V (int i) const { return v[i]; }		//!< returns the i^th vertex
+	const Point3f& V(int i) const { return v[i]; }		//!< returns the i^th vertex
 	Point3f&       V (int i)       { return v[i]; }		//!< returns the i^th vertex
 	const TriFace& F (int i) const { return f[i]; }		//!< returns the i^th face
 	TriFace&       F (int i)       { return f[i]; }		//!< returns the i^th face

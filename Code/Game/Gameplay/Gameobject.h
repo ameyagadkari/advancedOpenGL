@@ -24,7 +24,7 @@ namespace cs6610
 			~GameObject();
 			void UpdatePosition(float zOffset);
 			void UpdateOrientation(float xOffset, float yOffset);
-			//void LoadMeshAndMaterial(const std::string i_meshRelativePath, const std::vector<std::string> i_shaderPaths, const char * const i_names = nullptr);
+			void LoadMeshAndMaterial(const std::string i_meshRelativePath, const std::vector<std::string> i_shaderPaths, const std::vector<std::string> i_texturePaths, const char * const i_names = nullptr);
 #pragma region Gets
 			Graphics::Material* GetMaterial()const;
 			Graphics::Mesh* GetMesh()const;
@@ -32,9 +32,9 @@ namespace cs6610
 			cyPoint3f GetOrientationEular()const;
 #pragma endregion
 #pragma region Sets
-			void SetMaterial(const std::vector<std::string> i_shaderPaths, const std::vector<std::string> i_texturePaths, const char * const i_names = nullptr);
+			//void SetMaterial(const std::vector<std::string> i_shaderPaths, const std::vector<std::string> i_texturePaths, const char * const i_names = nullptr);
 			void SetMaterial(Graphics::Material* const i_material, const char * const i_names = nullptr);
-			void SetMesh(const std::string i_meshRelativePath);
+			//void SetMesh(const std::string i_meshRelativePath);
 			void SetMesh(Graphics::Mesh* const i_mesh);
 			void SetPosition(const cyPoint3f i_position);
 			void SetOrientationEular(const cyPoint3f i_eularAngles);

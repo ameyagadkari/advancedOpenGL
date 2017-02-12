@@ -6,18 +6,21 @@
 #include "../Asserts/Asserts.h"
 #include "Effect.h"
 #include "../../External/PNGLoader/lodepng.h"
+#include "UniformBuffer.h"
+#include "UniformBufferData.h"
 
 namespace
 {
-	size_t length = 0;
+	size_t numbeOfTextures = 0;
 }
 
-cs6610::Graphics::Material::Material(const std::vector<std::string> i_shaderPaths, const std::vector<std::string> i_texturePaths) :
+cs6610::Graphics::Material::Material(const cyTriMesh& i_meshData, const std::vector<std::string> i_shaderPaths, const std::vector<std::string> i_texturePaths) :
+	m_materialBuffer(nullptr),
 	m_effect(new Effect(i_shaderPaths))
 {
-	length = i_texturePaths.size();
-	m_textures = length > 0 ? new cyGLTexture2D[length] : nullptr;
-	for (size_t i = 0; i < length; i++)
+	numbeOfTextures = i_texturePaths.size();
+	m_textures = numbeOfTextures > 0 ? new cyGLTexture2D[numbeOfTextures] : nullptr;
+	for (size_t i = 0; i < numbeOfTextures; i++)
 	{
 		m_textures[i].Initialize();
 		const GLenum wrapModeForTextures = GL_REPEAT;
@@ -30,6 +33,8 @@ cs6610::Graphics::Material::Material(const std::vector<std::string> i_shaderPath
 		m_textures[i].SetImage(&image[0], GL_RGB, GL_RGBA, width, height);
 		m_textures[i].BuildMipmaps();
 	}
+	MaterialBufferData materialBufferData(i_meshData.M(0).Ka, i_meshData.M(0).Kd, i_meshData.M(0).Ks, i_meshData.M(0).Ns);
+	m_materialBuffer = new UniformBuffer(UniformBufferType::MATERIAL, sizeof(materialBufferData), &materialBufferData);
 }
 
 cs6610::Graphics::Material::~Material()
@@ -39,12 +44,13 @@ cs6610::Graphics::Material::~Material()
 		delete m_effect;
 		m_effect = nullptr;
 	}
+	if (m_materialBuffer)
+	{
+		delete m_materialBuffer;
+		m_materialBuffer = nullptr;
+	}
 	if (m_textures)
 	{
-		for (size_t i = 0; i < length; i++)
-		{
-			m_textures[i].Delete();
-		}
 		delete[] m_textures;
 		m_textures = nullptr;
 	}
@@ -58,7 +64,8 @@ cs6610::Graphics::Effect * cs6610::Graphics::Material::GetEffect() const
 void cs6610::Graphics::Material::Bind()const
 {
 	m_effect->Bind();
-	for (size_t i = 0; i < length; i++)
+	m_materialBuffer->Bind();
+	for (size_t i = 0; i < numbeOfTextures; i++)
 	{
 		m_textures->Bind(static_cast<int>(i));
 	}

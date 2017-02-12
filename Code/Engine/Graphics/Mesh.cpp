@@ -5,67 +5,55 @@
 #include "../Asserts/Asserts.h"
 #include "MeshData.h"
 
-#include "../../External/cyCodeBase/cyTriMesh.h"
-
 namespace
 {
-	cyTriMesh* s_meshData = nullptr;
 	cs6610::Graphics::MeshData* s_meshData_inner = nullptr;
 }
-cs6610::Graphics::Mesh::Mesh(const std::string i_relativePath, cy::Point3f &o_minBounds, cy::Point3f &o_maxBounds) :
+cs6610::Graphics::Mesh::Mesh(const cyTriMesh& i_meshData, cy::Point3f &o_minBounds, cy::Point3f &o_maxBounds) :
 	m_vertexArrayId(0),
 	m_vertexBufferId(0)
 {
-	s_meshData = new cyTriMesh();
-	s_meshData->LoadFromFileObj(i_relativePath.c_str());
-	m_numberOfVertices = s_meshData->NF() * 3;
+	m_numberOfVertices = i_meshData.NF() * 3;
 	s_meshData_inner = new MeshData(m_numberOfVertices);
-	s_meshData->ComputeNormals();
-	size_t length = s_meshData->NF();
+	size_t length = i_meshData.NF();
 	size_t index = 0;
 	for (size_t i = 0; i < length; i++)
 	{
 		int ii = static_cast<int>(i);
 		s_meshData_inner->vertexData[index].AddVertexData(
-			s_meshData->V(s_meshData->F(ii).v[0]).x,
-			s_meshData->V(s_meshData->F(ii).v[0]).y,
-			s_meshData->V(s_meshData->F(ii).v[0]).z,
-			s_meshData->VN(s_meshData->FN(ii).v[0]).x,
-			s_meshData->VN(s_meshData->FN(ii).v[0]).y,
-			s_meshData->VN(s_meshData->FN(ii).v[0]).z,
-			s_meshData->VT(s_meshData->FT(ii).v[0]).x,
-			s_meshData->VT(s_meshData->FT(ii).v[0]).y);
+			i_meshData.V(i_meshData.F(ii).v[0]).x,
+			i_meshData.V(i_meshData.F(ii).v[0]).y,
+			i_meshData.V(i_meshData.F(ii).v[0]).z,
+			i_meshData.VN(i_meshData.FN(ii).v[0]).x,
+			i_meshData.VN(i_meshData.FN(ii).v[0]).y,
+			i_meshData.VN(i_meshData.FN(ii).v[0]).z,
+			i_meshData.VT(i_meshData.FT(ii).v[0]).x,
+			1.0f - i_meshData.VT(i_meshData.FT(ii).v[0]).y);
 		++index;
 		s_meshData_inner->vertexData[index].AddVertexData(
-			s_meshData->V(s_meshData->F(ii).v[1]).x,
-			s_meshData->V(s_meshData->F(ii).v[1]).y,
-			s_meshData->V(s_meshData->F(ii).v[1]).z,
-			s_meshData->VN(s_meshData->FN(ii).v[1]).x,
-			s_meshData->VN(s_meshData->FN(ii).v[1]).y,
-			s_meshData->VN(s_meshData->FN(ii).v[1]).z,
-			s_meshData->VT(s_meshData->FT(ii).v[1]).x,
-			s_meshData->VT(s_meshData->FT(ii).v[1]).y);
+			i_meshData.V(i_meshData.F(ii).v[1]).x,
+			i_meshData.V(i_meshData.F(ii).v[1]).y,
+			i_meshData.V(i_meshData.F(ii).v[1]).z,
+			i_meshData.VN(i_meshData.FN(ii).v[1]).x,
+			i_meshData.VN(i_meshData.FN(ii).v[1]).y,
+			i_meshData.VN(i_meshData.FN(ii).v[1]).z,
+			i_meshData.VT(i_meshData.FT(ii).v[1]).x,
+			1.0f - i_meshData.VT(i_meshData.FT(ii).v[1]).y);
 		++index;
 		s_meshData_inner->vertexData[index].AddVertexData(
-			s_meshData->V(s_meshData->F(ii).v[2]).x,
-			s_meshData->V(s_meshData->F(ii).v[2]).y,
-			s_meshData->V(s_meshData->F(ii).v[2]).z,
-			s_meshData->VN(s_meshData->FN(ii).v[2]).x,
-			s_meshData->VN(s_meshData->FN(ii).v[2]).y,
-			s_meshData->VN(s_meshData->FN(ii).v[2]).z,
-			s_meshData->VT(s_meshData->FT(ii).v[2]).x,
-			s_meshData->VT(s_meshData->FT(ii).v[2]).y);
+			i_meshData.V(i_meshData.F(ii).v[2]).x,
+			i_meshData.V(i_meshData.F(ii).v[2]).y,
+			i_meshData.V(i_meshData.F(ii).v[2]).z,
+			i_meshData.VN(i_meshData.FN(ii).v[2]).x,
+			i_meshData.VN(i_meshData.FN(ii).v[2]).y,
+			i_meshData.VN(i_meshData.FN(ii).v[2]).z,
+			i_meshData.VT(i_meshData.FT(ii).v[2]).x,
+			1.0f - i_meshData.VT(i_meshData.FT(ii).v[2]).y);
 		++index;
 	}
 	Initialize();
-	s_meshData->ComputeBoundingBox();
-	o_minBounds = s_meshData->GetBoundMin();
-	o_maxBounds = s_meshData->GetBoundMax();
-	if (s_meshData)
-	{
-		delete s_meshData;
-		s_meshData = nullptr;
-	}
+	o_minBounds = i_meshData.GetBoundMin();
+	o_maxBounds = i_meshData.GetBoundMax();
 	if (s_meshData_inner)
 	{
 		delete s_meshData_inner;

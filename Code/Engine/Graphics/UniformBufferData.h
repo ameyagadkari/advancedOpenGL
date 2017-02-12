@@ -4,7 +4,7 @@ namespace cs6610
 {
 	namespace Graphics
 	{
-		struct MaterialBuffer
+		struct MaterialBufferData
 		{
 			struct Color
 			{
@@ -14,7 +14,7 @@ namespace cs6610
 			};
 			Color ambient, diffuse, specular;
 			float specularExponent;
-			MaterialBuffer(const float*const i_ka, const float*const i_kd, const float*const i_ks, const float i_specularExponent) :
+			MaterialBufferData(const float*const i_ka, const float*const i_kd, const float*const i_ks, const float i_specularExponent) :
 				ambient(i_ka[0], i_ka[1], i_ka[2]),
 				diffuse(i_kd[0], i_kd[1], i_kd[2]),
 				specular(i_ks[0], i_ks[1], i_ks[2]),
