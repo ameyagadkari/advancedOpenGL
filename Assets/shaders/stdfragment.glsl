@@ -13,6 +13,7 @@ layout( std140, binding = 0 ) uniform materialBuffer
 	vec4 ambientConstant;
 	vec4 diffuseConstant;
 	vec4 specularConstant;
+	float specularExponent;
 };
 
 out vec4 o_color;
@@ -37,7 +38,7 @@ void main()
 	//Specular light
 	vec3 viewDirection = normalize(-i_fragmentPosition);
 	vec3 halfwayDirection = normalize(lightDirection + viewDirection);
-	float cos_theta_specular = pow(max(dot(vertexNormalNormalized, halfwayDirection), 0.0f), 20);
+	float cos_theta_specular = pow(max(dot(vertexNormalNormalized, halfwayDirection), 0.0f), specularExponent);
 	vec3 specular = cos_theta_diffuse * cos_theta_specular * specularConstant.rgb * specularColor; 
 
 	vec3 result = ambient + diffuse + specular;
