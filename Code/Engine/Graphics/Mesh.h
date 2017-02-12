@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include "../../External/cyCodeBase/cyPoint.h"
+#include "../../External/cyCodeBase/cyTriMesh.h"
 
 typedef unsigned int GLuint;
 
@@ -12,7 +13,7 @@ namespace cs6610
 		{
 		public:
 			void RenderMesh()const;
-			explicit Mesh(const std::string i_relativePath, cy::Point3f &o_minBounds, cy::Point3f &o_maxBounds);
+			explicit Mesh(const cyTriMesh& i_meshData, cy::Point3f &o_minBounds, cy::Point3f &o_maxBounds);
 			~Mesh();
 		private:
 			uint32_t m_numberOfVertices;

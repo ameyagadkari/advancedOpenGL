@@ -5,6 +5,12 @@
 #include "../../Engine/Graphics/Material.h"
 #include "../../Engine/Graphics/Effect.h"
 #include "../../Engine/Time/Time.h"
+#include "../../External/cyCodeBase/cyTriMesh.h"
+
+namespace
+{
+	cyTriMesh* s_meshData = nullptr;
+}
 
 cs6610::Gameplay::GameObject::GameObject(const cyPoint3f i_position, const cyPoint3f i_eularAngles) :
 	m_mesh(nullptr),
@@ -23,6 +29,46 @@ cs6610::Gameplay::GameObject::~GameObject()
 	{
 		delete m_material;
 		m_material = nullptr;
+	}
+}
+
+void cs6610::Gameplay::GameObject::LoadMeshAndMaterial(const std::string i_meshRelativePath, const std::vector<std::string> i_shaderPaths, const std::vector<std::string> i_texturePaths, const char * const i_names)
+{
+	s_meshData = new cyTriMesh();
+	s_meshData->LoadFromFileObj(i_meshRelativePath.c_str());
+	s_meshData->ComputeNormals();
+	s_meshData->ComputeBoundingBox();
+
+	// Loading the mesh
+	if (!m_mesh)
+	{
+		cyPoint3f minBounds, maxBounds;
+		m_mesh = new Graphics::Mesh(*s_meshData, minBounds, maxBounds);
+		m_position += (maxBounds + minBounds) *0.5f;
+	}
+	else
+	{
+		CS6610_ASSERTF(false, "Use the other overload to set mesh");
+	}
+
+	// Loading the material
+	if (!m_material)
+	{
+		m_material = new Graphics::Material(*s_meshData, i_shaderPaths, i_texturePaths);
+		if (i_names)
+		{
+			m_material->GetEffect()->RegisterUniforms(i_names);
+		}
+	}
+	else
+	{
+		CS6610_ASSERTF(false, "Use the other overload to set effect");
+	}
+
+	if (s_meshData)
+	{
+		delete s_meshData;
+		s_meshData = nullptr;
 	}
 }
 
@@ -71,7 +117,7 @@ cyPoint3f cs6610::Gameplay::GameObject::GetOrientationEular()const
 #pragma endregion
 
 #pragma region Sets
-void cs6610::Gameplay::GameObject::SetMaterial(const std::vector<std::string> i_shaderPaths, const std::vector<std::string> i_texturePaths, const char* const i_names)
+/*void cs6610::Gameplay::GameObject::SetMaterial(const std::vector<std::string> i_shaderPaths, const std::vector<std::string> i_texturePaths, const char* const i_names)
 {
 	if (!m_material)
 	{
@@ -85,7 +131,7 @@ void cs6610::Gameplay::GameObject::SetMaterial(const std::vector<std::string> i_
 	{
 		CS6610_ASSERTF(false, "Use the other overload to set effect");
 	}
-}
+}*/
 void cs6610::Gameplay::GameObject::SetMaterial(Graphics::Material* const i_material, const char* const i_names)
 {
 	if (m_material)
@@ -103,7 +149,7 @@ void cs6610::Gameplay::GameObject::SetMaterial(Graphics::Material* const i_mater
 		CS6610_ASSERTF(false, "Use the other overload to set effect");
 	}
 }
-void cs6610::Gameplay::GameObject::SetMesh(const std::string i_meshRelativePath)
+/*void cs6610::Gameplay::GameObject::SetMesh(const std::string i_meshRelativePath)
 {
 	if (!m_mesh)
 	{
@@ -115,7 +161,7 @@ void cs6610::Gameplay::GameObject::SetMesh(const std::string i_meshRelativePath)
 	{
 		CS6610_ASSERTF(false, "Use the other overload to set mesh");
 	}
-}
+}*/
 void cs6610::Gameplay::GameObject::SetMesh(Graphics::Mesh* const i_mesh)
 {
 	if (m_mesh)

@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include "../../External/cyCodeBase/cyTriMesh.h"
 
 typedef unsigned int GLenum;
 
@@ -25,7 +26,7 @@ namespace cs6610
 		class Material
 		{
 		public:
-			Material(const std::vector<std::string> i_shaderPaths, const std::vector<std::string> i_texturePaths);
+			Material(const cyTriMesh& i_meshData, const std::vector<std::string> i_shaderPaths, const std::vector<std::string> i_texturePaths);
 			~Material();
 			Effect* GetEffect()const;
 			void Bind()const;
@@ -34,7 +35,6 @@ namespace cs6610
 			cy::GLTexture<GL_TEXTURE_2D>* m_textures;
 			//UniformBuffer *m_materialBuffer;
 			Effect* m_effect;
-			size_t m_numberOfTextures;
-		};
+size_t m_numbeOfTextures;		};
 	}
 }
