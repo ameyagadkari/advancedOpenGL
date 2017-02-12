@@ -997,13 +997,7 @@ inline bool GLSLProgram::BuildFiles( const char *vertexShaderFile,
 		}
 		AttachShader(tes);
 	}
-	bool result = Link(outStream);
-	vs.Delete();
-	fs.Delete();
-	gs.Delete();
-	tcs.Delete();
-	tes.Delete();
-	return result;
+	return Link(outStream);
 }
 
 
@@ -1050,7 +1044,12 @@ inline bool GLSLProgram::BuildSources( const char *vertexShaderSourceCode,
 		}
 		AttachShader(tes);
 	}
-	return Link(outStream);
+	 
+	bool result  = Link(outStream);
+
+	vs.Delete(); fs.Delete(); gs.Delete(); tcs.Delete(); tes.Delete();
+
+	return result;
 }
 
 inline void GLSLProgram::RegisterUniform( unsigned int index, const char *name, std::ostream *outStream )
