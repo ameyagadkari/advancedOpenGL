@@ -25,10 +25,10 @@ cs6610::Graphics::Material::Material(const cyTriMesh& i_meshData, const std::vec
 		unsigned width, height;
 		unsigned error = lodepng::decode(image, width, height, i_texturePaths[i].c_str());
 		CS6610_ASSERTF(!error, "Decoder error %d: %s", error, lodepng_error_text(error));
-		m_textures[i].SetImage(&image[0], GL_RGB, GL_RGBA, width, height);
+		m_textures[i].SetImage(&image[0], GL_RGBA, GL_RGBA, width, height);
 		m_textures[i].BuildMipmaps();
 	}
-	MaterialBufferData materialBufferData(i_meshData.M(0).Ka, i_meshData.M(0).Kd, i_meshData.M(0).Ks, i_meshData.M(0).Ns);
+	MaterialBuffer materialBufferData(i_meshData.M(0).Ka, i_meshData.M(0).Kd, i_meshData.M(0).Ks, i_meshData.M(0).Ns);
 	m_materialBuffer = new UniformBuffer(UniformBufferType::MATERIAL, sizeof(materialBufferData), &materialBufferData);
 }
 
@@ -58,8 +58,8 @@ cs6610::Graphics::Effect * cs6610::Graphics::Material::GetEffect() const
 
 void cs6610::Graphics::Material::Bind()const
 {
-	m_effect->Bind();
 	m_materialBuffer->Bind();
+	m_effect->Bind();
 	for (size_t i = 0; i < m_numbeOfTextures; i++)
 	{
 		m_textures->Bind(static_cast<int>(i));

@@ -44,7 +44,7 @@ bool cs6610::Graphics::UniformBuffer::Initialize(const void * const i_initialBuf
 
 	// Allocate space and copy the constant data into the uniform buffer
 	{
-		glBufferData(GL_UNIFORM_BUFFER, m_uniformBufferSize, i_initialBufferData, GL_DYNAMIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, m_uniformBufferSize, reinterpret_cast<const GLvoid*>(i_initialBufferData), GL_DYNAMIC_DRAW);
 		const GLenum errorCode = glGetError();
 		if (errorCode != GL_NO_ERROR)
 		{
@@ -77,7 +77,7 @@ void cs6610::Graphics::UniformBuffer::Bind() const
 	CS6610_ASSERT(glGetError() == GL_NO_ERROR);
 }
 
-void cs6610::Graphics::UniformBuffer::Update(void * i_newBufferData, size_t i_newUniformBufferSize) const
+void cs6610::Graphics::UniformBuffer::Update(const void * const i_newBufferData, size_t i_newUniformBufferSize) const
 {
 	// Make the uniform buffer active
 	{
@@ -96,7 +96,7 @@ void cs6610::Graphics::UniformBuffer::Update(void * i_newBufferData, size_t i_ne
 		{
 			CS6610_ASSERTF(false, "Size of the new buffer data is greater than initial size of the buffer data");
 		}
-		glBufferSubData(GL_UNIFORM_BUFFER, updateAtTheBeginning, updateTheEntireBuffer, i_newBufferData);
+		glBufferSubData(GL_UNIFORM_BUFFER, updateAtTheBeginning, updateTheEntireBuffer, reinterpret_cast<const GLvoid*>(i_newBufferData));
 		CS6610_ASSERT(glGetError() == GL_NO_ERROR);
 	}
 }
