@@ -118,7 +118,7 @@
       <SubSystem>Windows</SubSystem>
     </Link>
     <Lib>
-      <AdditionalDependencies>GLEW.lib;FreeGLUT.lib;Camera.lib;Asserts.lib;Time.lib</AdditionalDependencies>
+      <AdditionalDependencies>GLEW.lib;FreeGLUT.lib;Camera.lib;Asserts.lib;Time.lib;PNGLoader.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -137,7 +137,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>GLEW.lib;FreeGLUT.lib;Camera.lib;Asserts.lib;Time.lib</AdditionalDependencies>
+      <AdditionalDependencies>GLEW.lib;FreeGLUT.lib;Camera.lib;Asserts.lib;Time.lib;PNGLoader.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -156,7 +156,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>GLEW.lib;FreeGLUT.lib;Camera.lib;Asserts.lib;Time.lib</AdditionalDependencies>
+      <AdditionalDependencies>GLEW.lib;FreeGLUT.lib;Camera.lib;Asserts.lib;Time.lib;PNGLoader.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

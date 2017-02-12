@@ -126,7 +126,7 @@ namespace
 	{
 		if (lmbStillPressed)
 		{
-			float xOffsetLMB = static_cast<float>(x - xPosOnPressLMB);
+			float xOffsetLMB = static_cast<float>(xPosOnPressLMB - x);
 			float yOffsetLMB = static_cast<float>(y - yPosOnPressLMB);
 			xPosOnPressLMB = x;
 			yPosOnPressLMB = y;
@@ -134,14 +134,14 @@ namespace
 		}
 		if (rmbStillPressed)
 		{
-			float yOffsetRMB = static_cast<float>(y - yPosOnPressRMB);
+			float yOffsetRMB = static_cast<float>(yPosOnPressRMB - y);
 			yPosOnPressRMB = y;
 			cs6610::MyGame::ms_gameobjects.at("Teapot")->UpdatePosition(yOffsetRMB);
 		}
 		if (ctrlLMBStillPressed)
 		{
-			float xOffsetCtrlLMB = static_cast<float>(x - xPosOnPressCtrlLMB);
-			float yOffsetCtrlLMB = static_cast<float>(y - yPosOnPressCtrlLMB);
+			float xOffsetCtrlLMB = static_cast<float>(xPosOnPressCtrlLMB - x);
+			float yOffsetCtrlLMB = static_cast<float>(yPosOnPressCtrlLMB - y);
 			xPosOnPressCtrlLMB = x;
 			yPosOnPressCtrlLMB = y;
 			cs6610::MyGame::ms_gameobjects.at("Light")->UpdateOrientation(xOffsetCtrlLMB, yOffsetCtrlLMB);

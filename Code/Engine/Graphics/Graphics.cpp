@@ -67,7 +67,7 @@ void cs6610::Graphics::RenderFrame(void)
 		model =
 			cyMatrix4f::MatrixScale(0.1f)*
 			cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects.at("Teapot")->GetPosition())*
-			cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(MyGame::ms_gameobjects.at("Light")->GetOrientationEular().y))*
+			cyMatrix4f::MatrixRotationZ(Math::ConvertDegreesToRadians(MyGame::ms_gameobjects.at("Light")->GetOrientationEular().z))*
 			cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(MyGame::ms_gameobjects.at("Light")->GetOrientationEular().x))*
 			cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects.at("Light")->GetPosition() - MyGame::ms_gameobjects.at("Teapot")->GetPosition());
 
@@ -93,7 +93,7 @@ void cs6610::Graphics::RenderFrame(void)
 		model =
 			cyMatrix4f::MatrixScale(0.05f)*
 			cyMatrix4f::MatrixTrans(teapot->GetPosition())*
-			cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(teapot->GetOrientationEular().y))*
+			cyMatrix4f::MatrixRotationZ(Math::ConvertDegreesToRadians(teapot->GetOrientationEular().z))*
 			cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(teapot->GetOrientationEular().x));
 		/*view = MyGame::ms_pcamera->GetViewMatrix();
 		projection = MyGame::ms_pcamera->GetPerspectiveProjectionMatrix();*/
@@ -153,8 +153,8 @@ namespace
 	{
 		if (cs6610::Time::GetElapsedTimeDuringPreviousFrame() > FPS)
 		{
-			cs6610::MyGame::ms_pcamera->UpdateCurrentCameraOrientation();
-			cs6610::MyGame::ms_pcamera->UpdateCurrentCameraPosition();
+			/*cs6610::MyGame::ms_pcamera->UpdateCurrentCameraOrientation();
+			cs6610::MyGame::ms_pcamera->UpdateCurrentCameraPosition();*/
 			glutPostWindowRedisplay(currentWindowID);
 		}
 	}

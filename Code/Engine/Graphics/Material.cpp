@@ -60,6 +60,6 @@ void cs6610::Graphics::Material::Bind()const
 	m_effect->Bind();
 	for (size_t i = 0; i < length; i++)
 	{
-		m_textures->Bind(i);
+		m_textures->Bind(static_cast<int>(i));
 	}
 }
