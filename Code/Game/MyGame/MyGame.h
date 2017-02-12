@@ -20,14 +20,13 @@ namespace cs6610
 
 namespace cs6610
 {
-	class MyGame
+	namespace MyGame
 	{
-	public:
-		static void Run(void);
-		static bool Initialize(int i_argumentCount, char** i_arguments);
-		static void CleanUp(void);
-		static std::map<std::string, Gameplay::GameObject*> ms_gameobjects;
-		static Camera::Camera *ms_pcamera;
-		static Camera::Camera *ms_ocamera;
+		void Run();
+		bool Initialize(int i_argumentCount, char** i_arguments);
+		void CleanUp();
+		extern std::map<std::string, Gameplay::GameObject*> ms_gameobjects;
+		extern Camera::Camera *ms_pcamera;
+		extern Camera::Camera *ms_ocamera;
 	};
 }

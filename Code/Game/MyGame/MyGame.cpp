@@ -8,9 +8,17 @@
 #include "../Gameplay/Gameobject.h"
 #include "../../Engine/Camera/Camera.h"
 
-std::map<std::string, cs6610::Gameplay::GameObject*> cs6610::MyGame::ms_gameobjects;
-cs6610::Camera::Camera* cs6610::MyGame::ms_pcamera;
-cs6610::Camera::Camera* cs6610::MyGame::ms_ocamera;
+
+
+namespace cs6610
+{
+	namespace MyGame
+	{
+		std::map<std::string, Gameplay::GameObject*> ms_gameobjects;
+		Camera::Camera* ms_pcamera;
+		Camera::Camera* ms_ocamera;
+	}
+}
 
 void cs6610::MyGame::Run(void)
 {
