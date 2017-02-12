@@ -116,7 +116,7 @@ void cs6610::Gameplay::GameObject::SetMesh(const std::string i_meshRelativePath)
 		CS6610_ASSERTF(false, "Use the other overload to set mesh");
 	}
 }
-void cs6610::Gameplay::GameObject::SetMesh(cs6610::Graphics::Mesh* const i_mesh)
+void cs6610::Gameplay::GameObject::SetMesh(Graphics::Mesh* const i_mesh)
 {
 	if (m_mesh)
 	{

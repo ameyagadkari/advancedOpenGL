@@ -26,7 +26,7 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 		CS6610_ASSERTF(false, "Graphics Initialization failed");
 		wereThereErrors = true;
 	}
-	if (!UserInput::UserInput::Initialize())
+	if (!UserInput::Initialize())
 	{
 		CS6610_ASSERTF(false, "UserInput Initialization failed");
 		wereThereErrors = true;

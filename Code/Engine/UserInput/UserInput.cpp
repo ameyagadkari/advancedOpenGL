@@ -29,10 +29,17 @@ namespace
 	bool ctrlLMBStillPressed = false;
 }
 
-std::bitset<256> cs6610::UserInput::UserInput::keys;
-bool cs6610::UserInput::UserInput::isCameraPerspective = true;
+namespace cs6610
+{
+	namespace UserInput
+	{
+		std::bitset<256> keys;
+		bool isCameraPerspective = true;
+	}
+}
 
-bool cs6610::UserInput::UserInput::Initialize(void)
+
+bool cs6610::UserInput::Initialize()
 {
 	glutSetKeyRepeat(GLUT_KEY_REPEAT_ON);
 	glutKeyboardFunc(keyPress);
@@ -49,9 +56,9 @@ namespace
 {
 	void keyPress(unsigned char c, int x, int y)
 	{
-		if (c == 'p' && !cs6610::UserInput::UserInput::keys['p'])
+		if (c == 'p' && !cs6610::UserInput::keys['p'])
 		{
-			cs6610::UserInput::UserInput::isCameraPerspective = !cs6610::UserInput::UserInput::isCameraPerspective;
+			cs6610::UserInput::isCameraPerspective = !cs6610::UserInput::isCameraPerspective;
 		}
 		if (c == VK_ESCAPE)
 		{
@@ -60,12 +67,12 @@ namespace
 		}
 		else
 		{
-			cs6610::UserInput::UserInput::keys.set(c);
+			cs6610::UserInput::keys.set(c);
 		}
 	}
 	void keyRelease(unsigned char c, int x, int y)
 	{
-		cs6610::UserInput::UserInput::keys.reset(c);
+		cs6610::UserInput::keys.reset(c);
 	}
 	void mouse(int button, int state, int x, int y)
 	{
@@ -154,14 +161,14 @@ namespace
 	}
 	void keyPressSpecial(int key, int x, int y)
 	{
-		if (key == GLUT_KEY_F6 && !cs6610::UserInput::UserInput::keys[key])
+		if (key == GLUT_KEY_F6 && !cs6610::UserInput::keys[key])
 		{
-			cs6610::UserInput::UserInput::keys.set(key);
+			cs6610::UserInput::keys.set(key);
 			cs6610::Graphics::Effect::ReCompile();
 		}
 	}
 	void keyReleaseSpecial(int key, int x, int y)
 	{
-		cs6610::UserInput::UserInput::keys.reset(key);
+		cs6610::UserInput::keys.reset(key);
 	}
 }

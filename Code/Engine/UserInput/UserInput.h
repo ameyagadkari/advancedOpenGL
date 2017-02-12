@@ -6,12 +6,8 @@ namespace cs6610
 {
 	namespace UserInput
 	{
-		class UserInput
-		{
-		public:
-			static bool Initialize(void);
-			static std::bitset<256>keys;
-			static bool isCameraPerspective;
-		};
+		bool Initialize();
+		extern std::bitset<256>keys;
+		extern bool isCameraPerspective;
 	}
 }

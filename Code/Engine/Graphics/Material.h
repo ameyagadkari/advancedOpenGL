@@ -1,5 +1,4 @@
 #pragma once
-#include <cstdint>
 #include <vector>
 
 typedef unsigned int GLenum;
@@ -14,6 +13,7 @@ namespace cs6610
 {
 	namespace Graphics
 	{
+		class UniformBuffer;
 		class Effect;
 	}
 }
@@ -32,6 +32,7 @@ namespace cs6610
 		private:	
 #define GL_TEXTURE_2D 0x0DE1
 			cy::GLTexture<GL_TEXTURE_2D>* m_textures;
+			UniformBuffer *m_materialBuffer;
 			Effect* m_effect;
 		};
 	}

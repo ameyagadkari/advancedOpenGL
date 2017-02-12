@@ -5,6 +5,7 @@
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Effect.cpp" />
     <ClCompile Include="Material.cpp" />
+    <ClCompile Include="UniformBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics.h" />
@@ -12,5 +13,7 @@
     <ClInclude Include="Effect.h" />
     <ClInclude Include="MeshData.h" />
     <ClInclude Include="Material.h" />
+    <ClInclude Include="UniformBuffer.h" />
+    <ClInclude Include="UniformBufferData.h" />
   </ItemGroup>
 </Project>

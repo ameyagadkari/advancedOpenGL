@@ -23,6 +23,7 @@
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="UniformBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Effect.h" />
@@ -30,6 +31,8 @@
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshData.h" />
+    <ClInclude Include="UniformBuffer.h" />
+    <ClInclude Include="UniformBufferData.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{44529237-8F91-4FFE-9335-67A712550333}</ProjectGuid>

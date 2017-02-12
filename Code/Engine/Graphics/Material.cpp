@@ -9,7 +9,7 @@
 
 namespace
 {
-	size_t length;
+	size_t length = 0;
 }
 
 cs6610::Graphics::Material::Material(const std::vector<std::string> i_shaderPaths, const std::vector<std::string> i_texturePaths) :
