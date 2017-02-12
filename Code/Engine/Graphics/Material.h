@@ -32,7 +32,7 @@ namespace cs6610
 		private:	
 #define GL_TEXTURE_2D 0x0DE1
 			cy::GLTexture<GL_TEXTURE_2D>* m_textures;
-			UniformBuffer *m_materialBuffer;
+			//UniformBuffer *m_materialBuffer;
 			Effect* m_effect;
 		};
 	}

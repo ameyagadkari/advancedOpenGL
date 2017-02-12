@@ -34,7 +34,7 @@ cs6610::Graphics::Mesh::Mesh(const std::string i_relativePath, cy::Point3f &o_mi
 			s_meshData->VN(s_meshData->FN(ii).v[0]).y,
 			s_meshData->VN(s_meshData->FN(ii).v[0]).z,
 			s_meshData->VT(s_meshData->FT(ii).v[0]).x,
-			s_meshData->VT(s_meshData->FT(ii).v[0]).y);
+			1.0f - s_meshData->VT(s_meshData->FT(ii).v[0]).y);
 		++index;
 		s_meshData_inner->vertexData[index].AddVertexData(
 			s_meshData->V(s_meshData->F(ii).v[1]).x,
@@ -44,7 +44,7 @@ cs6610::Graphics::Mesh::Mesh(const std::string i_relativePath, cy::Point3f &o_mi
 			s_meshData->VN(s_meshData->FN(ii).v[1]).y,
 			s_meshData->VN(s_meshData->FN(ii).v[1]).z,
 			s_meshData->VT(s_meshData->FT(ii).v[1]).x,
-			s_meshData->VT(s_meshData->FT(ii).v[1]).y);
+			1.0f - s_meshData->VT(s_meshData->FT(ii).v[1]).y);
 		++index;
 		s_meshData_inner->vertexData[index].AddVertexData(
 			s_meshData->V(s_meshData->F(ii).v[2]).x,
@@ -54,7 +54,7 @@ cs6610::Graphics::Mesh::Mesh(const std::string i_relativePath, cy::Point3f &o_mi
 			s_meshData->VN(s_meshData->FN(ii).v[2]).y,
 			s_meshData->VN(s_meshData->FN(ii).v[2]).z,
 			s_meshData->VT(s_meshData->FT(ii).v[2]).x,
-			s_meshData->VT(s_meshData->FT(ii).v[2]).y);
+			1.0f - s_meshData->VT(s_meshData->FT(ii).v[2]).y);
 		++index;
 	}
 	Initialize();
