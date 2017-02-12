@@ -3,7 +3,6 @@
 #include "../../Game/MyGame/MyGame.h"
 #include "../Graphics/Effect.h"
 #include "../../External/cyCodeBase/cyPoint.h"
-#include "../Camera/Camera.h"
 #include "../../Game/Gameplay/Gameobject.h"
 
 namespace

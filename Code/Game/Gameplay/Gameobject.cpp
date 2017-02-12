@@ -117,21 +117,6 @@ cyPoint3f cs6610::Gameplay::GameObject::GetOrientationEular()const
 #pragma endregion
 
 #pragma region Sets
-/*void cs6610::Gameplay::GameObject::SetMaterial(const std::vector<std::string> i_shaderPaths, const std::vector<std::string> i_texturePaths, const char* const i_names)
-{
-	if (!m_material)
-	{
-		m_material = new Graphics::Material(i_shaderPaths, i_texturePaths);
-		if (i_names)
-		{
-			m_material->GetEffect()->RegisterUniforms(i_names);
-		}
-	}
-	else
-	{
-		CS6610_ASSERTF(false, "Use the other overload to set effect");
-	}
-}*/
 void cs6610::Gameplay::GameObject::SetMaterial(Graphics::Material* const i_material, const char* const i_names)
 {
 	if (m_material)
@@ -149,19 +134,6 @@ void cs6610::Gameplay::GameObject::SetMaterial(Graphics::Material* const i_mater
 		CS6610_ASSERTF(false, "Use the other overload to set effect");
 	}
 }
-/*void cs6610::Gameplay::GameObject::SetMesh(const std::string i_meshRelativePath)
-{
-	if (!m_mesh)
-	{
-		cyPoint3f minBounds, maxBounds;
-		m_mesh = new Graphics::Mesh(i_meshRelativePath, minBounds, maxBounds);
-		m_position += (maxBounds + minBounds) *0.5f;
-	}
-	else
-	{
-		CS6610_ASSERTF(false, "Use the other overload to set mesh");
-	}
-}*/
 void cs6610::Gameplay::GameObject::SetMesh(Graphics::Mesh* const i_mesh)
 {
 	if (m_mesh)

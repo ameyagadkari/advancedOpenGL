@@ -1,5 +1,4 @@
 #pragma once
-#include <string>
 #include "../../External/cyCodeBase/cyPoint.h"
 #include "../../External/cyCodeBase/cyTriMesh.h"
 
