@@ -8,6 +8,7 @@
 #include "../../Game/Gameplay/Gameobject.h"
 #include "Mesh.h"
 #include "Effect.h"
+#include "Material.h"
 #include "../Time/Time.h"
 #include "../Camera/Camera.h"
 #include "../../External/cyCodeBase/cyPoint.h"
@@ -61,7 +62,7 @@ void cs6610::Graphics::RenderFrame(void)
 	// Draw the light
 	{
 		Gameplay::GameObject* light = MyGame::ms_gameobjects.at("Light");
-		Effect* lightEffect = light->GetEffect();
+		Effect* lightEffect = light->GetMaterial()->GetEffect();
 		lightEffect->Bind();
 		model =
 			cyMatrix4f::MatrixScale(0.1f)*
@@ -86,7 +87,7 @@ void cs6610::Graphics::RenderFrame(void)
 	// Draw Teapot
 	{
 		Gameplay::GameObject* teapot = MyGame::ms_gameobjects.at("Teapot");
-		Effect* teapotEffect = teapot->GetEffect();
+		Effect* teapotEffect = teapot->GetMaterial()->GetEffect();
 		teapotEffect->Bind();
 
 		model =

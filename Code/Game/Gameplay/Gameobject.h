@@ -2,14 +2,14 @@
 
 #include "../../External/cyCodeBase/cyPoint.h"
 
-#include <string>
+#include <vector>
 
 namespace cs6610
 {
 	namespace Graphics
 	{
 		class Mesh;
-		class Effect;
+		class Material;
 	}
 }
 
@@ -25,14 +25,14 @@ namespace cs6610
 			void UpdatePosition(float zOffset);
 			void UpdateOrientation(float xOffset, float yOffset);
 #pragma region Gets
-			Graphics::Effect* GetEffect()const;
+			Graphics::Material* GetMaterial()const;
 			Graphics::Mesh* GetMesh()const;
 			cyPoint3f GetPosition()const;
 			cyPoint3f GetOrientationEular()const;
 #pragma endregion
 #pragma region Sets
-			void SetEffect(const std::string i_relativePathVertex, const std::string i_relativePathFragment, const char * const i_names = nullptr);
-			void SetEffect(Graphics::Effect* const i_effect, const char * const i_names = nullptr);
+			void SetMaterial(const std::vector<std::string> i_shaderPaths, const std::vector<std::string> i_texturePaths, const char * const i_names = nullptr);
+			void SetMaterial(Graphics::Material* const i_material, const char * const i_names = nullptr);
 			void SetMesh(const std::string i_meshRelativePath);
 			void SetMesh(Graphics::Mesh* const i_mesh);
 			void SetPosition(const cyPoint3f i_position);
@@ -40,7 +40,7 @@ namespace cs6610
 #pragma endregion 
 		private:
 			Graphics::Mesh* m_mesh;
-			Graphics::Effect* m_effect;
+			Graphics::Material* m_material;
 			cyPoint3f m_position;
 			cyPoint3f m_eularAngles;
 		};

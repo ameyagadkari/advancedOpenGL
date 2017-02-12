@@ -13,7 +13,8 @@ namespace cs6610
 			{
 				float x, y, z;
 				float nx, ny, nz;
-				void AddVertexData(const float i_x, const float i_y, const float i_z, const float i_nx, const float i_ny, const float i_nz)
+				float u, v;
+				void AddVertexData(const float i_x, const float i_y, const float i_z, const float i_nx, const float i_ny, const float i_nz, const float i_u, const float i_v)
 				{
 					x = i_x;
 					y = i_y;
@@ -21,6 +22,8 @@ namespace cs6610
 					nx = i_nx;
 					ny = i_ny;
 					nz = i_nz;
+					u = i_u;
+					v = i_v;
 				}
 			};
 			Vertex *vertexData;

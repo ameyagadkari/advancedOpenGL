@@ -997,7 +997,13 @@ inline bool GLSLProgram::BuildFiles( const char *vertexShaderFile,
 		}
 		AttachShader(tes);
 	}
-	return Link(outStream);
+	bool result = Link(outStream);
+	vs.Delete();
+	fs.Delete();
+	gs.Delete();
+	tcs.Delete();
+	tes.Delete();
+	return result;
 }
 
 

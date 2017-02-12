@@ -32,7 +32,9 @@ cs6610::Graphics::Mesh::Mesh(const std::string i_relativePath, cy::Point3f &o_mi
 			s_meshData->V(s_meshData->F(ii).v[0]).z,
 			s_meshData->VN(s_meshData->FN(ii).v[0]).x,
 			s_meshData->VN(s_meshData->FN(ii).v[0]).y,
-			s_meshData->VN(s_meshData->FN(ii).v[0]).z);
+			s_meshData->VN(s_meshData->FN(ii).v[0]).z,
+			s_meshData->VT(s_meshData->FT(ii).v[0]).x,
+			s_meshData->VT(s_meshData->FT(ii).v[0]).y);
 		++index;
 		s_meshData_inner->vertexData[index].AddVertexData(
 			s_meshData->V(s_meshData->F(ii).v[1]).x,
@@ -40,7 +42,9 @@ cs6610::Graphics::Mesh::Mesh(const std::string i_relativePath, cy::Point3f &o_mi
 			s_meshData->V(s_meshData->F(ii).v[1]).z,
 			s_meshData->VN(s_meshData->FN(ii).v[1]).x,
 			s_meshData->VN(s_meshData->FN(ii).v[1]).y,
-			s_meshData->VN(s_meshData->FN(ii).v[1]).z);
+			s_meshData->VN(s_meshData->FN(ii).v[1]).z,
+			s_meshData->VT(s_meshData->FT(ii).v[1]).x,
+			s_meshData->VT(s_meshData->FT(ii).v[1]).y);
 		++index;
 		s_meshData_inner->vertexData[index].AddVertexData(
 			s_meshData->V(s_meshData->F(ii).v[2]).x,
@@ -48,7 +52,9 @@ cs6610::Graphics::Mesh::Mesh(const std::string i_relativePath, cy::Point3f &o_mi
 			s_meshData->V(s_meshData->F(ii).v[2]).z,
 			s_meshData->VN(s_meshData->FN(ii).v[2]).x,
 			s_meshData->VN(s_meshData->FN(ii).v[2]).y,
-			s_meshData->VN(s_meshData->FN(ii).v[2]).z);
+			s_meshData->VN(s_meshData->FN(ii).v[2]).z,
+			s_meshData->VT(s_meshData->FT(ii).v[2]).x,
+			s_meshData->VT(s_meshData->FT(ii).v[2]).y);
 		++index;
 	}
 	Initialize();
@@ -206,7 +212,36 @@ bool cs6610::Graphics::Mesh::Initialize()
 			else
 			{
 				wereThereErrors = true;
-				CS6610_ASSERTF(false, "OpenGL failed to set the POSITION vertex attribute at location %u: %s", vertexElementLocation, reinterpret_cast<const char*>(gluErrorString(errorCode)));
+				CS6610_ASSERTF(false, "OpenGL failed to set the NORMAL vertex attribute at location %u: %s", vertexElementLocation, reinterpret_cast<const char*>(gluErrorString(errorCode)));
+				goto OnExit;
+			}
+		}
+		// UV at 1
+		{
+			const GLuint vertexElementLocation = 2;
+			const GLint elementCount = 2;
+			const GLboolean isNormalized = GL_FALSE;
+
+			glVertexAttribPointer(vertexElementLocation, elementCount, GL_FLOAT, isNormalized, stride,
+				reinterpret_cast<GLvoid*>(offsetof(MeshData::Vertex, u)));
+
+			const GLenum errorCode = glGetError();
+			if (errorCode == GL_NO_ERROR)
+			{
+				glEnableVertexAttribArray(vertexElementLocation);
+				const GLenum errorCode = glGetError();
+				if (errorCode != GL_NO_ERROR)
+				{
+					wereThereErrors = true;
+					CS6610_ASSERTF(false, "OpenGL failed to enable the UV vertex attribute at location %u: %s",
+						vertexElementLocation, reinterpret_cast<const char*>(gluErrorString(errorCode)));
+					goto OnExit;
+				}
+			}
+			else
+			{
+				wereThereErrors = true;
+				CS6610_ASSERTF(false, "OpenGL failed to set the UV vertex attribute at location %u: %s", vertexElementLocation, reinterpret_cast<const char*>(gluErrorString(errorCode)));
 				goto OnExit;
 			}
 		}

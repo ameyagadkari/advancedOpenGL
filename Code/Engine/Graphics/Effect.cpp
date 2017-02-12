@@ -12,11 +12,10 @@ void cs6610::Graphics::Effect::Bind()const
 	m_program->Bind();
 }
 
-cs6610::Graphics::Effect::Effect(const std::string i_relativePathVertex, const std::string i_relativePathFragment)
+cs6610::Graphics::Effect::Effect(const std::vector<std::string> i_shaderPaths)
 	:
-m_program(new cyGLSLProgram()),
-m_relativePathVertex(i_relativePathVertex),
-m_relativePathFragment(i_relativePathFragment)
+	m_program(new cyGLSLProgram()),
+	m_shaderPaths(i_shaderPaths)
 {
 	Compile();
 	allActiveEffects.push_back(this);
@@ -26,6 +25,7 @@ cs6610::Graphics::Effect::~Effect()
 {
 	if (m_program)
 	{
+		m_program->Delete();
 		delete m_program;
 		m_program = nullptr;
 	}
@@ -44,7 +44,7 @@ void cs6610::Graphics::Effect::RegisterUniforms(const char * const i_names) cons
 
 void cs6610::Graphics::Effect::Compile(void) const
 {
-	if (!m_program->BuildFiles(m_relativePathVertex.c_str(), m_relativePathFragment.c_str()))
+	if (!m_program->BuildFiles(m_shaderPaths[0].c_str(), m_shaderPaths[1].c_str()))
 	{
 		CS6610_ASSERTF(false, "Failed to build shaders and create program");
 	}

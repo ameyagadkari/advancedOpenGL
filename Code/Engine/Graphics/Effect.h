@@ -1,6 +1,6 @@
 #pragma once
-#include <string>
 #include <list>
+#include <vector>
 
 typedef unsigned int GLuint;
 
@@ -17,16 +17,15 @@ namespace cs6610
 		{
 		public:
 			void Bind()const;
-			explicit Effect(const std::string i_relativePathVertex, const std::string i_relativePathFragment);
+			explicit Effect(const std::vector<std::string> i_shaderPaths);
 			~Effect();
 			cy::GLSLProgram* GetProgram()const;
 			void RegisterUniforms(const char * const i_names) const;
-			static void ReCompile(void);
+			static void ReCompile();
 		private:
-			void Compile(void) const;
+			void Compile() const;
 			cy::GLSLProgram* m_program;
-			std::string m_relativePathVertex;
-			std::string m_relativePathFragment;
+			std::vector<std::string> m_shaderPaths;
 			static std::list<Effect*> allActiveEffects;
 		};
 	}

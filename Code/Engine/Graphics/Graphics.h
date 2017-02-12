@@ -4,7 +4,7 @@ namespace cs6610
 {
 	namespace Graphics
 	{
-		void RenderFrame(void);
+		void RenderFrame();
 		bool Initialize(int i_argumentCount, char** i_arguments);
 	}
 }

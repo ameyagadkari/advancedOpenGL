@@ -2,12 +2,13 @@
 
 #include "../../Engine/Graphics/Mesh.h"
 #include "../../Engine/Asserts/Asserts.h"
+#include "../../Engine/Graphics/Material.h"
 #include "../../Engine/Graphics/Effect.h"
 #include "../../Engine/Time/Time.h"
 
 cs6610::Gameplay::GameObject::GameObject(const cyPoint3f i_position, const cyPoint3f i_eularAngles) :
 	m_mesh(nullptr),
-	m_effect(nullptr),
+	m_material(nullptr),
 	m_position(i_position),
 	m_eularAngles(i_eularAngles)
 {}
@@ -18,10 +19,10 @@ cs6610::Gameplay::GameObject::~GameObject()
 		delete m_mesh;
 		m_mesh = nullptr;
 	}
-	if (m_effect)
+	if (m_material)
 	{
-		delete m_effect;
-		m_effect = nullptr;
+		delete m_material;
+		m_material = nullptr;
 	}
 }
 
@@ -51,9 +52,9 @@ void cs6610::Gameplay::GameObject::UpdateOrientation(float xOffset, float yOffse
 }
 
 #pragma region Gets
-cs6610::Graphics::Effect* cs6610::Gameplay::GameObject::GetEffect() const
+cs6610::Graphics::Material* cs6610::Gameplay::GameObject::GetMaterial() const
 {
-	return m_effect;
+	return m_material;
 }
 cs6610::Graphics::Mesh* cs6610::Gameplay::GameObject::GetMesh()const
 {
@@ -70,14 +71,14 @@ cyPoint3f cs6610::Gameplay::GameObject::GetOrientationEular()const
 #pragma endregion
 
 #pragma region Sets
-void cs6610::Gameplay::GameObject::SetEffect(const std::string i_relativePathVertex, const std::string i_relativePathFragment, const char * const i_names)
+void cs6610::Gameplay::GameObject::SetMaterial(const std::vector<std::string> i_shaderPaths, const std::vector<std::string> i_texturePaths, const char* const i_names)
 {
-	if (!m_effect)
+	if (!m_material)
 	{
-		m_effect = new Graphics::Effect(i_relativePathVertex, i_relativePathFragment);
+		m_material = new Graphics::Material(i_shaderPaths, i_texturePaths);
 		if (i_names)
 		{
-			m_effect->RegisterUniforms(i_names);
+			m_material->GetEffect()->RegisterUniforms(i_names);
 		}
 	}
 	else
@@ -85,16 +86,16 @@ void cs6610::Gameplay::GameObject::SetEffect(const std::string i_relativePathVer
 		CS6610_ASSERTF(false, "Use the other overload to set effect");
 	}
 }
-void cs6610::Gameplay::GameObject::SetEffect(Graphics::Effect* const i_effect, const char * const i_names)
+void cs6610::Gameplay::GameObject::SetMaterial(Graphics::Material* const i_material, const char* const i_names)
 {
-	if (m_effect)
+	if (m_material)
 	{
-		delete m_effect;
-		m_effect = nullptr;
-		m_effect = i_effect;
+		delete m_material;
+		m_material = nullptr;
+		m_material = i_material;
 		if (i_names)
 		{
-			m_effect->RegisterUniforms(i_names);
+			m_material->GetEffect()->RegisterUniforms(i_names);
 		}
 	}
 	else
