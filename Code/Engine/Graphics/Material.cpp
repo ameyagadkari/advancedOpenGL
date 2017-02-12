@@ -22,7 +22,7 @@ cs6610::Graphics::Material::Material(const std::vector<std::string> i_shaderPath
 		unsigned width, height;
 		unsigned error = lodepng::decode(image, width, height, i_texturePaths[i].c_str());
 		CS6610_ASSERTF(!error, "Decoder error %d: %s", error, lodepng_error_text(error));
-		m_textures[i].SetImage(&image[0], GL_RGB, GL_RGBA, width, height);
+		m_textures[i].SetImage(&image[0], GL_RGBA, GL_RGBA, width, height);
 		m_textures[i].BuildMipmaps();
 	}
 }
