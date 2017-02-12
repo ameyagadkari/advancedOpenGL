@@ -62,8 +62,8 @@ void cs6610::Graphics::RenderFrame(void)
 	// Draw the light
 	{
 		Gameplay::GameObject* light = MyGame::ms_gameobjects.at("Light");
-		Effect* lightEffect = light->GetMaterial()->GetEffect();
-		lightEffect->Bind();
+		Material* lightMaterial = light->GetMaterial();
+		lightMaterial->Bind();
 		model =
 			cyMatrix4f::MatrixScale(0.1f)*
 			cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects.at("Teapot")->GetPosition())*
@@ -76,7 +76,7 @@ void cs6610::Graphics::RenderFrame(void)
 		view = MyGame::ms_pcamera->GetViewMatrix();
 		projection = MyGame::ms_pcamera->GetPerspectiveProjectionMatrix();
 
-		cyGLSLProgram* program = lightEffect->GetProgram();
+		cyGLSLProgram* program = lightMaterial->GetEffect()->GetProgram();
 		program->SetUniform(0, model);
 		program->SetUniform(1, view);
 		program->SetUniform(2, projection);
@@ -87,8 +87,8 @@ void cs6610::Graphics::RenderFrame(void)
 	// Draw Teapot
 	{
 		Gameplay::GameObject* teapot = MyGame::ms_gameobjects.at("Teapot");
-		Effect* teapotEffect = teapot->GetMaterial()->GetEffect();
-		teapotEffect->Bind();
+		Material* teapotMaterial = teapot->GetMaterial();
+		teapotMaterial->Bind();
 
 		model =
 			cyMatrix4f::MatrixScale(0.05f)*
@@ -98,7 +98,7 @@ void cs6610::Graphics::RenderFrame(void)
 		/*view = MyGame::ms_pcamera->GetViewMatrix();
 		projection = MyGame::ms_pcamera->GetPerspectiveProjectionMatrix();*/
 		normal = cyMatrix3f(((view*model).GetInverse()).GetTranspose());
-		cyGLSLProgram* program = teapotEffect->GetProgram();
+		cyGLSLProgram* program = teapotMaterial->GetEffect()->GetProgram();
 		program->SetUniform(0, model);
 		program->SetUniform(1, view);
 		program->SetUniform(2, projection);
