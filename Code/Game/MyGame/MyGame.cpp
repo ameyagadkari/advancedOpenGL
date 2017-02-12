@@ -34,13 +34,13 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 
 	// Init all gameobjects
 	{
-		ms_gameobjects["Teapot"] = new Gameplay::GameObject(cyPoint3f(0.0f, 0.0f, 0.0f), cyPoint3f(180.0f, 0.0f, 180.0f));
+		ms_gameobjects["Teapot"] = new Gameplay::GameObject(cyPoint3f(0.0f, 0.0f, 0.0f), cyPoint3f(-90.0f, 0.0f, 0.0f));
 		ms_gameobjects.at("Teapot")->SetMesh("data/meshes/teapot/teapot.obj");
 		ms_gameobjects.at("Teapot")->SetMaterial(
 		{ "data/shaders/stdvertex.glsl", "data/shaders/stdfragment.glsl" },
 		{ "data/meshes/teapot/teapot_diffuse.png", "data/meshes/teapot/teapot_specular.png" },
 			"u_model u_view u_projection u_normal u_lightPosition");
-		ms_gameobjects["Light"] = new Gameplay::GameObject(cyPoint3f(0.0f, -5.0f, 0.0f));
+		ms_gameobjects["Light"] = new Gameplay::GameObject(cyPoint3f(0.0f, 0.0f, 15.0f));
 		ms_gameobjects.at("Light")->SetMesh("data/meshes/light.obj");
 		ms_gameobjects.at("Light")->SetMaterial(
 		{ "data/shaders/lightvertex.glsl", "data/shaders/lightfragment.glsl" },

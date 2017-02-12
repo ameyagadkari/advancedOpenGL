@@ -69,30 +69,48 @@ void cs6610::Camera::Camera::SetPosition(cyPoint3f i_position)
 }
 #pragma endregion
 
-void cs6610::Camera::Camera::UpdateCurrentCameraPosition(float zOffset)
+void cs6610::Camera::Camera::UpdateCurrentCameraPosition()
 {
 	cyPoint3f localOffset = cyPoint3f(0.0f);
 
-	localOffset.z += zOffset;
+	//localOffset.z += zOffset;
 
-	const float speed_unitsPerSecond = 1.0f;
+	if (UserInput::UserInput::keys.test('w'))
+		localOffset += m_localCameraAxis.m_front;
+	if (UserInput::UserInput::keys.test('s'))
+		localOffset -= m_localCameraAxis.m_front;
+	if (UserInput::UserInput::keys.test('d'))
+		localOffset += m_localCameraAxis.m_right;
+	if (UserInput::UserInput::keys.test('a'))
+		localOffset -= m_localCameraAxis.m_right;
+
+	const float speed_unitsPerSecond = 5.0f;
 	const float offsetModifier = speed_unitsPerSecond * static_cast<float>(Time::GetElapsedTimeDuringPreviousFrame());
 	localOffset *= offsetModifier;
 	m_position += localOffset;
 }
-void cs6610::Camera::Camera::UpdateCurrentCameraOrientation(float xOffset, float yOffset, bool constrainPitch)
+void cs6610::Camera::Camera::UpdateCurrentCameraOrientation(bool constrainPitch)
 {
 	cyPoint3f localOffset = cyPoint3f(0.0f);
 
-	localOffset.y += xOffset;
-	localOffset.x += yOffset;
+	//localOffset.y += xOffset;
+	//localOffset.x += yOffset;
+
+	if (UserInput::UserInput::keys.test('h'))
+		localOffset.y += 1.0f;
+	if (UserInput::UserInput::keys.test('f'))
+		localOffset.y -= 1.0f;
+	if (UserInput::UserInput::keys.test('g'))
+		localOffset.x += 1.0f;
+	if (UserInput::UserInput::keys.test('t'))
+		localOffset.x -= 1.0f;
 
 	const float speed_unitsPerSecond = 10.0f;
 	const float offsetModifier = speed_unitsPerSecond * static_cast<float>(Time::GetElapsedTimeDuringPreviousFrame());
 	localOffset *= offsetModifier;
 	m_eularAngles += localOffset;
 
-	/*if (constrainPitch)
+	if (constrainPitch)
 	{
 		if (m_eularAngles.x > 89.0f)
 		{
@@ -102,7 +120,7 @@ void cs6610::Camera::Camera::UpdateCurrentCameraOrientation(float xOffset, float
 		{
 			m_eularAngles.x = -89.0f;
 		}
-	}*/
+	}
 	UpdateLocalCameraAxes();
 }
 

@@ -13,17 +13,17 @@ out vec4 o_color;
 void main()
 {
 	//Hardcoded Values for ambient light
-	float ambientStrength = 0.1f;
+	vec3 ambientStrength = vec3(0.50980395,0.00000000,0.00000000);
 	vec3 ambientColor = vec3(texture2D(u_texture_diffuse, i_UV));
 
 	//Hardcoded Values for diffuse light
-	float diffuseStrength = 1.0f;
+	vec3 diffuseStrength = vec3(0.50980395,0.00000000,0.00000000);
 	vec3 diffuseColor = ambientColor;
 
 	//Hardcoded Values for specular light
-	float specularStrength = 0.5f;
+	vec3 specularStrength = vec3(0.80099994,0.80099994,0.80099994);
 	vec3 specularColor = vec3(texture2D(u_texture_specular, i_UV));
-	int glossiness = 32;
+	int glossiness = 20;
 
 	//Normalizing the normal
 	vec3 vertexNormalNormalized = normalize(i_vertexNormal);
@@ -35,13 +35,13 @@ void main()
 	//vec3 norm = normalize(ourNormal);
 	vec3 lightDirection = normalize(i_lightPosition - i_fragmentPosition); 
 	float cos_theta_diffuse = max(dot(vertexNormalNormalized, lightDirection), 0.0f);
-	vec3 diffuse = diffuseStrength * cos_theta_diffuse * diffuseColor;
+	vec3 diffuse = cos_theta_diffuse * diffuseStrength *  diffuseColor;
 
 	//Specular light
 	vec3 viewDirection = normalize(-i_fragmentPosition);
 	vec3 halfwayDirection = normalize(lightDirection + viewDirection);
 	float cos_theta_specular = pow(max(dot(vertexNormalNormalized, halfwayDirection), 0.0f), glossiness);
-	vec3 specular = cos_theta_diffuse * specularStrength * cos_theta_specular * specularColor; 
+	vec3 specular = cos_theta_diffuse * cos_theta_specular * specularStrength * specularColor; 
 
 	vec3 result = ambient + diffuse + specular;
 	o_color = vec4(result, 1.0f);
