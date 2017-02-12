@@ -153,7 +153,7 @@ namespace
 	{
 		if (cs6610::Time::GetElapsedTimeDuringPreviousFrame() > FPS)
 		{
-			//cs6610::MyGame::ms_pcamera->UpdateCurrentCameraOrientation();
+			cs6610::MyGame::ms_pcamera->UpdateCurrentCameraOrientation();
 			cs6610::MyGame::ms_pcamera->UpdateCurrentCameraPosition();
 			glutPostWindowRedisplay(currentWindowID);
 		}
