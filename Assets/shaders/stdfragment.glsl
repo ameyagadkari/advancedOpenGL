@@ -28,18 +28,18 @@ void main()
 	vec3 vertexNormalNormalized = normalize(i_vertexNormal);
 
 	//Ambient light
-	vec3 ambient = ambientConstant.rgb * ambientColor;
+	vec3 ambient = (ambientConstant.g == 0.0f && ambientConstant.b == 0.0f) ? ambientConstant.r * ambientColor : ambientConstant.rgb * ambientColor;
 
 	//Diffuse light
 	vec3 lightDirection = normalize(i_lightPosition - i_fragmentPosition); 
 	float cos_theta_diffuse = max(dot(vertexNormalNormalized, lightDirection), 0.0f);
-	vec3 diffuse = cos_theta_diffuse * diffuseConstant.rgb *  diffuseColor;
+	vec3 diffuse = (diffuseConstant.g == 0.0f && diffuseConstant.b == 0.0f) ? cos_theta_diffuse * diffuseConstant.r *  diffuseColor : cos_theta_diffuse * diffuseConstant.rgb *  diffuseColor;
 
 	//Specular light
 	vec3 viewDirection = normalize(-i_fragmentPosition);
 	vec3 halfwayDirection = normalize(lightDirection + viewDirection);
 	float cos_theta_specular = pow(max(dot(vertexNormalNormalized, halfwayDirection), 0.0f), specularExponent);
-	vec3 specular = cos_theta_diffuse * cos_theta_specular * specularConstant.rgb * specularColor; 
+	vec3 specular = (specularConstant.g == 0.0f && specularConstant.b == 0.0f) ? cos_theta_diffuse * cos_theta_specular * specularConstant.r * specularColor : cos_theta_diffuse * cos_theta_specular * specularConstant.rgb * specularColor;
 
 	vec3 result = ambient + diffuse + specular;
 	o_color = vec4(result, 1.0f);
