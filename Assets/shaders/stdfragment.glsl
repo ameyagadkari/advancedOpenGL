@@ -20,9 +20,9 @@ out vec4 o_color;
 
 void main()
 {
-	vec3 ambientColor = vec3(texture2D(u_texture_diffuse, i_UV));
+	vec3 ambientColor = (texture2D(u_texture_diffuse, i_UV)).rgb;
 	vec3 diffuseColor = ambientColor;
-	vec3 specularColor = vec3(texture2D(u_texture_specular, i_UV));
+	vec3 specularColor = (texture2D(u_texture_specular, i_UV)).rgb;
 
 	//Normalizing the normal
 	vec3 vertexNormalNormalized = normalize(i_vertexNormal);

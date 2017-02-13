@@ -6,5 +6,6 @@ namespace cs6610
 	{
 		void RenderFrame();
 		bool Initialize(int i_argumentCount, char** i_arguments);
+		void CleanUp();
 	}
 }

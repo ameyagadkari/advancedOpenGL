@@ -14,6 +14,8 @@
 #include "../../External/cyCodeBase/cyPoint.h"
 #include "../../External/cyCodeBase/cyMatrix.h"
 #include "../../External/cyCodeBase/cyGL.h"
+#include "UniformBuffer.h"
+#include "UniformBufferData.h"
 
 namespace
 {
@@ -37,8 +39,11 @@ namespace
 #endif
 		;
 	int currentWindowID = 0;
-	void CallingRedisplay(void);
+	void CallingRedisplay();
 	void ReShapeCallback(int width, int height);
+
+	cs6610::Graphics::UniformBuffer* s_drawcallBuffer = nullptr;
+
 }
 
 void cs6610::Graphics::RenderFrame(void)
@@ -54,9 +59,10 @@ void cs6610::Graphics::RenderFrame(void)
 	glClear(clearColorAndDepth);
 	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to clear color buffer and depth buffer");
 
-	cyMatrix4f model;
-	cyMatrix4f view;
-	cyMatrix4f projection;
+	//cyMatrix4f model;
+	//cyMatrix4f view;
+	//cyMatrix4f projection;
+	UniformBufferData::DrawcallBuffer drawcallBufferData;
 	cyMatrix3f normal;
 	cyPoint3f lightPositionWorld;
 	// Draw the light
@@ -64,22 +70,20 @@ void cs6610::Graphics::RenderFrame(void)
 		Gameplay::GameObject* light = MyGame::ms_gameobjects.at("Light");
 		Material* lightMaterial = light->GetMaterial();
 		lightMaterial->Bind();
-		model =
+		drawcallBufferData.model =
 			cyMatrix4f::MatrixScale(0.1f)*
 			cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects.at("Teapot")->GetPosition())*
 			cyMatrix4f::MatrixRotationZ(Math::ConvertDegreesToRadians(MyGame::ms_gameobjects.at("Light")->GetOrientationEular().z))*
 			cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(MyGame::ms_gameobjects.at("Light")->GetOrientationEular().x))*
 			cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects.at("Light")->GetPosition() - MyGame::ms_gameobjects.at("Teapot")->GetPosition());
 
-		lightPositionWorld = cyPoint3f(model*cyPoint4f(MyGame::ms_gameobjects.at("Light")->GetPosition(), 1.0f));
+		lightPositionWorld = cyPoint3f(drawcallBufferData.model*cyPoint4f(MyGame::ms_gameobjects.at("Light")->GetPosition(), 1.0f));
 
-		view = MyGame::ms_pcamera->GetViewMatrix();
-		projection = MyGame::ms_pcamera->GetPerspectiveProjectionMatrix();
+		drawcallBufferData.view = MyGame::ms_pcamera->GetViewMatrix();
+		drawcallBufferData.projection = MyGame::ms_pcamera->GetPerspectiveProjectionMatrix();
 
-		cyGLSLProgram* program = lightMaterial->GetEffect()->GetProgram();
-		program->SetUniform(0, model);
-		program->SetUniform(1, view);
-		program->SetUniform(2, projection);
+		//cyGLSLProgram* program = lightMaterial->GetEffect()->GetProgram();
+		s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 
 		light->GetMesh()->RenderMesh();
 	}
@@ -90,20 +94,18 @@ void cs6610::Graphics::RenderFrame(void)
 		Material* teapotMaterial = teapot->GetMaterial();
 		teapotMaterial->Bind();
 
-		model =
+		drawcallBufferData.model =
 			cyMatrix4f::MatrixScale(0.05f)*
 			cyMatrix4f::MatrixTrans(teapot->GetPosition())*
 			cyMatrix4f::MatrixRotationZ(Math::ConvertDegreesToRadians(teapot->GetOrientationEular().z))*
 			cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(teapot->GetOrientationEular().x));
 		/*view = MyGame::ms_pcamera->GetViewMatrix();
 		projection = MyGame::ms_pcamera->GetPerspectiveProjectionMatrix();*/
-		normal = cyMatrix3f(((view*model).GetInverse()).GetTranspose());
+		normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
 		cyGLSLProgram* program = teapotMaterial->GetEffect()->GetProgram();
-		program->SetUniform(0, model);
-		program->SetUniform(1, view);
-		program->SetUniform(2, projection);
-		program->SetUniform(3, normal);
-		program->SetUniform(4, lightPositionWorld);
+		s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+		program->SetUniform(0, normal);
+		program->SetUniform(1, lightPositionWorld);
 
 		teapot->GetMesh()->RenderMesh();
 	}
@@ -144,12 +146,23 @@ bool cs6610::Graphics::Initialize(int i_argumentCount, char** i_arguments)
 	const GLenum option = GLUT_ACTION_ON_WINDOW_CLOSE;
 	const int mode = GLUT_ACTION_GLUTMAINLOOP_RETURNS;
 	glutSetOption(option, mode);
+	s_drawcallBuffer = new UniformBuffer(UniformBufferType::DRAWCALL, sizeof(UniformBufferData::DrawcallBuffer));
+	s_drawcallBuffer->Bind();
 	return !wereThereErrors;
+}
+
+void cs6610::Graphics::CleanUp()
+{
+	if(s_drawcallBuffer)
+	{
+		delete s_drawcallBuffer;
+		s_drawcallBuffer = nullptr;
+	}
 }
 
 namespace
 {
-	void CallingRedisplay(void)
+	void CallingRedisplay()
 	{
 		if (cs6610::Time::GetElapsedTimeDuringPreviousFrame() > FPS)
 		{

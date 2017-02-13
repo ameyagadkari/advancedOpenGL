@@ -28,7 +28,7 @@ cs6610::Graphics::Material::Material(const cyTriMesh& i_meshData, const std::vec
 		m_textures[i].SetImage(&image[0], GL_RGBA, GL_RGBA, width, height);
 		m_textures[i].BuildMipmaps();
 	}
-	MaterialBuffer materialBufferData(i_meshData.M(0).Ka, i_meshData.M(0).Kd, i_meshData.M(0).Ks, i_meshData.M(0).Ns);
+	UniformBufferData::MaterialBuffer materialBufferData(i_meshData.M(0).Ka, i_meshData.M(0).Kd, i_meshData.M(0).Ks, i_meshData.M(0).Ns);
 	m_materialBuffer = new UniformBuffer(UniformBufferType::MATERIAL, sizeof(materialBufferData), &materialBufferData);
 }
 

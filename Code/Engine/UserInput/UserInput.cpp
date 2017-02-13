@@ -4,6 +4,7 @@
 #include "../Graphics/Effect.h"
 #include "../../External/cyCodeBase/cyPoint.h"
 #include "../../Game/Gameplay/Gameobject.h"
+#include "../Graphics/Graphics.h"
 
 namespace
 {
@@ -62,6 +63,7 @@ namespace
 		if (c == VK_ESCAPE)
 		{
 			cs6610::MyGame::CleanUp();
+			cs6610::Graphics::CleanUp();
 			glutLeaveMainLoop();
 		}
 		else
@@ -156,6 +158,7 @@ namespace
 	void close(void)
 	{
 		cs6610::MyGame::CleanUp();
+		cs6610::Graphics::CleanUp();
 		glutLeaveMainLoop();
 	}
 	void keyPressSpecial(int key, int x, int y)

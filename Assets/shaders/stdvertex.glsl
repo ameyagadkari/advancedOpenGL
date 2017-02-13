@@ -9,9 +9,13 @@ layout( location = 1 ) out vec3 o_fragmentPosition;
 layout( location = 2 ) out vec3 o_lightPosition;
 layout( location = 3 ) out vec2 o_UV;
 
-uniform mat4 u_model;
-uniform mat4 u_view;
-uniform mat4 u_projection;
+layout( std140, binding = 1 ) uniform drawcallBuffer
+{
+	mat4 model;
+	mat4 view;
+	mat4 projection;
+};
+
 uniform mat3 u_normal;
 uniform vec3 u_lightPosition;
 
@@ -19,12 +23,12 @@ void main()
 {
 	
 		vec4 vertexPosition_local = vec4( i_vertexPosition_local, 1.0 );
-		vec4 vertexPosition_world = u_model * vertexPosition_local;
-		vec4 vertexPosition_camera = u_view * vertexPosition_world;
-		gl_Position = u_projection * vertexPosition_camera;
+		vec4 vertexPosition_world = model * vertexPosition_local;
+		vec4 vertexPosition_camera = view * vertexPosition_world;
+		gl_Position = projection * vertexPosition_camera;
 	
 		o_UV = i_UV;
 		o_fragmentPosition = vec3(vertexPosition_camera);
 		o_vertexNormal = u_normal*i_vertexNormal;
-		o_lightPosition =  vec3(u_view * vec4(u_lightPosition, 1.0));
+		o_lightPosition =  vec3(view * vec4(u_lightPosition, 1.0));
 }

@@ -5,7 +5,7 @@ namespace cs6610
 {
 	namespace Graphics
 	{
-		enum struct UniformBufferType { MATERIAL };
+		enum struct UniformBufferType { MATERIAL, DRAWCALL };
 		class UniformBuffer
 		{
 		public:
