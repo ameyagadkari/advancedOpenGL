@@ -339,10 +339,10 @@ public:
 	void SetAnisotropy(float anisotropy) { glBindTexture(TEXTURE_TYPE, textureID); glTexParameterf(TEXTURE_TYPE, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropy ); }
 
 	//! Sets anisotropic filtering to the maximum permissible value.
-	void SetMaxAnisotropy() { float largest; glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest); SetAnisotropy(largest); }
+	void SetMaxAnisotropy() { glBindTexture(TEXTURE_TYPE, textureID); float largest; glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest); SetAnisotropy(largest); }
 
 	//! Turns off anisotropic filtering.
-	void SetNoAnisotropy() { SetAnisotropy(1.0f); }
+	void SetNoAnisotropy() { glBindTexture(TEXTURE_TYPE, textureID); SetAnisotropy(1.0f); }
 #endif
 };
 

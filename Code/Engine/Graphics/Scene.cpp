@@ -18,9 +18,14 @@ cs6610::Graphics::Scene::Scene(bool const i_useRenderBuffer, Color const i_clear
 	m_clearMask |= Math::BitManipulator::IsBitSet(i_clearControlBits, 1) ? GL_DEPTH_BUFFER_BIT : 0;
 	if (m_renderBuffer)
 	{
-		if (!m_renderBuffer->Initialize(m_useDepthBuffer, 4, 800, 600))
+		if (!m_renderBuffer->Initialize(m_useDepthBuffer))
 		{
 			CS6610_ASSERTF(false, "RenderBuffer is not ready");
+		}
+		else
+		{
+			m_renderBuffer->SetTextureFilteringMode(GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+			m_renderBuffer->SetTextureMaxAnisotropy();
 		}
 	}
 }
@@ -49,15 +54,6 @@ void cs6610::Graphics::Scene::AddGameObjectsToScene(std::string const i_name, Ga
 void cs6610::Graphics::Scene::RenderScene() const
 {
 	if (m_renderBuffer)m_renderBuffer->Bind();
-	/*if (m_useDepthBuffer)
-	{
-		glEnable(GL_DEPTH_TEST);
-		CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to enable depth buffer");
-		glDepthFunc(GL_LESS);
-		CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to set depth func");
-		glDepthMask(GL_TRUE);
-		CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to set depth mask for writing to depth buffer");
-	}*/
 	glClearColor(m_clearColor.r, m_clearColor.g, m_clearColor.b, m_clearColor.a);
 	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to set clear color");
 	glClearDepth(m_clearDepth);

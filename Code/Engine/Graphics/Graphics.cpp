@@ -41,13 +41,13 @@ namespace
 	void ReShapeCallback(int width, int height);
 
 	cs6610::Graphics::UniformBuffer* s_drawcallBuffer = nullptr;
+	cyGLRenderBuffer* secondarySceneRenderBuffer = nullptr;
 
 }
 
 void cs6610::Graphics::RenderFrame(void)
 {
 	Time::OnNewFrame();
-	cyGLRenderBuffer* secondarySceneRenderBuffer = MyGame::secondaryScene->GetRenderBuffer();
 	// Draw Secondary Scene
 	{
 		MyGame::secondaryScene->RenderScene();
@@ -131,6 +131,7 @@ bool cs6610::Graphics::Initialize(int i_argumentCount, char** i_arguments)
 	glutInit(&i_argumentCount, i_arguments);
 	const GLbitfield enableRGBAChannelsAndDepthAndDoubleBuffer = GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE;
 	glutInitDisplayMode(enableRGBAChannelsAndDepthAndDoubleBuffer);
+	glutInitContextVersion(3, 3);
 	glutInitWindowPosition(windowPositionX, windowPositionY);
 	glutInitWindowSize(windowWidth, windowHeight);
 	currentWindowID = glutCreateWindow(windowTitle.c_str());
@@ -188,5 +189,10 @@ namespace
 	{
 		cs6610::Camera::Camera::ms_aspectRatio = static_cast<float>(width) / height;
 		glViewport(0, 0, width, height);
+		if (!secondarySceneRenderBuffer)secondarySceneRenderBuffer = cs6610::MyGame::secondaryScene->GetRenderBuffer();
+		if(!secondarySceneRenderBuffer->Resize(4, width, height))
+		{
+			CS6610_ASSERTF(false, "RenderBuffer is not ready");
+		}
 	}
 }
