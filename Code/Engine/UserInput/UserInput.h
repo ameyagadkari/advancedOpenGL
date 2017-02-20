@@ -8,6 +8,5 @@ namespace cs6610
 	{
 		bool Initialize();
 		extern std::bitset<256>keys;
-		//extern bool isCameraPerspective;
 	}
 }

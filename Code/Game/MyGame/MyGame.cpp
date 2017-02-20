@@ -44,6 +44,13 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 	}
 
 	//Init all scenes
+	mainScene = new Graphics::Scene();
+	mainScene->AddGameObjectsToScene("Plane", new Gameplay::GameObject(cyPoint3f(0.0f, 10.0f, 0.0f), cyPoint3f(0.0f), cyPoint3f(1.0f)));
+	mainScene->GetGameobjectByName("Plane")->LoadMeshAndMaterial(
+		i_arguments[3],
+		{ "data/shaders/planevertex.glsl", "data/shaders/planefragment.glsl" },
+		{});
+
 	secondaryScene = new Graphics::Scene();
 	secondaryScene->AddGameObjectsToScene("Teapot", new Gameplay::GameObject(cyPoint3f(0.0f), cyPoint3f(180.0f, 0.0f, 180.0f), cyPoint3f(0.05f)));
 	secondaryScene->GetGameobjectByName("Teapot")->LoadMeshAndMaterial(
@@ -106,6 +113,12 @@ void cs6610::MyGame::CleanUp()
 	//	delete ms_ocamera;
 	//	ms_ocamera = nullptr;
 	//}
+
+	if (mainScene)
+	{
+		delete mainScene;
+		mainScene = nullptr;
+	}
 
 	if (secondaryScene)
 	{

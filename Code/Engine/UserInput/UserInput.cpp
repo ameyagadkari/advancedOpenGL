@@ -29,10 +29,18 @@ namespace
 	bool ctrlLMBFirstPress = true;
 	bool ctrlLMBStillPressed = false;
 
+	int xPosOnPressALTLMB = 0, yPosOnPressALTLMB = 0;
+	bool altLMBFirstPress = true;
+	bool altLMBStillPressed = false;
+
+	int yPosOnPressALTRMB = 0;
+	bool altRMBFirstPress = true;
+	bool altRMBStillPressed = false;
+
 	cs6610::Gameplay::GameObject* teapot = nullptr;
 	cs6610::Gameplay::GameObject* light = nullptr;
+	cs6610::Gameplay::GameObject* plane = nullptr;
 	void GetRequiredGameOject();
-	//cs6610::Gameplay::GameObject* plane = nullptr;
 }
 
 namespace cs6610
@@ -40,7 +48,6 @@ namespace cs6610
 	namespace UserInput
 	{
 		std::bitset<256> keys;
-		//bool isCameraPerspective = true;
 	}
 }
 
@@ -87,25 +94,26 @@ namespace
 		{
 			if (state == GLUT_DOWN)
 			{
-				if (glutGetModifiers() == GLUT_ACTIVE_CTRL)
+				if (glutGetModifiers() == GLUT_ACTIVE_CTRL && ctrlLMBFirstPress)
 				{
-					if (ctrlLMBFirstPress)
-					{
-						xPosOnPressCtrlLMB = x;
-						yPosOnPressCtrlLMB = y;
-						ctrlLMBFirstPress = false;
-						ctrlLMBStillPressed = true;
-					}
+					xPosOnPressCtrlLMB = x;
+					yPosOnPressCtrlLMB = y;
+					ctrlLMBFirstPress = false;
+					ctrlLMBStillPressed = true;
 				}
-				else
+				else if (glutGetModifiers() == GLUT_ACTIVE_ALT && altLMBFirstPress)
 				{
-					if (lmbFirstPress)
-					{
-						xPosOnPressLMB = x;
-						yPosOnPressLMB = y;
-						lmbFirstPress = false;
-						lmbStillPressed = true;
-					}
+					xPosOnPressALTLMB = x;
+					yPosOnPressALTLMB = y;
+					altLMBFirstPress = false;
+					altLMBStillPressed = true;
+				}
+				else if (lmbFirstPress)
+				{
+					xPosOnPressLMB = x;
+					yPosOnPressLMB = y;
+					lmbFirstPress = false;
+					lmbStillPressed = true;
 				}
 			}
 			else if (state == GLUT_UP)
@@ -115,6 +123,9 @@ namespace
 
 				ctrlLMBFirstPress = true;
 				ctrlLMBStillPressed = false;
+
+				altLMBFirstPress = true;
+				altLMBStillPressed = false;
 			}
 		}
 
@@ -122,7 +133,13 @@ namespace
 		{
 			if (state == GLUT_DOWN)
 			{
-				if (lmbFirstPress)
+				if (glutGetModifiers() == GLUT_ACTIVE_ALT && altRMBFirstPress)
+				{
+					yPosOnPressALTRMB = y;
+					altRMBFirstPress = false;
+					altRMBStillPressed = true;
+				}
+				else if (rmbFirstPress)
 				{
 					yPosOnPressRMB = y;
 					rmbFirstPress = false;
@@ -133,6 +150,9 @@ namespace
 			{
 				rmbFirstPress = true;
 				rmbStillPressed = false;
+
+				altRMBFirstPress = true;
+				altRMBStillPressed = false;
 			}
 		}
 	}
@@ -159,6 +179,20 @@ namespace
 			xPosOnPressCtrlLMB = x;
 			yPosOnPressCtrlLMB = y;
 			light ? light->UpdateOrientation(xOffsetCtrlLMB, yOffsetCtrlLMB) : GetRequiredGameOject();
+		}
+		if (altLMBStillPressed)
+		{
+			float xOffsetALTLMB = static_cast<float>(xPosOnPressALTLMB - x);
+			float yOffsetALTLMB = static_cast<float>(yPosOnPressALTLMB - y);
+			xPosOnPressALTLMB = x;
+			yPosOnPressALTLMB = y;
+			plane ? plane->UpdateOrientation(xOffsetALTLMB, yOffsetALTLMB) : GetRequiredGameOject();
+		}
+		if (altRMBStillPressed)
+		{
+			float yOffsetALTRMB = static_cast<float>(yPosOnPressALTRMB - y);
+			yPosOnPressALTRMB = y;
+			plane ? plane->UpdatePosition(yOffsetALTRMB) : GetRequiredGameOject();
 		}
 	}
 	void close()
@@ -189,6 +223,10 @@ namespace
 		if (!light)
 		{
 			light = cs6610::MyGame::secondaryScene->GetGameobjectByName("Light");
+		}
+		if (!plane)
+		{
+			plane = cs6610::MyGame::mainScene->GetGameobjectByName("Plane");
 		}
 	}
 }
