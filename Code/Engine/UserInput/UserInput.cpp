@@ -5,6 +5,7 @@
 #include "../../External/cyCodeBase/cyPoint.h"
 #include "../../Game/Gameplay/Gameobject.h"
 #include "../Graphics/Graphics.h"
+#include "../Graphics/Scene.h"
 
 namespace
 {
@@ -14,7 +15,7 @@ namespace
 	void keyReleaseSpecial(int key, int x, int y);
 	void mouse(int button, int state, int x, int y);
 	void mouseMotion(int x, int y);
-	void close(void);
+	void close();
 
 	int xPosOnPressLMB = 0, yPosOnPressLMB = 0;
 	bool lmbFirstPress = true;
@@ -27,6 +28,11 @@ namespace
 	int xPosOnPressCtrlLMB = 0, yPosOnPressCtrlLMB = 0;
 	bool ctrlLMBFirstPress = true;
 	bool ctrlLMBStillPressed = false;
+
+	cs6610::Gameplay::GameObject* teapot = nullptr;
+	cs6610::Gameplay::GameObject* light = nullptr;
+	void GetRequiredGameOject();
+	//cs6610::Gameplay::GameObject* plane = nullptr;
 }
 
 namespace cs6610
@@ -34,7 +40,7 @@ namespace cs6610
 	namespace UserInput
 	{
 		std::bitset<256> keys;
-		bool isCameraPerspective = true;
+		//bool isCameraPerspective = true;
 	}
 }
 
@@ -56,10 +62,10 @@ namespace
 {
 	void keyPress(unsigned char c, int x, int y)
 	{
-		if (c == 'p' && !cs6610::UserInput::keys['p'])
+		/*if (c == 'p' && !cs6610::UserInput::keys['p'])
 		{
 			cs6610::UserInput::isCameraPerspective = !cs6610::UserInput::isCameraPerspective;
-		}
+		}*/
 		if (c == VK_ESCAPE)
 		{
 			cs6610::MyGame::CleanUp();
@@ -138,13 +144,13 @@ namespace
 			float yOffsetLMB = static_cast<float>(y - yPosOnPressLMB);
 			xPosOnPressLMB = x;
 			yPosOnPressLMB = y;
-			cs6610::MyGame::ms_gameobjects.at("Teapot")->UpdateOrientation(xOffsetLMB, yOffsetLMB);
+			teapot ? teapot->UpdateOrientation(xOffsetLMB, yOffsetLMB) : GetRequiredGameOject();
 		}
 		if (rmbStillPressed)
 		{
 			float yOffsetRMB = static_cast<float>(yPosOnPressRMB - y);
 			yPosOnPressRMB = y;
-			cs6610::MyGame::ms_gameobjects.at("Teapot")->UpdatePosition(yOffsetRMB);
+			teapot ? teapot->UpdatePosition(yOffsetRMB) : GetRequiredGameOject();
 		}
 		if (ctrlLMBStillPressed)
 		{
@@ -152,10 +158,10 @@ namespace
 			float yOffsetCtrlLMB = static_cast<float>(yPosOnPressCtrlLMB - y);
 			xPosOnPressCtrlLMB = x;
 			yPosOnPressCtrlLMB = y;
-			cs6610::MyGame::ms_gameobjects.at("Light")->UpdateOrientation(xOffsetCtrlLMB, yOffsetCtrlLMB);
+			light ? light->UpdateOrientation(xOffsetCtrlLMB, yOffsetCtrlLMB) : GetRequiredGameOject();
 		}
 	}
-	void close(void)
+	void close()
 	{
 		cs6610::MyGame::CleanUp();
 		cs6610::Graphics::CleanUp();
@@ -172,5 +178,17 @@ namespace
 	void keyReleaseSpecial(int key, int x, int y)
 	{
 		cs6610::UserInput::keys.reset(key);
+	}
+
+	void GetRequiredGameOject()
+	{
+		if (!teapot)
+		{
+			teapot = cs6610::MyGame::secondaryScene->GetGameobjectByName("Teapot");
+		}
+		if (!light)
+		{
+			light = cs6610::MyGame::secondaryScene->GetGameobjectByName("Light");
+		}
 	}
 }

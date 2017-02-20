@@ -1,5 +1,6 @@
 #pragma once
 #include "../../External/cyCodeBase/cyMatrix.h"
+#include "Color.h"
 
 namespace cs6610
 {
@@ -9,12 +10,7 @@ namespace cs6610
 		{
 			struct MaterialBuffer
 			{
-				struct Color
-				{
-					float r, g, b, a;
-					Color(float i_r, float i_g, float i_b) :r(i_r), g(i_g), b(i_b), a(1.0f)
-					{}
-				}ambient, diffuse, specular;
+				Color ambient, diffuse, specular;
 				union
 				{
 					float specularExponent;

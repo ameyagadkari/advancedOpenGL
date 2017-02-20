@@ -20,7 +20,7 @@ namespace cs6610
 		class GameObject
 		{
 		public:
-			explicit GameObject(const cyPoint3f i_position = cyPoint3f(0.0f, 0.0f, 0.0f), const cyPoint3f i_eularAngles = cyPoint3f(0.0f, 0.0f, 0.0f));
+			explicit GameObject(const cyPoint3f i_position = cyPoint3f(0.0f, 0.0f, 0.0f), const cyPoint3f i_eularAngles = cyPoint3f(0.0f, 0.0f, 0.0f), const cyPoint3f i_scale = cyPoint3f(1.0f, 1.0f, 1.0f));
 			~GameObject();
 			void UpdatePosition(float zOffset);
 			void UpdateOrientation(float xOffset, float yOffset);
@@ -30,6 +30,7 @@ namespace cs6610
 			Graphics::Mesh* GetMesh()const;
 			cyPoint3f GetPosition()const;
 			cyPoint3f GetOrientationEular()const;
+			cyPoint3f GetScale()const;
 #pragma endregion
 #pragma region Sets
 			void SetMaterial(Graphics::Material* const i_material, const char * const i_names = nullptr);
@@ -42,6 +43,7 @@ namespace cs6610
 			Graphics::Material* m_material;
 			cyPoint3f m_position;
 			cyPoint3f m_eularAngles;
+			cyPoint3f m_scale;
 		};
 	}
 }

@@ -1,7 +1,6 @@
 #include "Graphics.h"
 
-#define GLEW_STATIC
-#include "../../External/GLEW/glew.h"
+#include "../../External/cyCodeBase/cyGL.h"
 #include "../../External/FreeGLUT/Includes/freeglut.h"
 #include "../Asserts/Asserts.h"
 #include "../../Game/MyGame/MyGame.h"
@@ -11,11 +10,10 @@
 #include "Material.h"
 #include "../Time/Time.h"
 #include "../Camera/Camera.h"
-#include "../../External/cyCodeBase/cyPoint.h"
-#include "../../External/cyCodeBase/cyMatrix.h"
-#include "../../External/cyCodeBase/cyGL.h"
 #include "UniformBuffer.h"
 #include "UniformBufferData.h"
+#include "Scene.h"
+#include "../Math/Functions.h"
 
 namespace
 {
@@ -49,7 +47,7 @@ namespace
 void cs6610::Graphics::RenderFrame(void)
 {
 	Time::OnNewFrame();
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	/*glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to set clear color");
 	glDepthMask(GL_TRUE);
 	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to set depth mask");
@@ -57,58 +55,105 @@ void cs6610::Graphics::RenderFrame(void)
 	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to set clear depth");
 	const GLbitfield clearColorAndDepth = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
 	glClear(clearColorAndDepth);
-	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to clear color buffer and depth buffer");
+	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to clear color buffer and depth buffer");*/
 
-	//cyMatrix4f model;
-	//cyMatrix4f view;
-	//cyMatrix4f projection;
-	UniformBufferData::DrawcallBuffer drawcallBufferData;
-	cyMatrix3f normal;
-	cyPoint3f lightPositionWorld;
-	// Draw the light
+	
+
+	// Draw Secondary Scene
 	{
-		Gameplay::GameObject* light = MyGame::ms_gameobjects.at("Light");
-		Material* lightMaterial = light->GetMaterial();
-		lightMaterial->Bind();
-		drawcallBufferData.model =
-			cyMatrix4f::MatrixScale(0.1f)*
-			cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects.at("Teapot")->GetPosition())*
-			cyMatrix4f::MatrixRotationZ(Math::ConvertDegreesToRadians(MyGame::ms_gameobjects.at("Light")->GetOrientationEular().z))*
-			cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(MyGame::ms_gameobjects.at("Light")->GetOrientationEular().x))*
-			cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects.at("Light")->GetPosition() - MyGame::ms_gameobjects.at("Teapot")->GetPosition());
+		MyGame::secondaryScene->RenderScene();
+		UniformBufferData::DrawcallBuffer drawcallBufferData;
+		cyMatrix3f normal;
+		cyPoint3f lightPositionWorld;
+		Gameplay::GameObject* teapot = MyGame::secondaryScene->GetGameobjectByName("Teapot");
+		Gameplay::GameObject* light = MyGame::secondaryScene->GetGameobjectByName("Light");
+		// Draw the light
+		{
+			
+			Material* lightMaterial = light->GetMaterial();
+			lightMaterial->Bind();
+			drawcallBufferData.model =
+				cyMatrix4f::MatrixScale(light->GetScale())*
+				cyMatrix4f::MatrixTrans(teapot->GetPosition())*
+				cyMatrix4f::MatrixRotationZ(Math::ConvertDegreesToRadians(light->GetOrientationEular().z))*
+				cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(light->GetOrientationEular().x))*
+				cyMatrix4f::MatrixTrans(light->GetPosition() - teapot->GetPosition());
 
-		lightPositionWorld = cyPoint3f(drawcallBufferData.model*cyPoint4f(MyGame::ms_gameobjects.at("Light")->GetPosition(), 1.0f));
+			lightPositionWorld = cyPoint3f(drawcallBufferData.model*cyPoint4f(light->GetPosition(), 1.0f));
 
-		drawcallBufferData.view = MyGame::ms_pcamera->GetViewMatrix();
-		drawcallBufferData.projection = MyGame::ms_pcamera->GetPerspectiveProjectionMatrix();
+			drawcallBufferData.view = MyGame::secondaryScene->GetCamera()->GetViewMatrix();
+			drawcallBufferData.projection = MyGame::secondaryScene->GetCamera()->GetPerspectiveProjectionMatrix();
 
-		//cyGLSLProgram* program = lightMaterial->GetEffect()->GetProgram();
-		s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 
-		light->GetMesh()->RenderMesh();
+			light->GetMesh()->RenderMesh();
+		}
+		// Draw Teapot
+		{
+			Material* teapotMaterial = teapot->GetMaterial();
+			teapotMaterial->Bind();
+
+			drawcallBufferData.model =
+				cyMatrix4f::MatrixScale(teapot->GetScale())*
+				cyMatrix4f::MatrixTrans(teapot->GetPosition())*
+				cyMatrix4f::MatrixRotationZ(Math::ConvertDegreesToRadians(teapot->GetOrientationEular().z))*
+				cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(teapot->GetOrientationEular().x));
+			drawcallBufferData.view = MyGame::secondaryScene->GetCamera()->GetViewMatrix();
+			drawcallBufferData.projection = MyGame::secondaryScene->GetCamera()->GetPerspectiveProjectionMatrix();
+			normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
+			cyGLSLProgram* program = teapotMaterial->GetEffect()->GetProgram();
+			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+			program->SetUniform(0, normal);
+			program->SetUniform(1, lightPositionWorld);
+
+			teapot->GetMesh()->RenderMesh();
+		}
 	}
 
-	// Draw Teapot
-	{
-		Gameplay::GameObject* teapot = MyGame::ms_gameobjects.at("Teapot");
-		Material* teapotMaterial = teapot->GetMaterial();
-		teapotMaterial->Bind();
+	//// Draw the light
+	//{
+	//	Gameplay::GameObject* light = MyGame::ms_gameobjects.at("Light");
+	//	Material* lightMaterial = light->GetMaterial();
+	//	lightMaterial->Bind();
+	//	drawcallBufferData.model =
+	//		cyMatrix4f::MatrixScale(0.1f)*
+	//		cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects.at("Teapot")->GetPosition())*
+	//		cyMatrix4f::MatrixRotationZ(Math::ConvertDegreesToRadians(MyGame::ms_gameobjects.at("Light")->GetOrientationEular().z))*
+	//		cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(MyGame::ms_gameobjects.at("Light")->GetOrientationEular().x))*
+	//		cyMatrix4f::MatrixTrans(MyGame::ms_gameobjects.at("Light")->GetPosition() - MyGame::ms_gameobjects.at("Teapot")->GetPosition());
 
-		drawcallBufferData.model =
-			cyMatrix4f::MatrixScale(0.05f)*
-			cyMatrix4f::MatrixTrans(teapot->GetPosition())*
-			cyMatrix4f::MatrixRotationZ(Math::ConvertDegreesToRadians(teapot->GetOrientationEular().z))*
-			cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(teapot->GetOrientationEular().x));
-		/*view = MyGame::ms_pcamera->GetViewMatrix();
-		projection = MyGame::ms_pcamera->GetPerspectiveProjectionMatrix();*/
-		normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
-		cyGLSLProgram* program = teapotMaterial->GetEffect()->GetProgram();
-		s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
-		program->SetUniform(0, normal);
-		program->SetUniform(1, lightPositionWorld);
+	//	lightPositionWorld = cyPoint3f(drawcallBufferData.model*cyPoint4f(MyGame::ms_gameobjects.at("Light")->GetPosition(), 1.0f));
 
-		teapot->GetMesh()->RenderMesh();
-	}
+	//	drawcallBufferData.view = MyGame::ms_pcamera->GetViewMatrix();
+	//	drawcallBufferData.projection = MyGame::ms_pcamera->GetPerspectiveProjectionMatrix();
+
+	//	//cyGLSLProgram* program = lightMaterial->GetEffect()->GetProgram();
+	//	s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+
+	//	light->GetMesh()->RenderMesh();
+	//}
+
+	//// Draw Teapot
+	//{
+	//	Gameplay::GameObject* teapot = MyGame::ms_gameobjects.at("Teapot");
+	//	Material* teapotMaterial = teapot->GetMaterial();
+	//	teapotMaterial->Bind();
+
+	//	drawcallBufferData.model =
+	//		cyMatrix4f::MatrixScale(0.05f)*
+	//		cyMatrix4f::MatrixTrans(teapot->GetPosition())*
+	//		cyMatrix4f::MatrixRotationZ(Math::ConvertDegreesToRadians(teapot->GetOrientationEular().z))*
+	//		cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(teapot->GetOrientationEular().x));
+	//	/*view = MyGame::ms_pcamera->GetViewMatrix();
+	//	projection = MyGame::ms_pcamera->GetPerspectiveProjectionMatrix();*/
+	//	normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
+	//	cyGLSLProgram* program = teapotMaterial->GetEffect()->GetProgram();
+	//	s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+	//	program->SetUniform(0, normal);
+	//	program->SetUniform(1, lightPositionWorld);
+
+	//	teapot->GetMesh()->RenderMesh();
+	//}
 
 	glutSwapBuffers();
 }
@@ -131,14 +176,6 @@ bool cs6610::Graphics::Initialize(int i_argumentCount, char** i_arguments)
 	{
 		CS6610_ASSERTF(false, "Failed to initialize GLEW");
 		wereThereErrors = true;
-	}
-	{
-		glEnable(GL_DEPTH_TEST);
-		CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to enable depth buffer");
-		glDepthFunc(GL_LESS);
-		CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to set depth func");
-		glDepthMask(GL_TRUE);
-		CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to set depth mask");
 	}
 	glutReshapeFunc(ReShapeCallback);
 	glutDisplayFunc(RenderFrame);

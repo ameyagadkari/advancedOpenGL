@@ -22,7 +22,11 @@
     <ClCompile Include="Functions.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BitManipulator.h" />
     <ClInclude Include="Functions.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BitManipulator.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{7754F46D-9143-4AA0-8FB4-DF0094249E9B}</ProjectGuid>

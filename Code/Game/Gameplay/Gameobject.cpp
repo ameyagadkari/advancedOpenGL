@@ -12,11 +12,12 @@ namespace
 	cyTriMesh* s_meshData = nullptr;
 }
 
-cs6610::Gameplay::GameObject::GameObject(const cyPoint3f i_position, const cyPoint3f i_eularAngles) :
+cs6610::Gameplay::GameObject::GameObject(const cyPoint3f i_position, const cyPoint3f i_eularAngles, const cyPoint3f i_scale) :
 	m_mesh(nullptr),
 	m_material(nullptr),
 	m_position(i_position),
-	m_eularAngles(i_eularAngles)
+	m_eularAngles(i_eularAngles),
+	m_scale(i_scale)
 {}
 cs6610::Gameplay::GameObject::~GameObject()
 {
@@ -113,6 +114,10 @@ cyPoint3f cs6610::Gameplay::GameObject::GetPosition()const
 cyPoint3f cs6610::Gameplay::GameObject::GetOrientationEular()const
 {
 	return m_eularAngles;
+}
+cyPoint3f cs6610::Gameplay::GameObject::GetScale() const
+{
+	return m_scale;
 }
 #pragma endregion
 
