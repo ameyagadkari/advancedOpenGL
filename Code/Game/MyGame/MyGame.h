@@ -1,23 +1,5 @@
 #pragma once
 
-#include <map>
-
-//namespace cs6610
-//{
-//	namespace Camera
-//	{
-//		class Camera;
-//	}
-//}
-//
-//namespace cs6610
-//{
-//	namespace Gameplay
-//	{
-//		class GameObject;
-//	}
-//}
-
 namespace cs6610
 {
 	namespace Graphics
@@ -35,8 +17,5 @@ namespace cs6610
 		void CleanUp();
 		extern Graphics::Scene* mainScene;
 		extern Graphics::Scene* secondaryScene;
-		//extern std::map<std::string, Gameplay::GameObject*> ms_gameobjects;
-		//extern Camera::Camera *ms_pcamera;
-		//extern Camera::Camera *ms_ocamera;
-	};
+	}
 }
