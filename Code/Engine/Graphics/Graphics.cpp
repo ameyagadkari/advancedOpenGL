@@ -96,9 +96,9 @@ void cs6610::Graphics::RenderFrame(void)
 			program->SetUniform(1, lightPositionWorld);
 
 			teapot->GetMesh()->RenderMesh();
-		}
-		secondarySceneRenderBuffer->BuildTextureMipmaps();
+		}		
 		secondarySceneRenderBuffer->Unbind();
+		secondarySceneRenderBuffer->BuildTextureMipmaps();
 	}
 
 	// Draw Main Scene
