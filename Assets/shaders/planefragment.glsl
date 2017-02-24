@@ -17,6 +17,5 @@ out vec4 o_color;
 void main()
 {
 	vec3 diffuseColor = (texture2D(u_texture_diffuse, i_UV)).rgb;
-	vec3 result = (diffuseColor.r == 0.0f && diffuseColor.g == 0.0f && diffuseColor.b == 0.0f) ? diffuseConstant.rgb : diffuseColor;
-	o_color = vec4(result, 1.0f);
+	o_color = vec4(diffuseColor, 1.0f);
 }

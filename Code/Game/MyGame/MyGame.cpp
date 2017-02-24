@@ -49,7 +49,7 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 
 	{
 		const bool useRenderBuffer = true;
-		secondaryScene = new Graphics::Scene(useRenderBuffer);
+		secondaryScene = new Graphics::Scene(useRenderBuffer, { 0.25f,0.25f,0.25f });
 		secondaryScene->AddGameObjectsToScene("Teapot", new Gameplay::GameObject(cyPoint3f(0.0f), cyPoint3f(180.0f, 0.0f, 180.0f), cyPoint3f(0.05f)));
 		secondaryScene->GetGameobjectByName("Teapot")->LoadMeshAndMaterial(
 			i_arguments[1],
