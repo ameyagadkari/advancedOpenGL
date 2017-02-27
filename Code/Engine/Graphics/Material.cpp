@@ -8,43 +8,47 @@
 #include "UniformBufferData.h"
 
 cs6610::Graphics::Material::Material(const bool i_isCubeMap, const cyTriMesh& i_meshData, const std::vector<std::string> i_shaderPaths, const std::vector<std::string> i_texturePaths) :
+	m_textures(nullptr),
+	m_texturesCubeMap(nullptr),
 	m_materialBuffer(nullptr),
 	m_effect(new Effect(i_shaderPaths)),
 	m_numbeOfTextures(i_texturePaths.size()),
 	m_isCubeMap(i_isCubeMap)
 {
-	if (!i_isCubeMap)
+	if (m_numbeOfTextures > 0)
 	{
-		m_texturesCubeMap = nullptr;
-		m_textures = m_numbeOfTextures > 0 ? new cyGLTexture2D[m_numbeOfTextures] : nullptr;
-		for (size_t i = 0; i < m_numbeOfTextures; i++)
+		if (!i_isCubeMap)
 		{
-			m_textures[i].Initialize();
-			const GLenum wrapModeForTextures = GL_REPEAT;
-			m_textures[i].SetWrappingMode(wrapModeForTextures, wrapModeForTextures);
+			m_textures = new cyGLTexture2D[m_numbeOfTextures];
+			for (size_t i = 0; i < m_numbeOfTextures; i++)
+			{
+				m_textures[i].Initialize();
+				const GLenum wrapModeForTextures = GL_REPEAT;
+				m_textures[i].SetWrappingMode(wrapModeForTextures, wrapModeForTextures);
 
-			std::vector<unsigned char> image;
-			unsigned width, height;
-			unsigned error = lodepng::decode(image, width, height, i_texturePaths[i].c_str());
-			CS6610_ASSERTF(!error, "Decoder error %d: %s", error, lodepng_error_text(error));
-			m_textures[i].SetImage(&image[0], 4, width, height);
-			m_textures[i].BuildMipmaps();
+				std::vector<unsigned char> image;
+				unsigned width, height;
+				unsigned error = lodepng::decode(image, width, height, i_texturePaths[i].c_str());
+				CS6610_ASSERTF(!error, "Decoder error %d: %s", error, lodepng_error_text(error));
+				m_textures[i].SetImage(&image[0], 4, width, height);
+				m_textures[i].BuildMipmaps();
+			}
 		}
-	}
-	else
-	{
-		m_textures = nullptr;
-		m_texturesCubeMap = new cyGLTextureCubeMap();
-		m_texturesCubeMap->Initialize();
-		for (size_t i = 0; i < m_numbeOfTextures; i++)
-		{	
-			std::vector<unsigned char> image;
-			unsigned width, height;
-			unsigned error = lodepng::decode(image, width, height, i_texturePaths[i].c_str());
-			CS6610_ASSERTF(!error, "Decoder error %d: %s", error, lodepng_error_text(error));
-			m_texturesCubeMap->SetImage(static_cast<cyGLTextureCubeMap::Side>(i), &image[0], 4, width, height);
+		else
+		{
+			m_textures = nullptr;
+			m_texturesCubeMap = new cyGLTextureCubeMap();
+			m_texturesCubeMap->Initialize();
+			for (size_t i = 0; i < m_numbeOfTextures; i++)
+			{
+				std::vector<unsigned char> image;
+				unsigned width, height;
+				unsigned error = lodepng::decode(image, width, height, i_texturePaths[i].c_str());
+				CS6610_ASSERTF(!error, "Decoder error %d: %s", error, lodepng_error_text(error));
+				m_texturesCubeMap->SetImage(static_cast<cyGLTextureCubeMap::Side>(i), &image[0], 4, width, height);
+			}
+			m_texturesCubeMap->SetSeamless();
 		}
-		m_texturesCubeMap->SetSeamless();
 	}
 	if (i_meshData.NM() == 1)
 	{
@@ -95,6 +99,6 @@ void cs6610::Graphics::Material::Bind()const
 	}
 	else
 	{
-		m_texturesCubeMap->Bind();
+		if (m_texturesCubeMap)m_texturesCubeMap->Bind();
 	}
 }

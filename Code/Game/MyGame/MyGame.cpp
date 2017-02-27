@@ -41,27 +41,35 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 	{
 		mainScene = new Graphics::Scene();
 
-		mainScene->AddGameObjectsToScene("Teapot", new Gameplay::GameObject(cyPoint3f(0.0f), cyPoint3f(0.0f, 0.0f, 0.0f), cyPoint3f(0.05f)));
-		mainScene->GetGameobjectByName("Teapot")->LoadMeshAndMaterial(
+		/*
+		mainScene->AddGameObjectsToScene("Plane", new Gameplay::GameObject(cyPoint3f(0.0f, 10.0f, 0.0f), cyPoint3f(0.0f), cyPoint3f(1.0f)));
+		mainScene->GetGameobjectByName("Plane")->LoadMeshAndMaterial(
 			false,
-			i_arguments[1],
+			i_arguments[3],
 			{ "data/shaders/lightvertex.glsl", "data/shaders/lightfragment.glsl" },
-			{ "data/meshes/teapot/teapot_diffuse.png", "data/meshes/teapot/teapot_specular.png" },
-			"u_normal u_lightPosition");
+		{});*/
 
-		mainScene->AddGameObjectsToScene("Light", new Gameplay::GameObject(cyPoint3f(0.0f, -10.0f, 0.0f), cyPoint3f(0.0f), cyPoint3f(0.1f)));
+		mainScene->AddGameObjectsToScene("Light", new Gameplay::GameObject(cyPoint3f(0.0f, 10.0f, 0.0f), cyPoint3f(0.0f), cyPoint3f(0.1f)));
 		mainScene->GetGameobjectByName("Light")->LoadMeshAndMaterial(
 			false,
 			i_arguments[2],
 			{ "data/shaders/lightvertex.glsl", "data/shaders/lightfragment.glsl" },
 			{});
 
-		mainScene->AddGameObjectsToScene("Plane", new Gameplay::GameObject(cyPoint3f(0.0f, 10.0f, 0.0f), cyPoint3f(0.0f), cyPoint3f(1.0f)));
-		mainScene->GetGameobjectByName("Plane")->LoadMeshAndMaterial(
+		mainScene->AddGameObjectsToScene("Teapot", new Gameplay::GameObject(cyPoint3f(0.0f), cyPoint3f(0.0f), cyPoint3f(0.05f)));
+		mainScene->GetGameobjectByName("Teapot")->LoadMeshAndMaterial(
 			false,
-			i_arguments[3],
-			{ "data/shaders/lightvertex.glsl", "data/shaders/lightfragment.glsl" },
-			{});
+			i_arguments[1],
+			{ "data/shaders/teapotvertex.glsl", "data/shaders/teapotfragment.glsl" },
+			{},
+			"u_normal u_lightPosition");
+		/*mainScene->AddGameObjectsToScene("Sphere", new Gameplay::GameObject(cyPoint3f(0.0f), cyPoint3f(0.0f), cyPoint3f(0.05f)));
+		mainScene->GetGameobjectByName("Sphere")->LoadMeshAndMaterial(
+			true,
+			"data/meshes/sphere/sphere.obj",
+			{ "data/shaders/spherevertex.glsl", "data/shaders/spherefragment.glsl" },
+			{},
+			"u_normal u_lightPosition");*/
 
 		mainScene->AddGameObjectsToScene("EnvCube", new Gameplay::GameObject());
 		mainScene->GetGameobjectByName("EnvCube")->LoadMeshAndMaterial(

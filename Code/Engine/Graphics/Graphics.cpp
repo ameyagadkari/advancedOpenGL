@@ -56,12 +56,12 @@ void cs6610::Graphics::RenderFrame(void)
 		cyPoint3f lightPositionWorld;
 		Gameplay::GameObject* teapot = MyGame::mainScene->GetGameobjectByName("Teapot");
 		Gameplay::GameObject* light = MyGame::mainScene->GetGameobjectByName("Light");
-		Gameplay::GameObject* plane = MyGame::mainScene->GetGameobjectByName("Plane");
+		//Gameplay::GameObject* plane = MyGame::mainScene->GetGameobjectByName("Plane");
+		//Gameplay::GameObject* sphere = MyGame::mainScene->GetGameobjectByName("Sphere");
 		Gameplay::GameObject* envCube = MyGame::mainScene->GetGameobjectByName("EnvCube");
 
 		glDepthMask(GL_FALSE);
 		CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to reset depth mask for writing to depth buffer");
-
 		//Draw Env Cube
 		{
 			envCube->GetMaterial()->Bind();
@@ -70,13 +70,13 @@ void cs6610::Graphics::RenderFrame(void)
 			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 			envCube->GetMesh()->RenderMesh();
 		}
-
+	
 		glDepthMask(GL_TRUE);
 		CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to reset depth mask for writing to depth buffer");
 
 		// Draw the light
 		{
-			
+
 			Material* lightMaterial = light->GetMaterial();
 			lightMaterial->Bind();
 			drawcallBufferData.model =
@@ -96,6 +96,7 @@ void cs6610::Graphics::RenderFrame(void)
 
 			light->GetMesh()->RenderMesh();
 		}
+
 		// Draw Teapot
 		{
 			Material* teapotMaterial = teapot->GetMaterial();
@@ -109,14 +110,33 @@ void cs6610::Graphics::RenderFrame(void)
 			drawcallBufferData.view = MyGame::mainScene->GetCamera()->GetViewMatrix();
 			drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
 			normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
-			cyGLSLProgram* program = teapotMaterial->GetEffect()->GetProgram();
-			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+			cyGLSLProgram* program = teapotMaterial->GetEffect()->GetProgram();	
 			program->SetUniform(0, normal);
 			program->SetUniform(1, lightPositionWorld);
-
+			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 			teapot->GetMesh()->RenderMesh();
-		}		
-		//Draw Plane
+		}
+
+		/*// Draw the sphere
+		{
+			sphere->GetMaterial()->Bind();
+			drawcallBufferData.model =
+				cyMatrix4f::MatrixScale(sphere->GetScale())*
+				cyMatrix4f::MatrixTrans(sphere->GetPosition());
+			drawcallBufferData.view = MyGame::mainScene->GetCamera()->GetViewMatrix();
+			drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
+			drawcallBufferData.viewInv = MyGame::mainScene->GetCamera()->GetViewMatrix().GetInverse();
+			normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
+			cyGLSLProgram* program = sphere->GetMaterial()->GetEffect()->GetProgram();
+			program->SetUniform(0, normal);
+			program->SetUniform(1, lightPositionWorld);
+			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+			sphere->GetMesh()->RenderMesh();
+		}*/
+
+		
+				
+		/*//Draw Plane
 		{
 			plane->GetMaterial()->Bind();
 			//secondarySceneRenderBuffer->BindTexture(0);
@@ -130,7 +150,7 @@ void cs6610::Graphics::RenderFrame(void)
 			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 
 			plane->GetMesh()->RenderMesh();
-		}
+		}*/
 
 		
 
