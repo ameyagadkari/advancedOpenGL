@@ -29,6 +29,7 @@ namespace cs6610
 				cyMatrix4f model;
 				cyMatrix4f view;
 				cyMatrix4f projection;
+				cyMatrix4f viewInv;
 			};
 		}
 	}

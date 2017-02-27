@@ -75,16 +75,16 @@ void cs6610::Camera::Camera::UpdateCurrentCameraPosition()
 
 	//localOffset.z += zOffset;
 
-	/*if (UserInput::UserInput::keys.test('w'))
+	if (UserInput::keys.test('w'))
 		localOffset += m_localCameraAxis.m_front;
-	if (UserInput::UserInput::keys.test('s'))
+	if (UserInput::keys.test('s'))
 		localOffset -= m_localCameraAxis.m_front;
-	if (UserInput::UserInput::keys.test('d'))
+	if (UserInput::keys.test('d'))
 		localOffset += m_localCameraAxis.m_right;
-	if (UserInput::UserInput::keys.test('a'))
-		localOffset -= m_localCameraAxis.m_right;*/
+	if (UserInput::keys.test('a'))
+		localOffset -= m_localCameraAxis.m_right;
 
-	const float speed_unitsPerSecond = 5.0f;
+	const float speed_unitsPerSecond = 10.0f;
 	const float offsetModifier = speed_unitsPerSecond * static_cast<float>(Time::GetElapsedTimeDuringPreviousFrame());
 	localOffset *= offsetModifier;
 	m_position += localOffset;
@@ -96,14 +96,14 @@ void cs6610::Camera::Camera::UpdateCurrentCameraOrientation(bool constrainPitch)
 	//localOffset.y += xOffset;
 	//localOffset.x += yOffset;
 
-	/*if (UserInput::UserInput::keys.test('h'))
+	if (UserInput::keys.test('h'))
 		localOffset.y += 1.0f;
-	if (UserInput::UserInput::keys.test('f'))
+	if (UserInput::keys.test('f'))
 		localOffset.y -= 1.0f;
-	if (UserInput::UserInput::keys.test('g'))
+	if (UserInput::keys.test('g'))
 		localOffset.x += 1.0f;
-	if (UserInput::UserInput::keys.test('t'))
-		localOffset.x -= 1.0f;*/
+	if (UserInput::keys.test('t'))
+		localOffset.x -= 1.0f;
 
 	const float speed_unitsPerSecond = 10.0f;
 	const float offsetModifier = speed_unitsPerSecond * static_cast<float>(Time::GetElapsedTimeDuringPreviousFrame());

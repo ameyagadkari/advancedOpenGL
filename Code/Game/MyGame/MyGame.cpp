@@ -40,14 +40,38 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 	//Init all scenes
 	{
 		mainScene = new Graphics::Scene();
+
+		mainScene->AddGameObjectsToScene("Teapot", new Gameplay::GameObject(cyPoint3f(0.0f), cyPoint3f(0.0f, 0.0f, 0.0f), cyPoint3f(0.05f)));
+		mainScene->GetGameobjectByName("Teapot")->LoadMeshAndMaterial(
+			false,
+			i_arguments[1],
+			{ "data/shaders/lightvertex.glsl", "data/shaders/lightfragment.glsl" },
+			{ "data/meshes/teapot/teapot_diffuse.png", "data/meshes/teapot/teapot_specular.png" },
+			"u_normal u_lightPosition");
+
+		mainScene->AddGameObjectsToScene("Light", new Gameplay::GameObject(cyPoint3f(0.0f, -10.0f, 0.0f), cyPoint3f(0.0f), cyPoint3f(0.1f)));
+		mainScene->GetGameobjectByName("Light")->LoadMeshAndMaterial(
+			false,
+			i_arguments[2],
+			{ "data/shaders/lightvertex.glsl", "data/shaders/lightfragment.glsl" },
+			{});
+
 		mainScene->AddGameObjectsToScene("Plane", new Gameplay::GameObject(cyPoint3f(0.0f, 10.0f, 0.0f), cyPoint3f(0.0f), cyPoint3f(1.0f)));
 		mainScene->GetGameobjectByName("Plane")->LoadMeshAndMaterial(
+			false,
 			i_arguments[3],
-			{ "data/shaders/planevertex.glsl", "data/shaders/planefragment.glsl" },
+			{ "data/shaders/lightvertex.glsl", "data/shaders/lightfragment.glsl" },
 			{});
+
+		mainScene->AddGameObjectsToScene("EnvCube", new Gameplay::GameObject());
+		mainScene->GetGameobjectByName("EnvCube")->LoadMeshAndMaterial(
+			true,
+			"data/meshes/environment/cube.obj",
+			{ "data/shaders/envvertex.glsl", "data/shaders/envfragment.glsl" },
+			{ "data/meshes/environment/cubemap_posx.png","data/meshes/environment/cubemap_negx.png" ,"data/meshes/environment/cubemap_posy.png" ,"data/meshes/environment/cubemap_negy.png" ,"data/meshes/environment/cubemap_posz.png" ,"data/meshes/environment/cubemap_negz.png" });
 	}
 
-	{
+	/*{
 		const bool useRenderBuffer = true;
 		secondaryScene = new Graphics::Scene(useRenderBuffer, { 0.25f,0.25f,0.25f });
 		secondaryScene->AddGameObjectsToScene("Teapot", new Gameplay::GameObject(cyPoint3f(0.0f), cyPoint3f(180.0f, 0.0f, 180.0f), cyPoint3f(0.05f)));
@@ -61,7 +85,7 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 			i_arguments[2],
 			{ "data/shaders/lightvertex.glsl", "data/shaders/lightfragment.glsl" },
 			{});
-	}
+	}*/
 	return !wereThereErrors;
 }
 

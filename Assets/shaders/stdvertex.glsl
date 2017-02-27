@@ -13,7 +13,8 @@ layout( std140, binding = 1 ) uniform drawcallBuffer
 {
 	mat4 model;
 	mat4 view;
-	mat4 projection;
+	mat4 projection
+	mat4 viewInv;
 };
 
 uniform mat3 u_normal;

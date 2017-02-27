@@ -17,39 +17,79 @@ cs6610::Graphics::Mesh::Mesh(const cyTriMesh& i_meshData, cy::Point3f &o_minBoun
 	s_meshData_inner = new MeshData(m_numberOfVertices);
 	size_t length = i_meshData.NF();
 	size_t index = 0;
-	for (size_t i = 0; i < length; i++)
+	if (i_meshData.NVT() > 0)
 	{
-		int ii = static_cast<int>(i);
-		s_meshData_inner->vertexData[index].AddVertexData(
-			i_meshData.V(i_meshData.F(ii).v[0]).x,
-			i_meshData.V(i_meshData.F(ii).v[0]).y,
-			i_meshData.V(i_meshData.F(ii).v[0]).z,
-			i_meshData.VN(i_meshData.FN(ii).v[0]).x,
-			i_meshData.VN(i_meshData.FN(ii).v[0]).y,
-			i_meshData.VN(i_meshData.FN(ii).v[0]).z,
-			i_meshData.VT(i_meshData.FT(ii).v[0]).x,
-			1.0f - i_meshData.VT(i_meshData.FT(ii).v[0]).y);
-		++index;
-		s_meshData_inner->vertexData[index].AddVertexData(
-			i_meshData.V(i_meshData.F(ii).v[1]).x,
-			i_meshData.V(i_meshData.F(ii).v[1]).y,
-			i_meshData.V(i_meshData.F(ii).v[1]).z,
-			i_meshData.VN(i_meshData.FN(ii).v[1]).x,
-			i_meshData.VN(i_meshData.FN(ii).v[1]).y,
-			i_meshData.VN(i_meshData.FN(ii).v[1]).z,
-			i_meshData.VT(i_meshData.FT(ii).v[1]).x,
-			1.0f - i_meshData.VT(i_meshData.FT(ii).v[1]).y);
-		++index;
-		s_meshData_inner->vertexData[index].AddVertexData(
-			i_meshData.V(i_meshData.F(ii).v[2]).x,
-			i_meshData.V(i_meshData.F(ii).v[2]).y,
-			i_meshData.V(i_meshData.F(ii).v[2]).z,
-			i_meshData.VN(i_meshData.FN(ii).v[2]).x,
-			i_meshData.VN(i_meshData.FN(ii).v[2]).y,
-			i_meshData.VN(i_meshData.FN(ii).v[2]).z,
-			i_meshData.VT(i_meshData.FT(ii).v[2]).x,
-			1.0f - i_meshData.VT(i_meshData.FT(ii).v[2]).y);
-		++index;
+		for (size_t i = 0; i < length; i++)
+		{
+			int ii = static_cast<int>(i);
+			s_meshData_inner->vertexData[index].AddVertexData(
+				i_meshData.V(i_meshData.F(ii).v[0]).x,
+				i_meshData.V(i_meshData.F(ii).v[0]).y,
+				i_meshData.V(i_meshData.F(ii).v[0]).z,
+				i_meshData.VN(i_meshData.FN(ii).v[0]).x,
+				i_meshData.VN(i_meshData.FN(ii).v[0]).y,
+				i_meshData.VN(i_meshData.FN(ii).v[0]).z,
+				i_meshData.VT(i_meshData.FT(ii).v[0]).x,
+				1.0f - i_meshData.VT(i_meshData.FT(ii).v[0]).y);
+			++index;
+			s_meshData_inner->vertexData[index].AddVertexData(
+				i_meshData.V(i_meshData.F(ii).v[1]).x,
+				i_meshData.V(i_meshData.F(ii).v[1]).y,
+				i_meshData.V(i_meshData.F(ii).v[1]).z,
+				i_meshData.VN(i_meshData.FN(ii).v[1]).x,
+				i_meshData.VN(i_meshData.FN(ii).v[1]).y,
+				i_meshData.VN(i_meshData.FN(ii).v[1]).z,
+				i_meshData.VT(i_meshData.FT(ii).v[1]).x,
+				1.0f - i_meshData.VT(i_meshData.FT(ii).v[1]).y);
+			++index;
+			s_meshData_inner->vertexData[index].AddVertexData(
+				i_meshData.V(i_meshData.F(ii).v[2]).x,
+				i_meshData.V(i_meshData.F(ii).v[2]).y,
+				i_meshData.V(i_meshData.F(ii).v[2]).z,
+				i_meshData.VN(i_meshData.FN(ii).v[2]).x,
+				i_meshData.VN(i_meshData.FN(ii).v[2]).y,
+				i_meshData.VN(i_meshData.FN(ii).v[2]).z,
+				i_meshData.VT(i_meshData.FT(ii).v[2]).x,
+				1.0f - i_meshData.VT(i_meshData.FT(ii).v[2]).y);
+			++index;
+		}
+	}
+	else
+	{
+		for (size_t i = 0; i < length; i++)
+		{
+			int ii = static_cast<int>(i);
+			s_meshData_inner->vertexData[index].AddVertexData(
+				i_meshData.V(i_meshData.F(ii).v[0]).x,
+				i_meshData.V(i_meshData.F(ii).v[0]).y,
+				i_meshData.V(i_meshData.F(ii).v[0]).z,
+				i_meshData.VN(i_meshData.FN(ii).v[0]).x,
+				i_meshData.VN(i_meshData.FN(ii).v[0]).y,
+				i_meshData.VN(i_meshData.FN(ii).v[0]).z,
+				0,
+				0);
+			++index;
+			s_meshData_inner->vertexData[index].AddVertexData(
+				i_meshData.V(i_meshData.F(ii).v[1]).x,
+				i_meshData.V(i_meshData.F(ii).v[1]).y,
+				i_meshData.V(i_meshData.F(ii).v[1]).z,
+				i_meshData.VN(i_meshData.FN(ii).v[1]).x,
+				i_meshData.VN(i_meshData.FN(ii).v[1]).y,
+				i_meshData.VN(i_meshData.FN(ii).v[1]).z,
+				0,
+				0);
+			++index;
+			s_meshData_inner->vertexData[index].AddVertexData(
+				i_meshData.V(i_meshData.F(ii).v[2]).x,
+				i_meshData.V(i_meshData.F(ii).v[2]).y,
+				i_meshData.V(i_meshData.F(ii).v[2]).z,
+				i_meshData.VN(i_meshData.FN(ii).v[2]).x,
+				i_meshData.VN(i_meshData.FN(ii).v[2]).y,
+				i_meshData.VN(i_meshData.FN(ii).v[2]).z,
+				0,
+				0);
+			++index;
+		}
 	}
 	Initialize();
 	o_minBounds = i_meshData.GetBoundMin();

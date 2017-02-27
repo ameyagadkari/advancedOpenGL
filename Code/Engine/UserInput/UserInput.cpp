@@ -218,15 +218,15 @@ namespace
 	{
 		if (!teapot)
 		{
-			teapot = cs6610::MyGame::secondaryScene->GetGameobjectByName("Teapot");
+			//teapot = cs6610::MyGame::mainScene->GetGameobjectByName("Teapot");
 		}
 		if (!light)
 		{
-			light = cs6610::MyGame::secondaryScene->GetGameobjectByName("Light");
+			//light = cs6610::MyGame::mainScene->GetGameobjectByName("Light");
 		}
 		if (!plane)
 		{
-			plane = cs6610::MyGame::mainScene->GetGameobjectByName("Plane");
+			//plane = cs6610::MyGame::mainScene->GetGameobjectByName("Plane");
 		}
 	}
 }

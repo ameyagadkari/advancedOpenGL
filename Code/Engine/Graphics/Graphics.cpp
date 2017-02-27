@@ -41,21 +41,39 @@ namespace
 	void ReShapeCallback(int width, int height);
 
 	cs6610::Graphics::UniformBuffer* s_drawcallBuffer = nullptr;
-	cyGLRenderBuffer* secondarySceneRenderBuffer = nullptr;
+	cyGLRenderBuffer2D* secondarySceneRenderBuffer = nullptr;
 
 }
 
 void cs6610::Graphics::RenderFrame(void)
 {
 	Time::OnNewFrame();
-	// Draw Secondary Scene
+	// Draw Main Scene
 	{
-		MyGame::secondaryScene->RenderScene();
+		MyGame::mainScene->RenderScene();
 		UniformBufferData::DrawcallBuffer drawcallBufferData;
 		cyMatrix3f normal;
 		cyPoint3f lightPositionWorld;
-		Gameplay::GameObject* teapot = MyGame::secondaryScene->GetGameobjectByName("Teapot");
-		Gameplay::GameObject* light = MyGame::secondaryScene->GetGameobjectByName("Light");
+		Gameplay::GameObject* teapot = MyGame::mainScene->GetGameobjectByName("Teapot");
+		Gameplay::GameObject* light = MyGame::mainScene->GetGameobjectByName("Light");
+		Gameplay::GameObject* plane = MyGame::mainScene->GetGameobjectByName("Plane");
+		Gameplay::GameObject* envCube = MyGame::mainScene->GetGameobjectByName("EnvCube");
+
+		glDepthMask(GL_FALSE);
+		CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to reset depth mask for writing to depth buffer");
+
+		//Draw Env Cube
+		{
+			envCube->GetMaterial()->Bind();
+			drawcallBufferData.view = cyMatrix4f(cyMatrix3f(MyGame::mainScene->GetCamera()->GetViewMatrix()));
+			drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
+			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+			envCube->GetMesh()->RenderMesh();
+		}
+
+		glDepthMask(GL_TRUE);
+		CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to reset depth mask for writing to depth buffer");
+
 		// Draw the light
 		{
 			
@@ -64,14 +82,15 @@ void cs6610::Graphics::RenderFrame(void)
 			drawcallBufferData.model =
 				cyMatrix4f::MatrixScale(light->GetScale())*
 				cyMatrix4f::MatrixTrans(teapot->GetPosition())*
-				cyMatrix4f::MatrixRotationZ(Math::ConvertDegreesToRadians(light->GetOrientationEular().z))*
+				cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(light->GetOrientationEular().z))*
 				cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(light->GetOrientationEular().x))*
 				cyMatrix4f::MatrixTrans(light->GetPosition() - teapot->GetPosition());
 
 			lightPositionWorld = cyPoint3f(drawcallBufferData.model*cyPoint4f(light->GetPosition(), 1.0f));
 
-			drawcallBufferData.view = MyGame::secondaryScene->GetCamera()->GetViewMatrix();
-			drawcallBufferData.projection = MyGame::secondaryScene->GetCamera()->GetPerspectiveProjectionMatrix();
+			drawcallBufferData.view = MyGame::mainScene->GetCamera()->GetViewMatrix();
+			drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
+			drawcallBufferData.viewInv = MyGame::mainScene->GetCamera()->GetViewMatrix().GetInverse();
 
 			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 
@@ -85,10 +104,10 @@ void cs6610::Graphics::RenderFrame(void)
 			drawcallBufferData.model =
 				cyMatrix4f::MatrixScale(teapot->GetScale())*
 				cyMatrix4f::MatrixTrans(teapot->GetPosition())*
-				cyMatrix4f::MatrixRotationZ(Math::ConvertDegreesToRadians(teapot->GetOrientationEular().z))*
+				cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(teapot->GetOrientationEular().z))*
 				cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(teapot->GetOrientationEular().x));
-			drawcallBufferData.view = MyGame::secondaryScene->GetCamera()->GetViewMatrix();
-			drawcallBufferData.projection = MyGame::secondaryScene->GetCamera()->GetPerspectiveProjectionMatrix();
+			drawcallBufferData.view = MyGame::mainScene->GetCamera()->GetViewMatrix();
+			drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
 			normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
 			cyGLSLProgram* program = teapotMaterial->GetEffect()->GetProgram();
 			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
@@ -97,24 +116,14 @@ void cs6610::Graphics::RenderFrame(void)
 
 			teapot->GetMesh()->RenderMesh();
 		}		
-		secondarySceneRenderBuffer->Unbind();
-		secondarySceneRenderBuffer->BuildTextureMipmaps();
-	}
-
-	// Draw Main Scene
-	{
-		MyGame::mainScene->RenderScene();
-		UniformBufferData::DrawcallBuffer drawcallBufferData;
-		Gameplay::GameObject* plane = MyGame::mainScene->GetGameobjectByName("Plane");
-		
 		//Draw Plane
 		{
 			plane->GetMaterial()->Bind();
-			secondarySceneRenderBuffer->BindTexture();
+			//secondarySceneRenderBuffer->BindTexture(0);
 			drawcallBufferData.model =
 				cyMatrix4f::MatrixScale(plane->GetScale())*
 				cyMatrix4f::MatrixTrans(plane->GetPosition())*
-				cyMatrix4f::MatrixRotationZ(Math::ConvertDegreesToRadians(plane->GetOrientationEular().z))*
+				cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(plane->GetOrientationEular().z))*
 				cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(plane->GetOrientationEular().x));
 			drawcallBufferData.view = MyGame::mainScene->GetCamera()->GetViewMatrix();
 			drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
@@ -122,13 +131,42 @@ void cs6610::Graphics::RenderFrame(void)
 
 			plane->GetMesh()->RenderMesh();
 		}
+
+		
+
+		//secondarySceneRenderBuffer->Unbind();
+		//secondarySceneRenderBuffer->BuildTextureMipmaps();
 	}
+
+	//// Draw Main Scene
+	//{
+	//	MyGame::mainScene->RenderScene();
+	//	UniformBufferData::DrawcallBuffer drawcallBufferData;
+	//	Gameplay::GameObject* plane = MyGame::mainScene->GetGameobjectByName("Plane");
+	//	
+	//	//Draw Plane
+	//	{
+	//		plane->GetMaterial()->Bind();
+	//		secondarySceneRenderBuffer->BindTexture(0);
+	//		drawcallBufferData.model =
+	//			cyMatrix4f::MatrixScale(plane->GetScale())*
+	//			cyMatrix4f::MatrixTrans(plane->GetPosition())*
+	//			cyMatrix4f::MatrixRotationZ(Math::ConvertDegreesToRadians(plane->GetOrientationEular().z))*
+	//			cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(plane->GetOrientationEular().x));
+	//		drawcallBufferData.view = MyGame::mainScene->GetCamera()->GetViewMatrix();
+	//		drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
+	//		s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+
+	//		plane->GetMesh()->RenderMesh();
+	//	}
+	//}
 	glutSwapBuffers();
 }
 bool cs6610::Graphics::Initialize(int i_argumentCount, char** i_arguments)
 {
 	bool wereThereErrors = false;
 	glutInit(&i_argumentCount, i_arguments);
+	glutInitContextFlags(GLUT_DEBUG);
 	const GLbitfield enableRGBAChannelsAndDepthAndDoubleBuffer = GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE;
 	glutInitDisplayMode(enableRGBAChannelsAndDepthAndDoubleBuffer);
 	glutInitContextVersion(3, 3);
@@ -162,6 +200,7 @@ bool cs6610::Graphics::Initialize(int i_argumentCount, char** i_arguments)
 	glutSetOption(option, mode);
 	s_drawcallBuffer = new UniformBuffer(UniformBufferType::DRAWCALL, sizeof(UniformBufferData::DrawcallBuffer));
 	s_drawcallBuffer->Bind();
+	CY_GL_REGISTER_DEBUG_CALLBACK;
 	return !wereThereErrors;
 }
 
@@ -180,8 +219,8 @@ namespace
 	{
 		if (cs6610::Time::GetElapsedTimeDuringPreviousFrame() > FPS)
 		{
-			/*cs6610::MyGame::ms_pcamera->UpdateCurrentCameraOrientation();
-			cs6610::MyGame::ms_pcamera->UpdateCurrentCameraPosition();*/
+			cs6610::MyGame::mainScene->GetCamera()->UpdateCurrentCameraOrientation();
+			cs6610::MyGame::mainScene->GetCamera()->UpdateCurrentCameraPosition();
 			glutPostWindowRedisplay(currentWindowID);
 		}
 	}
@@ -189,10 +228,10 @@ namespace
 	{
 		cs6610::Camera::Camera::ms_aspectRatio = static_cast<float>(width) / height;
 		glViewport(0, 0, width, height);
-		if (!secondarySceneRenderBuffer)secondarySceneRenderBuffer = cs6610::MyGame::secondaryScene->GetRenderBuffer();
+		/*if (!secondarySceneRenderBuffer)secondarySceneRenderBuffer = cs6610::MyGame::secondaryScene->GetRenderBuffer();
 		if(!secondarySceneRenderBuffer->Resize(4, width, height))
 		{
 			CS6610_ASSERTF(false, "RenderBuffer is not ready");
-		}
+		}*/
 	}
 }

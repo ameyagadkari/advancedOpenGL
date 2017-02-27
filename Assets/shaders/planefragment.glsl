@@ -4,14 +4,6 @@ layout( location = 0 ) in vec2 i_UV;
 
 layout( binding = 0 ) uniform sampler2D u_texture_diffuse;
 
-layout( std140, binding = 0 ) uniform materialBuffer
-{
-	vec4 ambientConstant;
-	vec4 diffuseConstant;
-	vec4 specularConstant;
-	float specularExponent;
-};
-
 out vec4 o_color;
 
 void main()

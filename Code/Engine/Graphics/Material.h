@@ -7,7 +7,9 @@ typedef unsigned int GLenum;
 namespace cy
 {
 	template <GLenum TEXTURE_TYPE>
-	class GLTexture;
+	class GLTexture2;
+	template <GLenum TEXTURE_TYPE>
+	class GLTextureCubeM;
 }
 
 namespace cs6610
@@ -26,16 +28,19 @@ namespace cs6610
 		class Material
 		{
 		public:
-			Material(const cyTriMesh& i_meshData, const std::vector<std::string> i_shaderPaths, const std::vector<std::string> i_texturePaths);
+			Material(const bool i_isCubeMap, const cyTriMesh& i_meshData, const std::vector<std::string> i_shaderPaths, const std::vector<std::string> i_texturePaths);
 			~Material();
 			Effect* GetEffect()const;
 			void Bind()const;
 		private:
 #define GL_TEXTURE_2D 0x0DE1
-			cy::GLTexture<GL_TEXTURE_2D>* m_textures;
+			cy::GLTexture2<GL_TEXTURE_2D>* m_textures;
+#define GL_TEXTURE_CUBE_MAP 0x8513
+			cy::GLTextureCubeM<GL_TEXTURE_CUBE_MAP>* m_texturesCubeMap;
 			UniformBuffer *m_materialBuffer;
 			Effect* m_effect;
 			size_t m_numbeOfTextures;
+			bool m_isCubeMap;
 		};
 	}
 }

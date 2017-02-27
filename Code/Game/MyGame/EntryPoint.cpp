@@ -7,7 +7,7 @@
 int main(int i_argumentCount, char** i_arguments)
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	//_crtBreakAlloc = 188;
+	//_crtBreakAlloc = 950;
 	if (!cs6610::MyGame::Initialize(i_argumentCount, i_arguments))
 	{		
 		CS6610_ASSERTF(false, "My Game initialization failed");
