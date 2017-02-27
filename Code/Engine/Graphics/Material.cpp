@@ -99,6 +99,6 @@ void cs6610::Graphics::Material::Bind()const
 	}
 	else
 	{
-		if (m_texturesCubeMap)m_texturesCubeMap->Bind();
+		if (m_texturesCubeMap)m_texturesCubeMap->Bind(0);
 	}
 }

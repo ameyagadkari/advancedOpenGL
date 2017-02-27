@@ -32,7 +32,7 @@ namespace cs6610
 			~Material();
 			Effect* GetEffect()const;
 			void Bind()const;
-		private:
+		//private:
 #define GL_TEXTURE_2D 0x0DE1
 			cy::GLTexture2<GL_TEXTURE_2D>* m_textures;
 #define GL_TEXTURE_CUBE_MAP 0x8513

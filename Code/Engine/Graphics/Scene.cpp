@@ -8,8 +8,8 @@
 cs6610::Graphics::Scene::Scene(bool const i_useRenderBuffer, Color const i_clearColor, float const i_clearDepth, uint8_t const i_clearControlBits, bool const i_useDepthBuffer)
 	:
 	m_clearColor(i_clearColor),
-	m_pcamera(new Camera::Camera(cyPoint3f(0.0f,0.0f,10.0f))),
-	m_renderBuffer(i_useRenderBuffer ? new cyGLRenderBuffer2D() : nullptr),
+	m_pcamera(new Camera::Camera(cyPoint3f(0.0f,1.0f,10.0f))),
+	m_renderBuffer(i_useRenderBuffer ? new cyGLRenderBufferRect() : nullptr),
 	m_clearDepth(i_clearDepth),
 	m_clearMask(0),
 	m_useDepthBuffer(i_useDepthBuffer)
@@ -24,8 +24,9 @@ cs6610::Graphics::Scene::Scene(bool const i_useRenderBuffer, Color const i_clear
 		}
 		else
 		{
-			m_renderBuffer->SetTextureFilteringMode(GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
-			m_renderBuffer->SetTextureMaxAnisotropy();
+			//m_renderBuffer->SetTextureWrappingMode(GL_REPEAT,GL_REPEAT);
+			//m_renderBuffer->SetTextureFilteringMode(GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+			//m_renderBuffer->SetTextureMaxAnisotropy();
 		}
 	}
 }
@@ -40,7 +41,7 @@ cs6610::Camera::Camera* cs6610::Graphics::Scene::GetCamera()const
 {
 	return m_pcamera;
 }
-cyGLRenderBuffer2D* cs6610::Graphics::Scene::GetRenderBuffer()const
+cyGLRenderBufferRect* cs6610::Graphics::Scene::GetRenderBuffer()const
 {
 	return m_renderBuffer;
 }
@@ -55,8 +56,7 @@ void cs6610::Graphics::Scene::RenderScene() const
 {
 	if (m_renderBuffer)m_renderBuffer->Bind();
 	glClearColor(m_clearColor.r, m_clearColor.g, m_clearColor.b, m_clearColor.a);
-	GLenum z = glGetError();
-	CS6610_ASSERTF(z == GL_NO_ERROR, "OpenGL failed to set clear color");
+	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to set clear color");
 	glClearDepth(m_clearDepth);
 	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to set clear depth");
 	glClear(m_clearMask);

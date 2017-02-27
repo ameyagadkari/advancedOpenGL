@@ -41,25 +41,24 @@ namespace
 	void ReShapeCallback(int width, int height);
 
 	cs6610::Graphics::UniformBuffer* s_drawcallBuffer = nullptr;
-	cyGLRenderBuffer2D* secondarySceneRenderBuffer = nullptr;
+	cyGLRenderBufferRect* secondarySceneRenderBuffer = nullptr;
 
 }
 
 void cs6610::Graphics::RenderFrame(void)
 {
 	Time::OnNewFrame();
+	UniformBufferData::DrawcallBuffer drawcallBufferData;
+	cyMatrix3f normal;
+	cyPoint3f lightPositionWorld;
+	Gameplay::GameObject* teapot = MyGame::mainScene->GetGameobjectByName("Teapot");
+	Gameplay::GameObject* light = MyGame::mainScene->GetGameobjectByName("Light");
+	Gameplay::GameObject* plane = MyGame::mainScene->GetGameobjectByName("Plane");
+	Gameplay::GameObject* envCube = MyGame::mainScene->GetGameobjectByName("EnvCube");
 	// Draw Main Scene
 	{
 		MyGame::mainScene->RenderScene();
-		UniformBufferData::DrawcallBuffer drawcallBufferData;
-		cyMatrix3f normal;
-		cyPoint3f lightPositionWorld;
-		Gameplay::GameObject* teapot = MyGame::mainScene->GetGameobjectByName("Teapot");
-		Gameplay::GameObject* light = MyGame::mainScene->GetGameobjectByName("Light");
-		//Gameplay::GameObject* plane = MyGame::mainScene->GetGameobjectByName("Plane");
-		//Gameplay::GameObject* sphere = MyGame::mainScene->GetGameobjectByName("Sphere");
-		Gameplay::GameObject* envCube = MyGame::mainScene->GetGameobjectByName("EnvCube");
-
+		
 		glDepthMask(GL_FALSE);
 		CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to reset depth mask for writing to depth buffer");
 		//Draw Env Cube
@@ -70,7 +69,7 @@ void cs6610::Graphics::RenderFrame(void)
 			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 			envCube->GetMesh()->RenderMesh();
 		}
-	
+
 		glDepthMask(GL_TRUE);
 		CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to reset depth mask for writing to depth buffer");
 
@@ -110,76 +109,98 @@ void cs6610::Graphics::RenderFrame(void)
 			drawcallBufferData.view = MyGame::mainScene->GetCamera()->GetViewMatrix();
 			drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
 			normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
-			cyGLSLProgram* program = teapotMaterial->GetEffect()->GetProgram();	
+			cyGLSLProgram* program = teapotMaterial->GetEffect()->GetProgram();
 			program->SetUniform(0, normal);
 			program->SetUniform(1, lightPositionWorld);
 			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 			teapot->GetMesh()->RenderMesh();
 		}
+	}
 
-		/*// Draw the sphere
+	// Draw Secondary Scene
+	{
+		MyGame::secondaryScene->RenderScene();
+		/*glDepthMask(GL_FALSE);
+		CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to reset depth mask for writing to depth buffer");
+		//Draw Env Cube
 		{
-			sphere->GetMaterial()->Bind();
+			envCube->GetMaterial()->Bind();
+			drawcallBufferData.view = cyMatrix4f(cyMatrix3f(MyGame::mainScene->GetCamera()->GetViewMatrix()));
+			drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
+			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+			envCube->GetMesh()->RenderMesh();
+		}
+		glDepthMask(GL_TRUE);
+		CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to reset depth mask for writing to depth buffer");*/
+
+		// Draw the light
+		{
+
+			Material* lightMaterial = light->GetMaterial();
+			lightMaterial->Bind();
 			drawcallBufferData.model =
-				cyMatrix4f::MatrixScale(sphere->GetScale())*
-				cyMatrix4f::MatrixTrans(sphere->GetPosition());
+				cyMatrix4f::MatrixScale(1.0f, -1.0f, 1.0f)*
+				cyMatrix4f::MatrixScale(light->GetScale())*
+				cyMatrix4f::MatrixTrans(teapot->GetPosition())*
+				cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(light->GetOrientationEular().z))*
+				cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(light->GetOrientationEular().x))*
+				cyMatrix4f::MatrixTrans(light->GetPosition() - teapot->GetPosition());
+
+			lightPositionWorld = cyPoint3f(drawcallBufferData.model*cyPoint4f(light->GetPosition(), 1.0f));
+
 			drawcallBufferData.view = MyGame::mainScene->GetCamera()->GetViewMatrix();
 			drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
 			drawcallBufferData.viewInv = MyGame::mainScene->GetCamera()->GetViewMatrix().GetInverse();
+
+			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+
+			light->GetMesh()->RenderMesh();
+		}
+
+		// Draw Teapot
+		{
+			Material* teapotMaterial = teapot->GetMaterial();
+			teapotMaterial->Bind();
+
+			drawcallBufferData.model =
+				cyMatrix4f::MatrixScale(1.0f,-1.0f,1.0f)*
+				cyMatrix4f::MatrixScale(teapot->GetScale())*
+				cyMatrix4f::MatrixTrans(teapot->GetPosition())*
+				cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(teapot->GetOrientationEular().z))*
+				cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(teapot->GetOrientationEular().x));
+			drawcallBufferData.view = MyGame::mainScene->GetCamera()->GetViewMatrix();
+			drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
 			normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
-			cyGLSLProgram* program = sphere->GetMaterial()->GetEffect()->GetProgram();
+			cyGLSLProgram* program = teapotMaterial->GetEffect()->GetProgram();
 			program->SetUniform(0, normal);
 			program->SetUniform(1, lightPositionWorld);
 			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
-			sphere->GetMesh()->RenderMesh();
-		}*/
-
-		
-				
-		/*//Draw Plane
-		{
-			plane->GetMaterial()->Bind();
-			//secondarySceneRenderBuffer->BindTexture(0);
-			drawcallBufferData.model =
-				cyMatrix4f::MatrixScale(plane->GetScale())*
-				cyMatrix4f::MatrixTrans(plane->GetPosition())*
-				cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(plane->GetOrientationEular().z))*
-				cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(plane->GetOrientationEular().x));
-			drawcallBufferData.view = MyGame::mainScene->GetCamera()->GetViewMatrix();
-			drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
-			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
-
-			plane->GetMesh()->RenderMesh();
-		}*/
-
-		
-
-		//secondarySceneRenderBuffer->Unbind();
-		//secondarySceneRenderBuffer->BuildTextureMipmaps();
+			teapot->GetMesh()->RenderMesh();
+		}
+		secondarySceneRenderBuffer->Unbind();
 	}
+		//Draw Plane
+		{
+		plane->GetMaterial()->Bind();
+		secondarySceneRenderBuffer->BindTexture(1);
+		envCube->GetMaterial()->m_texturesCubeMap->Bind(0);
+		drawcallBufferData.model =
+		cyMatrix4f::MatrixScale(plane->GetScale())*
+		cyMatrix4f::MatrixTrans(plane->GetPosition())*
+		cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(plane->GetOrientationEular().z))*
+		cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(plane->GetOrientationEular().x));
+		drawcallBufferData.view = MyGame::mainScene->GetCamera()->GetViewMatrix();
+		drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
+		drawcallBufferData.viewInv = MyGame::mainScene->GetCamera()->GetViewMatrix().GetInverse();
+		normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
+		cyGLSLProgram* program = plane->GetMaterial()->GetEffect()->GetProgram();
+		program->SetUniform(2, normal);
+		program->SetUniform(0, 0);
+		program->SetUniform(1, 1);
+		s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 
-	//// Draw Main Scene
-	//{
-	//	MyGame::mainScene->RenderScene();
-	//	UniformBufferData::DrawcallBuffer drawcallBufferData;
-	//	Gameplay::GameObject* plane = MyGame::mainScene->GetGameobjectByName("Plane");
-	//	
-	//	//Draw Plane
-	//	{
-	//		plane->GetMaterial()->Bind();
-	//		secondarySceneRenderBuffer->BindTexture(0);
-	//		drawcallBufferData.model =
-	//			cyMatrix4f::MatrixScale(plane->GetScale())*
-	//			cyMatrix4f::MatrixTrans(plane->GetPosition())*
-	//			cyMatrix4f::MatrixRotationZ(Math::ConvertDegreesToRadians(plane->GetOrientationEular().z))*
-	//			cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(plane->GetOrientationEular().x));
-	//		drawcallBufferData.view = MyGame::mainScene->GetCamera()->GetViewMatrix();
-	//		drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
-	//		s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
-
-	//		plane->GetMesh()->RenderMesh();
-	//	}
-	//}
+		plane->GetMesh()->RenderMesh();
+		}
 	glutSwapBuffers();
 }
 bool cs6610::Graphics::Initialize(int i_argumentCount, char** i_arguments)
@@ -248,10 +269,10 @@ namespace
 	{
 		cs6610::Camera::Camera::ms_aspectRatio = static_cast<float>(width) / height;
 		glViewport(0, 0, width, height);
-		/*if (!secondarySceneRenderBuffer)secondarySceneRenderBuffer = cs6610::MyGame::secondaryScene->GetRenderBuffer();
+		if (!secondarySceneRenderBuffer)secondarySceneRenderBuffer = cs6610::MyGame::secondaryScene->GetRenderBuffer();
 		if(!secondarySceneRenderBuffer->Resize(4, width, height))
 		{
 			CS6610_ASSERTF(false, "RenderBuffer is not ready");
-		}*/
+		}
 	}
 }

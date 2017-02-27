@@ -226,7 +226,7 @@ namespace
 		}
 		if (!plane)
 		{
-			//plane = cs6610::MyGame::mainScene->GetGameobjectByName("Plane");
+			plane = cs6610::MyGame::mainScene->GetGameobjectByName("Plane");
 		}
 	}
 }
