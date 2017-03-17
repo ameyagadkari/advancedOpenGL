@@ -86,20 +86,21 @@ void cs6610::Graphics::RenderFrame()
 			Material* teapotMaterial = teapot->GetMaterial();
 			teapotMaterial->Bind();
 
-			cyMatrix4f model =
+			cyMatrix4f modelLight =
 				cyMatrix4f::MatrixScale(light->GetScale())*
 				cyMatrix4f::MatrixTrans(teapot->GetPosition())*
 				cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(light->GetOrientationEular().z))*
 				cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(light->GetOrientationEular().x))*
 				cyMatrix4f::MatrixTrans(light->GetPosition() - teapot->GetPosition());
 
-			lightPositionWorld = cyPoint3f(model*cyPoint4f(light->GetPosition(), 1.0f));
+			lightPositionWorld = cyPoint3f(modelLight*cyPoint4f(light->GetPosition(), 1.0f));
 
 			drawcallBufferData.model =
 				cyMatrix4f::MatrixScale(teapot->GetScale())*
 				cyMatrix4f::MatrixTrans(teapot->GetPosition())*
 				cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(teapot->GetOrientationEular().z))*
 				cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(teapot->GetOrientationEular().x));
+
 				drawcallBufferData.view = cyMatrix4f::MatrixView(lightPositionWorld, teapot->GetPosition(), cyPoint3f(0.0f, 1.0f, 0.0f));
 			drawcallBufferData.projection = cyMatrix4f::MatrixPerspective(Math::ConvertDegreesToRadians(45.0f), Camera::Camera::ms_aspectRatio, 0.01f, 500.0f);
 			//normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
@@ -115,7 +116,7 @@ void cs6610::Graphics::RenderFrame()
 	
 	// Draw Main Scene
 	{
-		secondarySceneRenderBuffer->BindTexture(2);
+		secondarySceneRenderBuffer->BindTexture();
 		MyGame::mainScene->RenderScene();
 		
 		// Draw the light
@@ -175,10 +176,10 @@ void cs6610::Graphics::RenderFrame()
 			drawcallBufferData.viewInv = cyMatrix4f::MatrixTrans(cyPoint3f(0.5f, 0.5f, 0.495f)) * cyMatrix4f::MatrixScale(0.5f, 0.5f, 0.5f) *cyMatrix4f::MatrixPerspective(Math::ConvertDegreesToRadians(45.0f), Camera::Camera::ms_aspectRatio, 0.01f, 500.0f)*cyMatrix4f::MatrixView(lightPositionWorld, teapot->GetPosition(), cyPoint3f(0.0f, 1.0f, 0.0f));
 			normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
 			cyGLSLProgram* program = plane->GetMaterial()->GetEffect()->GetProgram();
-			program->SetUniform(0, 0.01f);
-			program->SetUniform(1, 500.0f);
-			//program->SetUniform(0, normal);
-			//program->SetUniform(1, light->GetPosition());
+			//program->SetUniform(0, 0.01f);
+			//program->SetUniform(1, 500.0f);
+			program->SetUniform(0, normal);
+			program->SetUniform(1, light->GetPosition());
 			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 
 			plane->GetMesh()->RenderMesh();

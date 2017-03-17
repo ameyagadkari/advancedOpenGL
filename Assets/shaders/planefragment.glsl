@@ -6,7 +6,7 @@ layout( location = 2 ) in vec3 i_lightPosition;
 layout( location = 3 ) in vec2 i_UV;
 layout( location = 4 ) in vec4 i_fragmentPositionLightSpace;
 
-layout( binding = 2 ) uniform sampler2D u_depthMap;
+layout( binding = 0 ) uniform sampler2DShadow u_depthMap;
 
 layout( std140, binding = 0 ) uniform materialBuffer
 {
@@ -21,7 +21,7 @@ out vec4 o_color;
 uniform float u_near_plane;
 uniform float u_far_plane;
 
-/*float ShadowCalculation(vec4 fragPosLightSpace)
+float ShadowCalculation(vec4 fragPosLightSpace)
 {
     // perform perspective divide
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
@@ -39,7 +39,7 @@ uniform float u_far_plane;
     float shadow = (currentDepth - bias) > closestDepth  ? 1.0f : 0.0f;
 
     return shadow;
-}*/
+}
 
 float LinearizeDepth(float depth)
 {
@@ -49,10 +49,10 @@ float LinearizeDepth(float depth)
 
 void main()
 {             
-	float depthValue = texture(u_depthMap, i_UV).r;
-    o_color = vec4(vec3(LinearizeDepth(depthValue) / u_far_plane), 1.0); // perspective
+	//float depthValue = texture(u_depthMap, i_UV).r;
+    //o_color = vec4(vec3(LinearizeDepth(depthValue) / u_far_plane), 1.0); // perspective
 	
-	/*//vec3 ambientColor = (texture2D(u_texture_diffuse, i_UV)).rgb;
+	//vec3 ambientColor = (texture2D(u_texture_diffuse, i_UV)).rgb;
 	//vec3 diffuseColor = ambientColor;
 	//vec3 specularColor = (texture2D(u_texture_specular, i_UV)).rgb;
 
@@ -78,5 +78,5 @@ void main()
     vec3 result = ambient + ((1.0 - shadow) * (diffuse + specular));    
 
 	//vec3 result = ambient + diffuse + specular;
-	o_color = vec4(result, 1.0f);*/
+	o_color = vec4(result, 1.0f);
 } 
