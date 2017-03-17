@@ -9,7 +9,7 @@ namespace cy
 	template <GLenum TEXTURE_TYPE>
 	class GLTexture2;
 	template <GLenum TEXTURE_TYPE>
-	class GLTextureCubeM;
+	class GLTextureCubeMap;
 }
 
 namespace cs6610
@@ -36,7 +36,7 @@ namespace cs6610
 #define GL_TEXTURE_2D 0x0DE1
 			cy::GLTexture2<GL_TEXTURE_2D>* m_textures;
 #define GL_TEXTURE_CUBE_MAP 0x8513
-			cy::GLTextureCubeM<GL_TEXTURE_CUBE_MAP>* m_texturesCubeMap;
+			cy::GLTextureCubeMap<GL_TEXTURE_CUBE_MAP>* m_texturesCubeMap;
 			UniformBuffer *m_materialBuffer;
 			Effect* m_effect;
 			size_t m_numbeOfTextures;

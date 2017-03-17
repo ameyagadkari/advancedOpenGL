@@ -478,7 +478,7 @@ public:
 //! the texture from the GPU memory. You must explicitly call the Delete() 
 //! method to free the texture storage on the GPU.
 template <GLenum TEXTURE_TYPE>
-class GLTextureCubeM : public GLTexture<TEXTURE_TYPE>
+class GLTextureCubeMap : public GLTexture<GL_TEXTURE_CUBE_MAP>
 {
 public:
 	//! Sides of the cube map.
@@ -492,7 +492,7 @@ public:
 	};
 
 	//! Sets the texture image using the given texture format, data format, and data type.
-	void SetImage( Side side, GLenum textureFormat, GLenum dataFormat, GLenum dataType, const void *data, GLsizei width, GLsizei height, int level=0 ) { GLTexture<TEXTURE_TYPE>::Bind(); glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X+side,level,textureFormat,width,height,0,dataFormat,dataType,data); }
+	void SetImage( Side side, GLenum textureFormat, GLenum dataFormat, GLenum dataType, const void *data, GLsizei width, GLsizei height, int level=0 ) { GLTexture<GL_TEXTURE_CUBE_MAP>::Bind(); glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X+side,level,textureFormat,width,height,0,dataFormat,dataType,data); }
 
 	//! Sets the texture image using the given texture format and data format. The data type is determined by the data pointer type.
 	template <typename T> void SetImage( Side side, GLenum textureFormat, GLenum dataFormat, const T *data, GLsizei width, GLsizei height, int level=0 ) { SetImage(side,textureFormat,dataFormat,GL::GetGLType(data),data,width,height,level); }
@@ -530,9 +530,11 @@ public:
 #ifdef GL_VERSION_3_0
 #define _CY_GLRenderBuffer
 
+//-------------------------------------------------------------------------------
+
 //! OpenGL render buffer
 //!
-//! This class provides a convenient interface for OpenGL render buffers.
+//! This is the base class for helper classes for render to texture in OpenGL.
 template <GLenum TEXTURE_TYPE>
 class GLRenderBuffer
 {
@@ -547,7 +549,7 @@ protected:
 
 public:
 	GLRenderBuffer() : framebufferID(CY_GL_INVALID_ID), depthbufferID(CY_GL_INVALID_ID), prevBufferID(0) {}	//!< Constructor.
-	virtual ~GLRenderBuffer() { if ( GL::CheckContext() ) Delete(); }										//!< Destructor.
+	~GLRenderBuffer() { if ( GL::CheckContext() ) Delete(); }										//!< Destructor.
 
 	//!@name General Methods
 
@@ -583,6 +585,20 @@ public:
 	void SetTextureNoAnisotropy () { texture.SetNoAnisotropy(); }						//!< Turns off anisotropic filtering.
 #endif
 
+protected:
+	void GenerateBuffer();	//!< Generates the frame buffer and initializes the texture
+	void SetSize(GLsizei width, GLsizei height) { bufferWidth = width; bufferHeight = height; }	//!< Sets the size of the frame buffer
+};
+
+//-------------------------------------------------------------------------------
+
+//! OpenGL render color buffer
+//!
+//! This class provides a convenient interface for texture rendering in OpenGL with a color texture buffer.
+template <GLenum TEXTURE_TYPE>
+class GLRenderTexture : public GLRenderBuffer<TEXTURE_TYPE>
+{
+public:
 	//!@name Render Buffer Creation and Initialization
 
 	//! Generates the render buffer.
@@ -591,14 +607,42 @@ public:
 
 	//! Generates the render buffer and sets its size.
 	//! Returns true if the render buffer is ready and complete.
-	bool Initialize( bool useDepthBuffer, int numChannels, GLsizei width, GLsizei height, GL::Type type=GL::TYPE_UBYTE ) { if ( Initialize(useDepthBuffer) ) return Resize(numChannels,width,height,type); return false; }
+	bool Initialize( bool useDepthBuffer, int numChannels, GLsizei width, GLsizei height, GL::Type type=GL::TYPE_UBYTE ) { return Initialize(useDepthBuffer) ? Resize(numChannels,width,height,type) : false; }
 
 	//! Initializes or changes the size of the render buffer.
 	//! Returns true if the buffer is complete.
 	bool Resize( int numChannels, GLsizei width, GLsizei height, GL::Type type=GL::TYPE_UBYTE );
 };
 
-#endif
+//-------------------------------------------------------------------------------
+
+//! OpenGL render depth buffer
+//!
+//! This class provides a convenient interface for texture rendering in OpenGL with a depth texture buffer.
+template <GLenum TEXTURE_TYPE>
+class GLRenderDepth : public GLRenderBuffer<TEXTURE_TYPE>
+{
+public:
+	//!@name Render Buffer Creation and Initialization
+
+	//! Generates the render buffer.
+	//! Returns true if the render buffer is ready.
+	//! If depthComparisonTexture is true, initializes the texture for depth comparison.
+	bool Initialize( bool depthComparisonTexture=true );
+
+	//! Generates the render buffer and sets its size.
+	//! Returns true if the render buffer is ready and complete.
+	//! If depthComparisonTexture is true, initializes the texture for depth comparison.
+	bool Initialize( bool depthComparisonTexture, GLsizei width, GLsizei height, GLenum depthFormat=GL_DEPTH_COMPONENT ) { return Initialize(depthComparisonTexture) ? Resize(width,height,depthFormat) : false; }
+
+	//! Initializes or changes the size of the render buffer.
+	//! Returns true if the buffer is complete.
+	bool Resize( GLsizei width, GLsizei height, GLenum depthFormat=GL_DEPTH_COMPONENT );
+};
+
+//-------------------------------------------------------------------------------
+
+#endif // GL_VERSION_3_0
 
 //-------------------------------------------------------------------------------
 
@@ -892,19 +936,19 @@ public:
 #endif
 
 #ifdef _CY_IPOINT_H_INCLUDED_
-	void SetUniform(int index, const IPoint2<int>    &p)              { glUniform2iv (params[index],1,    &p.x );
-	void SetUniform(int index, const IPoint3<int>    &p)              { glUniform3iv (params[index],1,    &p.x );
-	void SetUniform(int index, const IPoint4<int>    &p)              { glUniform4iv (params[index],1,    &p.x );
-	void SetUniform(int index, const IPoint2<int>    *p, int count=1) { glUniform2iv (params[index],count,&p->x);
-	void SetUniform(int index, const IPoint3<int>    *p, int count=1) { glUniform3iv (params[index],count,&p->x);
-	void SetUniform(int index, const IPoint4<int>    *p, int count=1) { glUniform4iv (params[index],count,&p->x);
+	void SetUniform(int index, const IPoint2<int>    &p)              { glUniform2iv (params[index],1,    &p.x ); }
+	void SetUniform(int index, const IPoint3<int>    &p)              { glUniform3iv (params[index],1,    &p.x ); }
+	void SetUniform(int index, const IPoint4<int>    &p)              { glUniform4iv (params[index],1,    &p.x ); }
+	void SetUniform(int index, const IPoint2<int>    *p, int count=1) { glUniform2iv (params[index],count,&p->x); }
+	void SetUniform(int index, const IPoint3<int>    *p, int count=1) { glUniform3iv (params[index],count,&p->x); }
+	void SetUniform(int index, const IPoint4<int>    *p, int count=1) { glUniform4iv (params[index],count,&p->x); }
 # ifdef GL_VERSION_3_0
-	void SetUniform(int index, const IPoint2<GLuint> &p)              { glUniform2uiv(params[index],1,    &p.x );
-	void SetUniform(int index, const IPoint3<GLuint> &p)              { glUniform3uiv(params[index],1,    &p.x );
-	void SetUniform(int index, const IPoint4<GLuint> &p)              { glUniform4uiv(params[index],1,    &p.x );
-	void SetUniform(int index, const IPoint2<GLuint> *p, int count=1) { glUniform2uiv(params[index],count,&p->x);
-	void SetUniform(int index, const IPoint3<GLuint> *p, int count=1) { glUniform3uiv(params[index],count,&p->x);
-	void SetUniform(int index, const IPoint4<GLuint> *p, int count=1) { glUniform4uiv(params[index],count,&p->x);
+	void SetUniform(int index, const IPoint2<GLuint> &p)              { glUniform2uiv(params[index],1,    &p.x ); }
+	void SetUniform(int index, const IPoint3<GLuint> &p)              { glUniform3uiv(params[index],1,    &p.x ); }
+	void SetUniform(int index, const IPoint4<GLuint> &p)              { glUniform4uiv(params[index],1,    &p.x ); }
+	void SetUniform(int index, const IPoint2<GLuint> *p, int count=1) { glUniform2uiv(params[index],count,&p->x); }
+	void SetUniform(int index, const IPoint3<GLuint> *p, int count=1) { glUniform3uiv(params[index],count,&p->x); }
+	void SetUniform(int index, const IPoint4<GLuint> *p, int count=1) { glUniform4uiv(params[index],count,&p->x); }
 # endif
 #endif
 
@@ -1029,19 +1073,19 @@ public:
 #endif
 
 #ifdef _CY_IPOINT_H_INCLUDED_
-	void SetUniform(const char *name, const IPoint2<int>    &p)              { glUseProgram(programID); int id = glGetUniformLocation( programID, name ); if ( id >= 0 ) glUniform2iv (id,1,    &p.x );
-	void SetUniform(const char *name, const IPoint3<int>    &p)              { glUseProgram(programID); int id = glGetUniformLocation( programID, name ); if ( id >= 0 ) glUniform3iv (id,1,    &p.x );
-	void SetUniform(const char *name, const IPoint4<int>    &p)              { glUseProgram(programID); int id = glGetUniformLocation( programID, name ); if ( id >= 0 ) glUniform4iv (id,1,    &p.x );
-	void SetUniform(const char *name, const IPoint2<int>    *p, int count=1) { glUseProgram(programID); int id = glGetUniformLocation( programID, name ); if ( id >= 0 ) glUniform2iv (id,count,&p->x);
-	void SetUniform(const char *name, const IPoint3<int>    *p, int count=1) { glUseProgram(programID); int id = glGetUniformLocation( programID, name ); if ( id >= 0 ) glUniform3iv (id,count,&p->x);
-	void SetUniform(const char *name, const IPoint4<int>    *p, int count=1) { glUseProgram(programID); int id = glGetUniformLocation( programID, name ); if ( id >= 0 ) glUniform4iv (id,count,&p->x);
+	void SetUniform(const char *name, const IPoint2<int>    &p)              { glUseProgram(programID); int id = glGetUniformLocation( programID, name ); if ( id >= 0 ) glUniform2iv (id,1,    &p.x ); }
+	void SetUniform(const char *name, const IPoint3<int>    &p)              { glUseProgram(programID); int id = glGetUniformLocation( programID, name ); if ( id >= 0 ) glUniform3iv (id,1,    &p.x ); }
+	void SetUniform(const char *name, const IPoint4<int>    &p)              { glUseProgram(programID); int id = glGetUniformLocation( programID, name ); if ( id >= 0 ) glUniform4iv (id,1,    &p.x ); }
+	void SetUniform(const char *name, const IPoint2<int>    *p, int count=1) { glUseProgram(programID); int id = glGetUniformLocation( programID, name ); if ( id >= 0 ) glUniform2iv (id,count,&p->x); }
+	void SetUniform(const char *name, const IPoint3<int>    *p, int count=1) { glUseProgram(programID); int id = glGetUniformLocation( programID, name ); if ( id >= 0 ) glUniform3iv (id,count,&p->x); }
+	void SetUniform(const char *name, const IPoint4<int>    *p, int count=1) { glUseProgram(programID); int id = glGetUniformLocation( programID, name ); if ( id >= 0 ) glUniform4iv (id,count,&p->x); }
 # ifdef GL_VERSION_3_0
-	void SetUniform(const char *name, const IPoint2<GLuint> &p)              { glUseProgram(programID); int id = glGetUniformLocation( programID, name ); if ( id >= 0 ) glUniform2uiv(id,1,    &p.x );
-	void SetUniform(const char *name, const IPoint3<GLuint> &p)              { glUseProgram(programID); int id = glGetUniformLocation( programID, name ); if ( id >= 0 ) glUniform3uiv(id,1,    &p.x );
-	void SetUniform(const char *name, const IPoint4<GLuint> &p)              { glUseProgram(programID); int id = glGetUniformLocation( programID, name ); if ( id >= 0 ) glUniform4uiv(id,1,    &p.x );
-	void SetUniform(const char *name, const IPoint2<GLuint> *p, int count=1) { glUseProgram(programID); int id = glGetUniformLocation( programID, name ); if ( id >= 0 ) glUniform2uiv(id,count,&p->x);
-	void SetUniform(const char *name, const IPoint3<GLuint> *p, int count=1) { glUseProgram(programID); int id = glGetUniformLocation( programID, name ); if ( id >= 0 ) glUniform3uiv(id,count,&p->x);
-	void SetUniform(const char *name, const IPoint4<GLuint> *p, int count=1) { glUseProgram(programID); int id = glGetUniformLocation( programID, name ); if ( id >= 0 ) glUniform4uiv(id,count,&p->x);
+	void SetUniform(const char *name, const IPoint2<GLuint> &p)              { glUseProgram(programID); int id = glGetUniformLocation( programID, name ); if ( id >= 0 ) glUniform2uiv(id,1,    &p.x ); }
+	void SetUniform(const char *name, const IPoint3<GLuint> &p)              { glUseProgram(programID); int id = glGetUniformLocation( programID, name ); if ( id >= 0 ) glUniform3uiv(id,1,    &p.x ); }
+	void SetUniform(const char *name, const IPoint4<GLuint> &p)              { glUseProgram(programID); int id = glGetUniformLocation( programID, name ); if ( id >= 0 ) glUniform4uiv(id,1,    &p.x ); }
+	void SetUniform(const char *name, const IPoint2<GLuint> *p, int count=1) { glUseProgram(programID); int id = glGetUniformLocation( programID, name ); if ( id >= 0 ) glUniform2uiv(id,count,&p->x); }
+	void SetUniform(const char *name, const IPoint3<GLuint> *p, int count=1) { glUseProgram(programID); int id = glGetUniformLocation( programID, name ); if ( id >= 0 ) glUniform3uiv(id,count,&p->x); }
+	void SetUniform(const char *name, const IPoint4<GLuint> *p, int count=1) { glUseProgram(programID); int id = glGetUniformLocation( programID, name ); if ( id >= 0 ) glUniform4uiv(id,count,&p->x); }
 # endif
 #endif
 
@@ -1270,39 +1314,68 @@ inline bool GLRenderBuffer<TEXTURE_TYPE>::IsComplete() const
 }
 
 template <GLenum TEXTURE_TYPE>
-inline bool GLRenderBuffer<TEXTURE_TYPE>::Initialize( bool useDepthBuffer )
+inline void GLRenderBuffer<TEXTURE_TYPE>::GenerateBuffer()
 {
-	GLint prevBuffer;
-	glGetIntegerv( GL_FRAMEBUFFER_BINDING, &prevBuffer );
-	Delete();
+	GLRenderBuffer<TEXTURE_TYPE>::Delete();
 	glGenFramebuffers(1, &framebufferID);
 	glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);
 	texture.Initialize();
 	texture.SetFilteringMode(GL_NEAREST,GL_NEAREST);
 	texture.SetWrappingMode(GL_CLAMP_TO_EDGE,GL_CLAMP_TO_EDGE);
-	if ( useDepthBuffer ) {
-		glGenRenderbuffers(1, &depthbufferID);
-		glBindRenderbuffer(GL_RENDERBUFFER, depthbufferID);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthbufferID);
-	}
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture.GetID(), 0);
-	GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
-	glDrawBuffers(1, DrawBuffers);
-	glBindFramebuffer(GL_FRAMEBUFFER, prevBuffer);
-	return IsReady();
 }
 
 template <GLenum TEXTURE_TYPE>
-inline bool GLRenderBuffer<TEXTURE_TYPE>::Resize( int numChannels, GLsizei width, GLsizei height, GL::Type type )
+inline bool GLRenderTexture<TEXTURE_TYPE>::Initialize( bool useDepthBuffer )
 {
-	texture.SetImage(GL::TextureFormat(type,numChannels),GL_RGBA,GL_UNSIGNED_BYTE,nullptr,width,height);
-	if ( depthbufferID != CY_GL_INVALID_ID ) {
-		glBindRenderbuffer(GL_RENDERBUFFER, depthbufferID);
+	GLint prevBuffer;
+	glGetIntegerv( GL_FRAMEBUFFER_BINDING, &prevBuffer );
+	GLRenderBuffer<TEXTURE_TYPE>::GenerateBuffer();
+	if ( useDepthBuffer ) {
+		glGenRenderbuffers(1, &this->depthbufferID);
+		glBindRenderbuffer(GL_RENDERBUFFER, this->depthbufferID);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, this->depthbufferID);
+	}
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GLRenderBuffer<TEXTURE_TYPE>::GetTextureID(), 0);
+	glDrawBuffer(GL_COLOR_ATTACHMENT0);
+	glBindFramebuffer(GL_FRAMEBUFFER, prevBuffer);
+	return GLRenderBuffer<TEXTURE_TYPE>::IsReady();
+}
+
+template <GLenum TEXTURE_TYPE>
+inline bool GLRenderTexture<TEXTURE_TYPE>::Resize( int numChannels, GLsizei width, GLsizei height, GL::Type type )
+{
+	this->texture.SetImage(GL::TextureFormat(type,numChannels),GL_RGBA,GL_UNSIGNED_BYTE,nullptr,width,height);
+	if ( this->depthbufferID != CY_GL_INVALID_ID ) {
+		glBindRenderbuffer(GL_RENDERBUFFER, this->depthbufferID);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
 	}
-	bufferWidth = width;
-	bufferHeight = height;
-	return IsComplete();
+	GLRenderBuffer<TEXTURE_TYPE>::SetSize(width,height);
+	return GLRenderBuffer<TEXTURE_TYPE>::IsComplete();
+}
+
+template <GLenum TEXTURE_TYPE>
+inline bool GLRenderDepth<TEXTURE_TYPE>::Initialize( bool depthComparisonTexture )
+{
+	GLint prevBuffer;
+	glGetIntegerv( GL_FRAMEBUFFER_BINDING, &prevBuffer );
+	GLRenderBuffer<TEXTURE_TYPE>::GenerateBuffer();
+	if ( depthComparisonTexture ) {
+		glTexParameteri(TEXTURE_TYPE, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+		glTexParameteri(TEXTURE_TYPE, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+	}
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GLRenderBuffer<TEXTURE_TYPE>::GetTextureID(), 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, prevBuffer);
+	return GLRenderBuffer<TEXTURE_TYPE>::IsReady();
+}
+
+template <GLenum TEXTURE_TYPE>
+inline bool GLRenderDepth<TEXTURE_TYPE>::Resize( GLsizei width, GLsizei height, GLenum depthFormat )
+{
+	this->texture.SetImage(depthFormat,GL_DEPTH_COMPONENT,GL_FLOAT,nullptr,width,height);
+	GLRenderBuffer<TEXTURE_TYPE>::SetSize(width,height);
+	return GLRenderBuffer<TEXTURE_TYPE>::IsComplete();
 }
 
 #endif
@@ -1536,8 +1609,6 @@ typedef GLTexture1<GL_TEXTURE_1D       >     GLTexture1D;			//!< OpenGL 1D Textu
 typedef GLTexture2<GL_TEXTURE_2D       >     GLTexture2D;			//!< OpenGL 2D Texture
 typedef GLTexture3<GL_TEXTURE_3D       >     GLTexture3D;			//!< OpenGL 3D Texture
 
-typedef GLTextureCubeM<GL_TEXTURE_CUBE_MAP       >     GLTextureCube;			//!< OpenGL Cube Map Texture
-
 #ifdef GL_TEXTURE_1D_ARRAY
 typedef GLTexture2<GL_TEXTURE_1D_ARRAY >     GLTexture1DArray;		//!< OpenGL 1D Texture Array
 typedef GLTexture3<GL_TEXTURE_2D_ARRAY >     GLTexture2DArray;		//!< OpenGL 2D Texture Array
@@ -1547,8 +1618,10 @@ typedef GLTexture2<GL_TEXTURE_RECTANGLE>     GLTextureRect;			//!< OpenGL Rectan
 typedef GLTexture1<GL_TEXTURE_BUFFER   >     GLTextureBuffer;		//!< OpenGL Buffer Texture
 #endif
 
-typedef GLRenderBuffer<GL_TEXTURE_2D>        GLRenderBuffer2D;		//!< OpenGL render buffer with a 2D texture
-typedef GLRenderBuffer<GL_TEXTURE_RECTANGLE> GLRenderBufferRect;	//!< OpenGL render buffer with a rectangle texture
+typedef GLRenderTexture<GL_TEXTURE_2D>        GLRenderTexture2D;	//!< OpenGL render color buffer with a 2D texture
+typedef GLRenderTexture<GL_TEXTURE_RECTANGLE> GLRenderTextureRect;	//!< OpenGL render color buffer with a rectangle texture
+typedef GLRenderDepth  <GL_TEXTURE_2D>        GLRenderDepth2D;		//!< OpenGL render depth buffer with a 2D texture
+typedef GLRenderDepth  <GL_TEXTURE_RECTANGLE> GLRenderDepthRect;	//!< OpenGL render depth buffer with a rectangle texture
 
 //-------------------------------------------------------------------------------
 } // namespace cy
@@ -1563,7 +1636,7 @@ typedef cy::GLDebugCallback    cyGLDebugCallback;		//!< OpenGL debug callback cl
 typedef cy::GLTexture1D        cyGLTexture1D;			//!< OpenGL 1D Texture
 typedef cy::GLTexture2D        cyGLTexture2D;			//!< OpenGL 2D Texture
 typedef cy::GLTexture3D        cyGLTexture3D;			//!< OpenGL 3D Texture
-typedef cy::GLTextureCube	   cyGLTextureCubeMap;		//!< OpenGL Cube Map Texture
+typedef cy::GLTextureCubeMap<GL_TEXTURE_CUBE_MAP>   cyGLTextureCubeMap;		//!< OpenGL Cube Map Texture
 
 #ifdef GL_TEXTURE_1D_ARRAY
 typedef cy::GLTexture1DArray   cyGLTexture1DArray;		//!< OpenGL 1D Texture Array
@@ -1574,8 +1647,10 @@ typedef cy::GLTextureRect      cyGLTextureRect;			//!< OpenGL Rectangle Texture
 typedef cy::GLTextureBuffer    cyGLTextureBuffer;		//!< OpenGL Buffer Texture
 #endif
 
-typedef cy::GLRenderBuffer2D   cyGLRenderBuffer2D;		//!< OpenGL render buffer with a 2D texture
-typedef cy::GLRenderBufferRect cyGLRenderBufferRect;	//!< OpenGL render buffer with a rectangle texture
+typedef cy::GLRenderTexture2D   cyGLRenderTexture2D;	//!< OpenGL render color buffer with a 2D texture
+typedef cy::GLRenderTextureRect cyGLRenderTextureRect;	//!< OpenGL render color buffer with a rectangle texture
+typedef cy::GLRenderDepth2D     cyGLRenderDepth2D;		//!< OpenGL render depth buffer with a 2D texture
+typedef cy::GLRenderDepthRect   cyGLRenderDepthRect;	//!< OpenGL render depth buffer with a rectangle texture
 
 typedef cy::GLSLShader         cyGLSLShader;			//!< GLSL shader class
 typedef cy::GLSLProgram        cyGLSLProgram;			//!< GLSL program class

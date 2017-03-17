@@ -168,14 +168,14 @@ namespace
 		}
 		if (rmbStillPressed)
 		{
-			float yOffsetRMB = static_cast<float>(yPosOnPressRMB - y);
+			float yOffsetRMB = static_cast<float>(y - yPosOnPressRMB);
 			yPosOnPressRMB = y;
 			teapot ? teapot->UpdatePosition(yOffsetRMB) : GetRequiredGameOject();
 		}
 		if (ctrlLMBStillPressed)
 		{
 			float xOffsetCtrlLMB = static_cast<float>(xPosOnPressCtrlLMB - x);
-			float yOffsetCtrlLMB = static_cast<float>(yPosOnPressCtrlLMB - y);
+			float yOffsetCtrlLMB = static_cast<float>(y - yPosOnPressCtrlLMB);
 			xPosOnPressCtrlLMB = x;
 			yPosOnPressCtrlLMB = y;
 			light ? light->UpdateOrientation(xOffsetCtrlLMB, yOffsetCtrlLMB) : GetRequiredGameOject();
@@ -226,7 +226,7 @@ namespace
 		}
 		if (!plane)
 		{
-			plane = cs6610::MyGame::mainScene->GetGameobjectByName("Plane");
+			//plane = cs6610::MyGame::mainScene->GetGameobjectByName("Plane");
 		}
 	}
 }

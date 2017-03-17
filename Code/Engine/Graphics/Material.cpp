@@ -23,9 +23,8 @@ cs6610::Graphics::Material::Material(const bool i_isCubeMap, const cyTriMesh& i_
 			for (size_t i = 0; i < m_numbeOfTextures; i++)
 			{
 				m_textures[i].Initialize();
-				const GLenum wrapModeForTextures = GL_REPEAT;
-				m_textures[i].SetWrappingMode(wrapModeForTextures, wrapModeForTextures);
-
+				//const GLenum wrapModeForTextures = GL_REPEAT;
+				//m_textures[i].SetWrappingMode(wrapModeForTextures, wrapModeForTextures);
 				std::vector<unsigned char> image;
 				unsigned width, height;
 				unsigned error = lodepng::decode(image, width, height, i_texturePaths[i].c_str());

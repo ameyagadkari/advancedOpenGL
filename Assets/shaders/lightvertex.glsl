@@ -12,8 +12,8 @@ layout( std140, binding = 1 ) uniform drawcallBuffer
 
 void main()
 {
-		vec4 vertexPosition_local = vec4( i_vertexPosition_local, 1.0 );
-		vec4 vertexPosition_world = model * vertexPosition_local;
-		vec4 vertexPosition_camera = view * vertexPosition_world;
-		gl_Position = projection * vertexPosition_camera;
+	vec4 vertexPosition_local = vec4( i_vertexPosition_local, 1.0 );
+	vec4 vertexPosition_world = model * vertexPosition_local;
+	vec4 vertexPosition_camera = view * vertexPosition_world;
+	gl_Position = projection * vertexPosition_camera;
 }

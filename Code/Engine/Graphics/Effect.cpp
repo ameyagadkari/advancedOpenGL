@@ -40,7 +40,7 @@ void cs6610::Graphics::Effect::RegisterUniforms(const char * const i_names) cons
 	m_program->RegisterUniforms(i_names);
 }
 
-void cs6610::Graphics::Effect::Compile(void) const
+void cs6610::Graphics::Effect::Compile() const
 {
 	if (!m_program->BuildFiles(m_shaderPaths[0].c_str(), m_shaderPaths[1].c_str()))
 	{
@@ -48,7 +48,7 @@ void cs6610::Graphics::Effect::Compile(void) const
 	}
 }
 
-void cs6610::Graphics::Effect::ReCompile(void)
+void cs6610::Graphics::Effect::ReCompile()
 {
 	for (auto it = allActiveEffects.begin(); it != allActiveEffects.end(); ++it)
 	{

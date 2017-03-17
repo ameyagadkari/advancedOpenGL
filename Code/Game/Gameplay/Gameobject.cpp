@@ -77,7 +77,7 @@ void cs6610::Gameplay::GameObject::UpdatePosition(float yOffset)
 {
 	cyPoint3f localOffset = cyPoint3f(0.0f);
 
-	localOffset.y += yOffset;
+	localOffset.z += yOffset;
 
 	const float speed_unitsPerSecond = 10.0f;
 	const float offsetModifier = speed_unitsPerSecond * static_cast<float>(Time::GetElapsedTimeDuringPreviousFrame());
