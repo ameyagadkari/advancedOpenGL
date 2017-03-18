@@ -81,7 +81,7 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 			{ "data/shaders/lightvertex.glsl", "data/shaders/lightfragment.glsl" },
 			{});
 
-		secondaryScene = new Graphics::Scene(true, { 0.0f,0.0f,0.0f,0.0f }, 1.0f, 0x40, true);*/
+		secondaryScene = new Graphics::Scene(true, { 0.0f,0.0f,0.0f,0.0f }, 1.0f, 0x40000000, true);*/
 
 
 	}

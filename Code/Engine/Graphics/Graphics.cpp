@@ -60,8 +60,7 @@ void cs6610::Graphics::RenderFrame()
 
 		// Draw the light
 		{
-			Material* lightMaterial = light->GetMaterial();
-			lightMaterial->Bind();
+			Material* lightMaterial = light->GetMaterial();			
 
 			drawcallBufferData.model =
 				cyMatrix4f::MatrixScale(light->GetScale())*
@@ -72,7 +71,11 @@ void cs6610::Graphics::RenderFrame()
 			drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
 
 			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
-			light->GetMesh()->RenderMesh();
+			for (size_t i = 0; i < lightMaterial->m_numbeOfMaterials; i++)
+			{
+				lightMaterial->Bind(i);
+				light->GetMesh()->RenderMesh(i);
+			}
 		}
 
 		// Draw Teapot

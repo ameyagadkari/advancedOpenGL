@@ -11,11 +11,18 @@ namespace cs6610
 		class Mesh
 		{
 		public:
-			void RenderMesh()const;
+			void RenderMesh(size_t meshID = 0)const;
 			explicit Mesh(const cyTriMesh& i_meshData, cy::Point3f &o_minBounds, cy::Point3f &o_maxBounds);
 			~Mesh();
 		private:
-			uint32_t m_numberOfVertices;
+			struct sMesh
+			{
+				int startIndex;
+				int m_numberOfVertices;
+			};
+			size_t m_numberOfMeshes;
+			int m_totalNumberOfVertices;
+			sMesh* m_subMeshes;
 			bool Initialize();
 			bool CleanUp();
 			GLuint m_vertexArrayId;

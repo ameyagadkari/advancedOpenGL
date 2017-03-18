@@ -5,7 +5,7 @@
 #include "../../Game/Gameplay/Gameobject.h"
 #include "../Asserts/Asserts.h"
 
-cs6610::Graphics::Scene::Scene(bool const i_useRenderBuffer, Color const i_clearColor, float const i_clearDepth, uint8_t const i_clearControlBits, bool const i_useDepthBuffer)
+cs6610::Graphics::Scene::Scene(bool const i_useRenderBuffer, Color const i_clearColor, float const i_clearDepth, uint32_t const i_clearControlBits, bool const i_useDepthBuffer)
 	:
 	m_clearColor(i_clearColor),
 	m_pcamera(new Camera::Camera(cyPoint3f(0.0f,0.0f,10.0f))),

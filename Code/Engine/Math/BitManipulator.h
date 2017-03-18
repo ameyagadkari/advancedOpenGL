@@ -8,10 +8,10 @@ namespace cs6610
 	{
 		namespace BitManipulator
 		{
-			bool IsBitSet(uint8_t number, uint8_t bitNumber);
-			bool IsBitClear(uint8_t number, uint8_t bitNumber);
-			void SetBit(uint8_t& number, uint8_t bitNumber);
-			void ClearBit(uint8_t& number, uint8_t bitNumber);
+			bool IsBitSet(uint32_t number, uint32_t bitNumber);
+			bool IsBitClear(uint32_t number, uint32_t bitNumber);
+			void SetBit(uint32_t& number, uint32_t bitNumber);
+			void ClearBit(uint32_t& number, uint32_t bitNumber);
 		}
 	}
 }

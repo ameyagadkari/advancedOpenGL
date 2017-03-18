@@ -24,7 +24,7 @@ namespace cs6610
 			~GameObject();
 			void UpdatePosition(float xOffset = 0.0f, float yOffset = 0.0f);
 			void UpdateOrientation(float xOffset = 0.0f, float yOffset = 0.0f);
-			void LoadMeshAndMaterial(const bool i_isCubeMap, const std::string i_meshRelativePath, const std::vector<std::string> i_shaderPaths, const std::vector<std::string> i_texturePaths, const char * const i_names = nullptr);
+			void LoadMeshAndMaterial(const bool i_isCubeMap, const std::string i_meshRelativePath, const std::vector<std::string> i_shaderPaths, const std::string i_texturePathPrefix, const char * const i_names = nullptr);
 #pragma region Gets
 			Graphics::Material* GetMaterial()const;
 			Graphics::Mesh* GetMesh()const;

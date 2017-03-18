@@ -10,85 +10,103 @@ namespace
 	cs6610::Graphics::MeshData* s_meshData_inner = nullptr;
 }
 cs6610::Graphics::Mesh::Mesh(const cyTriMesh& i_meshData, cy::Point3f &o_minBounds, cy::Point3f &o_maxBounds) :
+	m_numberOfMeshes(static_cast<size_t>(i_meshData.NM())),
+	m_totalNumberOfVertices(0),
 	m_vertexArrayId(0),
 	m_vertexBufferId(0)
 {
-	m_numberOfVertices = i_meshData.NF() * 3;
-	s_meshData_inner = new MeshData(m_numberOfVertices);
-	size_t length = i_meshData.NF();
-	size_t index = 0;
+	m_subMeshes = new sMesh[m_numberOfMeshes];
+	for (size_t i = 0; i < m_numberOfMeshes; i++)
+	{
+		m_totalNumberOfVertices += i_meshData.GetMaterialFaceCount(static_cast<int>(i)) * 3;
+		m_subMeshes[i].startIndex = i_meshData.GetMaterialFirstFace(static_cast<int>(i)) * 3;
+		m_subMeshes[i].m_numberOfVertices = i_meshData.GetMaterialFaceCount(static_cast<int>(i)) * 3;
+	}
+	s_meshData_inner = new MeshData(m_totalNumberOfVertices);
 	if (i_meshData.NVT() > 0)
 	{
-		for (size_t i = 0; i < length; i++)
+		size_t index = 0;
+		for (size_t i = 0; i < m_numberOfMeshes; i++)
 		{
-			int ii = static_cast<int>(i);
-			s_meshData_inner->vertexData[index].AddVertexData(
-				i_meshData.V(i_meshData.F(ii).v[0]).x,
-				i_meshData.V(i_meshData.F(ii).v[0]).y,
-				i_meshData.V(i_meshData.F(ii).v[0]).z,
-				i_meshData.VN(i_meshData.FN(ii).v[0]).x,
-				i_meshData.VN(i_meshData.FN(ii).v[0]).y,
-				i_meshData.VN(i_meshData.FN(ii).v[0]).z,
-				i_meshData.VT(i_meshData.FT(ii).v[0]).x,
-				1.0f - i_meshData.VT(i_meshData.FT(ii).v[0]).y);
-			++index;
-			s_meshData_inner->vertexData[index].AddVertexData(
-				i_meshData.V(i_meshData.F(ii).v[1]).x,
-				i_meshData.V(i_meshData.F(ii).v[1]).y,
-				i_meshData.V(i_meshData.F(ii).v[1]).z,
-				i_meshData.VN(i_meshData.FN(ii).v[1]).x,
-				i_meshData.VN(i_meshData.FN(ii).v[1]).y,
-				i_meshData.VN(i_meshData.FN(ii).v[1]).z,
-				i_meshData.VT(i_meshData.FT(ii).v[1]).x,
-				1.0f - i_meshData.VT(i_meshData.FT(ii).v[1]).y);
-			++index;
-			s_meshData_inner->vertexData[index].AddVertexData(
-				i_meshData.V(i_meshData.F(ii).v[2]).x,
-				i_meshData.V(i_meshData.F(ii).v[2]).y,
-				i_meshData.V(i_meshData.F(ii).v[2]).z,
-				i_meshData.VN(i_meshData.FN(ii).v[2]).x,
-				i_meshData.VN(i_meshData.FN(ii).v[2]).y,
-				i_meshData.VN(i_meshData.FN(ii).v[2]).z,
-				i_meshData.VT(i_meshData.FT(ii).v[2]).x,
-				1.0f - i_meshData.VT(i_meshData.FT(ii).v[2]).y);
-			++index;
+			size_t length = i_meshData.GetMaterialFaceCount(static_cast<int>(i));
+			int ii = i_meshData.GetMaterialFirstFace(static_cast<int>(i));
+			for (size_t j = 0; j < length; j++)
+			{
+				s_meshData_inner->vertexData[index].AddVertexData(
+					i_meshData.V(i_meshData.F(ii).v[0]).x,
+					i_meshData.V(i_meshData.F(ii).v[0]).y,
+					i_meshData.V(i_meshData.F(ii).v[0]).z,
+					i_meshData.VN(i_meshData.FN(ii).v[0]).x,
+					i_meshData.VN(i_meshData.FN(ii).v[0]).y,
+					i_meshData.VN(i_meshData.FN(ii).v[0]).z,
+					i_meshData.VT(i_meshData.FT(ii).v[0]).x,
+					1.0f - i_meshData.VT(i_meshData.FT(ii).v[0]).y);
+				++index;
+				s_meshData_inner->vertexData[index].AddVertexData(
+					i_meshData.V(i_meshData.F(ii).v[1]).x,
+					i_meshData.V(i_meshData.F(ii).v[1]).y,
+					i_meshData.V(i_meshData.F(ii).v[1]).z,
+					i_meshData.VN(i_meshData.FN(ii).v[1]).x,
+					i_meshData.VN(i_meshData.FN(ii).v[1]).y,
+					i_meshData.VN(i_meshData.FN(ii).v[1]).z,
+					i_meshData.VT(i_meshData.FT(ii).v[1]).x,
+					1.0f - i_meshData.VT(i_meshData.FT(ii).v[1]).y);
+				++index;
+				s_meshData_inner->vertexData[index].AddVertexData(
+					i_meshData.V(i_meshData.F(ii).v[2]).x,
+					i_meshData.V(i_meshData.F(ii).v[2]).y,
+					i_meshData.V(i_meshData.F(ii).v[2]).z,
+					i_meshData.VN(i_meshData.FN(ii).v[2]).x,
+					i_meshData.VN(i_meshData.FN(ii).v[2]).y,
+					i_meshData.VN(i_meshData.FN(ii).v[2]).z,
+					i_meshData.VT(i_meshData.FT(ii).v[2]).x,
+					1.0f - i_meshData.VT(i_meshData.FT(ii).v[2]).y);
+				++index;
+				ii++;
+			}
 		}
 	}
 	else
 	{
-		for (size_t i = 0; i < length; i++)
+		size_t index = 0;
+		for (size_t i = 0; i < m_numberOfMeshes; i++)
 		{
-			int ii = static_cast<int>(i);
-			s_meshData_inner->vertexData[index].AddVertexData(
-				i_meshData.V(i_meshData.F(ii).v[0]).x,
-				i_meshData.V(i_meshData.F(ii).v[0]).y,
-				i_meshData.V(i_meshData.F(ii).v[0]).z,
-				i_meshData.VN(i_meshData.FN(ii).v[0]).x,
-				i_meshData.VN(i_meshData.FN(ii).v[0]).y,
-				i_meshData.VN(i_meshData.FN(ii).v[0]).z,
-				0,
-				0);
-			++index;
-			s_meshData_inner->vertexData[index].AddVertexData(
-				i_meshData.V(i_meshData.F(ii).v[1]).x,
-				i_meshData.V(i_meshData.F(ii).v[1]).y,
-				i_meshData.V(i_meshData.F(ii).v[1]).z,
-				i_meshData.VN(i_meshData.FN(ii).v[1]).x,
-				i_meshData.VN(i_meshData.FN(ii).v[1]).y,
-				i_meshData.VN(i_meshData.FN(ii).v[1]).z,
-				0,
-				0);
-			++index;
-			s_meshData_inner->vertexData[index].AddVertexData(
-				i_meshData.V(i_meshData.F(ii).v[2]).x,
-				i_meshData.V(i_meshData.F(ii).v[2]).y,
-				i_meshData.V(i_meshData.F(ii).v[2]).z,
-				i_meshData.VN(i_meshData.FN(ii).v[2]).x,
-				i_meshData.VN(i_meshData.FN(ii).v[2]).y,
-				i_meshData.VN(i_meshData.FN(ii).v[2]).z,
-				0,
-				0);
-			++index;
+			size_t length = i_meshData.GetMaterialFaceCount(static_cast<int>(i));
+			int ii = i_meshData.GetMaterialFirstFace(static_cast<int>(i));
+			for (size_t j = 0; j < length; j++)
+			{
+				s_meshData_inner->vertexData[index].AddVertexData(
+					i_meshData.V(i_meshData.F(ii).v[0]).x,
+					i_meshData.V(i_meshData.F(ii).v[0]).y,
+					i_meshData.V(i_meshData.F(ii).v[0]).z,
+					i_meshData.VN(i_meshData.FN(ii).v[0]).x,
+					i_meshData.VN(i_meshData.FN(ii).v[0]).y,
+					i_meshData.VN(i_meshData.FN(ii).v[0]).z,
+					0,
+					0);
+				++index;
+				s_meshData_inner->vertexData[index].AddVertexData(
+					i_meshData.V(i_meshData.F(ii).v[1]).x,
+					i_meshData.V(i_meshData.F(ii).v[1]).y,
+					i_meshData.V(i_meshData.F(ii).v[1]).z,
+					i_meshData.VN(i_meshData.FN(ii).v[1]).x,
+					i_meshData.VN(i_meshData.FN(ii).v[1]).y,
+					i_meshData.VN(i_meshData.FN(ii).v[1]).z,
+					0,
+					0);
+				++index;
+				s_meshData_inner->vertexData[index].AddVertexData(
+					i_meshData.V(i_meshData.F(ii).v[2]).x,
+					i_meshData.V(i_meshData.F(ii).v[2]).y,
+					i_meshData.V(i_meshData.F(ii).v[2]).z,
+					i_meshData.VN(i_meshData.FN(ii).v[2]).x,
+					i_meshData.VN(i_meshData.FN(ii).v[2]).y,
+					i_meshData.VN(i_meshData.FN(ii).v[2]).z,
+					0,
+					0);
+				++index;
+				ii++;
+			}
 		}
 	}
 	Initialize();
@@ -163,8 +181,8 @@ bool cs6610::Graphics::Mesh::Initialize()
 	// Assign the data to the buffer
 	{
 		//Vextex Buffer init
-		const unsigned int vertexBufferSize = m_numberOfVertices * sizeof(MeshData::Vertex);
-		if (m_numberOfVertices > 0)
+		const unsigned int vertexBufferSize = m_totalNumberOfVertices * sizeof(MeshData::Vertex);
+		CS6610_ASSERTF((m_totalNumberOfVertices > 0 && m_totalNumberOfVertices < UINT32_MAX), "Too many vertices. Split the mesh");
 		{
 			glBufferData(GL_ARRAY_BUFFER, vertexBufferSize, reinterpret_cast<GLvoid*>(s_meshData_inner->vertexData), GL_STATIC_DRAW);
 			const GLenum errorCode = glGetError();
@@ -174,12 +192,6 @@ bool cs6610::Graphics::Mesh::Initialize()
 				CS6610_ASSERTF(false, "OpenGL failed to allocate the vertex buffer with data: %s", reinterpret_cast<const char*>(gluErrorString(errorCode)));
 				goto OnExit;
 			}
-		}
-		else
-		{
-			wereThereErrors = true;
-			CS6610_ASSERTF(false, "OpenGL failed to allocate the vertex buffer because there is no Vertex Data");
-			goto OnExit;
 		}
 	}
 
@@ -244,7 +256,7 @@ bool cs6610::Graphics::Mesh::Initialize()
 				goto OnExit;
 			}
 		}
-		// UV at 1
+		// UV at 2
 		{
 			const GLuint vertexElementLocation = 2;
 			const GLint elementCount = 2;
@@ -328,10 +340,16 @@ bool cs6610::Graphics::Mesh::CleanUp()
 		}
 		m_vertexArrayId = 0;
 	}
+
+	if (m_subMeshes)
+	{
+		delete[] m_subMeshes;
+		m_subMeshes = nullptr;
+	}
 	return !wereThereErrors;
 }
 
-void cs6610::Graphics::Mesh::RenderMesh()const
+void cs6610::Graphics::Mesh::RenderMesh(size_t meshID)const
 {
 	// Binding the VAO
 	{
@@ -342,8 +360,7 @@ void cs6610::Graphics::Mesh::RenderMesh()const
 	//Drawing data as points
 	{
 		const GLenum mode = GL_TRIANGLES;
-		const GLint first = 0;
-		glDrawArrays(mode, first, m_numberOfVertices);
+		glDrawArrays(mode, m_subMeshes[meshID].startIndex, m_subMeshes[meshID].m_numberOfVertices);
 		CS6610_ASSERT(glGetError() == GL_NO_ERROR);
 	}
 
