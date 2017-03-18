@@ -50,16 +50,59 @@ void cs6610::Graphics::RenderFrame()
 	Time::OnNewFrame();
 	UniformBufferData::DrawcallBuffer drawcallBufferData;
 	cyMatrix3f normal;
-	cyPoint3f lightPositionWorld;
 	Gameplay::GameObject* teapot = MyGame::mainScene->GetGameobjectByName("Teapot");
 	Gameplay::GameObject* light = MyGame::mainScene->GetGameobjectByName("Light");
-	Gameplay::GameObject* plane = MyGame::mainScene->GetGameobjectByName("Plane");
+	//Gameplay::GameObject* plane = MyGame::mainScene->GetGameobjectByName("Plane");
 
-	// Draw Secondary Scene
+	// Draw Main Scene
+	{
+		MyGame::mainScene->RenderScene();
+
+		// Draw the light
+		{
+			Material* lightMaterial = light->GetMaterial();
+			lightMaterial->Bind();
+
+			drawcallBufferData.model =
+				cyMatrix4f::MatrixScale(light->GetScale())*
+				cyMatrix4f::MatrixTrans(light->GetPosition())*
+				cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(light->GetOrientationEular().y))*
+				cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(light->GetOrientationEular().x));
+			drawcallBufferData.view = MyGame::mainScene->GetCamera()->GetViewMatrix();
+			drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
+
+			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+			light->GetMesh()->RenderMesh();
+		}
+
+		// Draw Teapot
+		{
+			Material* teapotMaterial = teapot->GetMaterial();
+			teapotMaterial->Bind();
+
+			drawcallBufferData.model =
+				cyMatrix4f::MatrixScale(teapot->GetScale())*
+				cyMatrix4f::MatrixTrans(teapot->GetPosition())*
+				cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(teapot->GetOrientationEular().y))*
+				cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(teapot->GetOrientationEular().x));
+			drawcallBufferData.view = MyGame::mainScene->GetCamera()->GetViewMatrix();
+			drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
+
+			normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
+			cyGLSLProgram* program = teapotMaterial->GetEffect()->GetProgram();
+			program->SetUniform(0, normal);
+			program->SetUniform(1, light->GetPosition());
+
+			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+			teapot->GetMesh()->RenderMesh();
+		}
+	}
+
+	/*// Draw Secondary Scene
 	{
 		MyGame::secondaryScene->RenderScene();
 
-		/*// Draw the light
+		// Draw the light
 		{
 			Material* lightMaterial = light->GetMaterial();
 			lightMaterial->Bind();
@@ -79,7 +122,7 @@ void cs6610::Graphics::RenderFrame()
 			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 
 			light->GetMesh()->RenderMesh();
-		}*/
+		}
 		
 		// Draw Teapot
 		{
@@ -186,7 +229,7 @@ void cs6610::Graphics::RenderFrame()
 		}
 	}
 
-	/*// Draw Secondary Scene
+	// Draw Secondary Scene
 	{
 		MyGame::secondaryScene->RenderScene();
 		/*glDepthMask(GL_FALSE);
@@ -330,7 +373,6 @@ namespace
 	{
 		if (cs6610::Time::GetElapsedTimeDuringPreviousFrame() > FPS)
 		{
-			cs6610::MyGame::mainScene->GetCamera()->UpdateCurrentCameraOrientation();
 			cs6610::MyGame::mainScene->GetCamera()->UpdateCurrentCameraPosition();
 			glutPostWindowRedisplay(currentWindowID);
 		}
@@ -339,10 +381,10 @@ namespace
 	{
 		cs6610::Camera::Camera::ms_aspectRatio = static_cast<float>(width) / height;
 		glViewport(0, 0, width, height);
-		if (!secondarySceneRenderBuffer)secondarySceneRenderBuffer = cs6610::MyGame::secondaryScene->GetRenderBuffer();
+		/*if (!secondarySceneRenderBuffer)secondarySceneRenderBuffer = cs6610::MyGame::secondaryScene->GetRenderBuffer();
 		if (!secondarySceneRenderBuffer->Resize(width, height))
 		{
 			CS6610_ASSERTF(false, "RenderBuffer is not ready");
-		}
+		}*/
 	}
 }

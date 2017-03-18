@@ -6,6 +6,7 @@
 #include "../../Game/Gameplay/Gameobject.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/Scene.h"
+#include "../Camera/Camera.h"
 
 namespace
 {
@@ -15,6 +16,7 @@ namespace
 	void keyReleaseSpecial(int key, int x, int y);
 	void mouse(int button, int state, int x, int y);
 	void mouseMotion(int x, int y);
+	void mouseMotionPassive(int x, int y);
 	void close();
 
 	int xPosOnPressLMB = 0, yPosOnPressLMB = 0;
@@ -36,6 +38,9 @@ namespace
 	int yPosOnPressALTRMB = 0;
 	bool altRMBFirstPress = true;
 	bool altRMBStillPressed = false;
+
+	int xLast = 0, yLast = 0;
+	bool isFirstMouseMove = true;
 
 	cs6610::Gameplay::GameObject* teapot = nullptr;
 	cs6610::Gameplay::GameObject* light = nullptr;
@@ -61,6 +66,7 @@ bool cs6610::UserInput::Initialize()
 	glutSpecialUpFunc(keyReleaseSpecial);
 	glutMouseFunc(mouse);
 	glutMotionFunc(mouseMotion);
+	glutPassiveMotionFunc(mouseMotionPassive);
 	glutCloseFunc(close);
 	return true;
 }
@@ -170,7 +176,7 @@ namespace
 		{
 			float yOffsetRMB = static_cast<float>(y - yPosOnPressRMB);
 			yPosOnPressRMB = y;
-			teapot ? teapot->UpdatePosition(yOffsetRMB) : GetRequiredGameOject();
+			teapot ? teapot->UpdatePosition(0.0f, yOffsetRMB) : GetRequiredGameOject();
 		}
 		if (ctrlLMBStillPressed)
 		{
@@ -178,7 +184,7 @@ namespace
 			float yOffsetCtrlLMB = static_cast<float>(y - yPosOnPressCtrlLMB);
 			xPosOnPressCtrlLMB = x;
 			yPosOnPressCtrlLMB = y;
-			light ? light->UpdateOrientation(xOffsetCtrlLMB, yOffsetCtrlLMB) : GetRequiredGameOject();
+			light ? light->UpdatePosition(xOffsetCtrlLMB, yOffsetCtrlLMB) : GetRequiredGameOject();
 		}
 		if (altLMBStillPressed)
 		{
@@ -192,9 +198,29 @@ namespace
 		{
 			float yOffsetALTRMB = static_cast<float>(yPosOnPressALTRMB - y);
 			yPosOnPressALTRMB = y;
-			plane ? plane->UpdatePosition(yOffsetALTRMB) : GetRequiredGameOject();
+			plane ? plane->UpdatePosition(0.0f, yOffsetALTRMB) : GetRequiredGameOject();
+		}
+		isFirstMouseMove = true;
+	}
+
+	void mouseMotionPassive(int x, int y)
+	{
+		if (!lmbStillPressed && !rmbStillPressed && !ctrlLMBStillPressed && !altLMBStillPressed && !altRMBStillPressed)
+		{
+			if (isFirstMouseMove)
+			{
+				xLast = x;
+				yLast = y;
+				isFirstMouseMove = false;
+			}
+			float xOffset = static_cast<float>(x - xLast);
+			float yOffset = static_cast<float>(y - yLast);
+			xLast = x;
+			yLast = y;
+			cs6610::MyGame::mainScene->GetCamera()->UpdateCurrentCameraOrientation(xOffset, yOffset);
 		}
 	}
+
 	void close()
 	{
 		cs6610::MyGame::CleanUp();

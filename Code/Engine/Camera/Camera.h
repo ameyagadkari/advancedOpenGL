@@ -15,9 +15,7 @@ namespace cs6610
 			~Camera();
 
 			void UpdateCurrentCameraPosition();
-			void UpdateCurrentCameraOrientation(bool constrainPitch = true);
-
-
+			void UpdateCurrentCameraOrientation(float xOffset = 0.0f, float yOffset = 0.0f, bool constrainPitch = true);
 
 			static float ms_aspectRatio;
 

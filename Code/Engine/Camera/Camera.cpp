@@ -73,8 +73,6 @@ void cs6610::Camera::Camera::UpdateCurrentCameraPosition()
 {
 	cyPoint3f localOffset = cyPoint3f(0.0f);
 
-	//localOffset.z += zOffset;
-
 	if (UserInput::keys.test('w'))
 		localOffset += m_localCameraAxis.m_front;
 	if (UserInput::keys.test('s'))
@@ -89,28 +87,19 @@ void cs6610::Camera::Camera::UpdateCurrentCameraPosition()
 	localOffset *= offsetModifier;
 	m_position += localOffset;
 }
-void cs6610::Camera::Camera::UpdateCurrentCameraOrientation(bool constrainPitch)
+void cs6610::Camera::Camera::UpdateCurrentCameraOrientation(float xOffset, float yOffset, bool constrainPitch)
 {
 	cyPoint3f localOffset = cyPoint3f(0.0f);
 
-	//localOffset.y += xOffset;
-	//localOffset.x += yOffset;
-
-	if (UserInput::keys.test('h'))
-		localOffset.y += 1.0f;
-	if (UserInput::keys.test('f'))
-		localOffset.y -= 1.0f;
-	if (UserInput::keys.test('g'))
-		localOffset.x += 1.0f;
-	if (UserInput::keys.test('t'))
-		localOffset.x -= 1.0f;
+	localOffset.y += xOffset;
+	localOffset.x += yOffset;
 
 	const float speed_unitsPerSecond = 10.0f;
 	const float offsetModifier = speed_unitsPerSecond * static_cast<float>(Time::GetElapsedTimeDuringPreviousFrame());
 	localOffset *= offsetModifier;
 	m_eularAngles += localOffset;
 
-	/*if (constrainPitch)
+	if (constrainPitch)
 	{
 		if (m_eularAngles.x > 89.0f)
 		{
@@ -120,7 +109,7 @@ void cs6610::Camera::Camera::UpdateCurrentCameraOrientation(bool constrainPitch)
 		{
 			m_eularAngles.x = -89.0f;
 		}
-	}*/
+	}
 	UpdateLocalCameraAxes();
 }
 

@@ -35,7 +35,7 @@ namespace cs6610
 		class Scene
 		{
 		public:
-			Scene(bool const i_useRenderBuffer = false, Color const i_clearColor = { 0.0f,0.0f,0.0f,1.0f }, float const i_clearDepth = 1.0f, uint8_t const i_clearControlBits = 0xc0, bool const i_useDepthBuffer = true);
+			Scene(bool const i_useRenderBuffer = false, Color const i_clearColor = { 0.0f,0.0f,0.0f,0.0f }, float const i_clearDepth = 1.0f, uint8_t const i_clearControlBits = 0xc0, bool const i_useDepthBuffer = true);
 			~Scene();
 			void RenderScene()const;
 			void AddGameObjectsToScene(std::string const i_name, Gameplay::GameObject* i_gameOject);

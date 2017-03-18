@@ -22,8 +22,8 @@ namespace cs6610
 		public:
 			explicit GameObject(const cyPoint3f i_position = cyPoint3f(0.0f, 0.0f, 0.0f), const cyPoint3f i_eularAngles = cyPoint3f(0.0f, 0.0f, 0.0f), const cyPoint3f i_scale = cyPoint3f(1.0f, 1.0f, 1.0f));
 			~GameObject();
-			void UpdatePosition(float zOffset);
-			void UpdateOrientation(float xOffset, float yOffset);
+			void UpdatePosition(float xOffset = 0.0f, float yOffset = 0.0f);
+			void UpdateOrientation(float xOffset = 0.0f, float yOffset = 0.0f);
 			void LoadMeshAndMaterial(const bool i_isCubeMap, const std::string i_meshRelativePath, const std::vector<std::string> i_shaderPaths, const std::vector<std::string> i_texturePaths, const char * const i_names = nullptr);
 #pragma region Gets
 			Graphics::Material* GetMaterial()const;

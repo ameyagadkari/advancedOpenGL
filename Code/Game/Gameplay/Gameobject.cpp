@@ -73,10 +73,11 @@ void cs6610::Gameplay::GameObject::LoadMeshAndMaterial(const bool i_isCubeMap, c
 	}
 }
 
-void cs6610::Gameplay::GameObject::UpdatePosition(float yOffset)
+void cs6610::Gameplay::GameObject::UpdatePosition(float xOffset, float yOffset)
 {
 	cyPoint3f localOffset = cyPoint3f(0.0f);
 
+	localOffset.x += xOffset;
 	localOffset.z += yOffset;
 
 	const float speed_unitsPerSecond = 10.0f;
@@ -89,7 +90,7 @@ void cs6610::Gameplay::GameObject::UpdateOrientation(float xOffset, float yOffse
 {
 	cyPoint3f localOffset = cyPoint3f(0.0f);
 
-	localOffset.z += xOffset;
+	localOffset.y += xOffset;
 	localOffset.x += yOffset;
 
 	const float speed_unitsPerSecond = 10.0f;
