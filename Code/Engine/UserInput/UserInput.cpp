@@ -16,7 +16,7 @@ namespace
 	void keyReleaseSpecial(int key, int x, int y);
 	void mouse(int button, int state, int x, int y);
 	void mouseMotion(int x, int y);
-	void mouseMotionPassive(int x, int y);
+	//void mouseMotionPassive(int x, int y);
 	void close();
 
 	int xPosOnPressLMB = 0, yPosOnPressLMB = 0;
@@ -44,7 +44,7 @@ namespace
 
 	cs6610::Gameplay::GameObject* teapot = nullptr;
 	cs6610::Gameplay::GameObject* light = nullptr;
-	cs6610::Gameplay::GameObject* plane = nullptr;
+	//cs6610::Gameplay::GameObject* plane = nullptr;
 	void GetRequiredGameOject();
 }
 
@@ -66,7 +66,7 @@ bool cs6610::UserInput::Initialize()
 	glutSpecialUpFunc(keyReleaseSpecial);
 	glutMouseFunc(mouse);
 	glutMotionFunc(mouseMotion);
-	glutPassiveMotionFunc(mouseMotionPassive);
+	//glutPassiveMotionFunc(mouseMotionPassive);
 	glutCloseFunc(close);
 	return true;
 }
@@ -90,10 +90,12 @@ namespace
 			cs6610::UserInput::keys.set(c);
 		}
 	}
+
 	void keyRelease(unsigned char c, int x, int y)
 	{
 		cs6610::UserInput::keys.reset(c);
 	}
+
 	void mouse(int button, int state, int x, int y)
 	{
 		if (button == GLUT_LEFT_BUTTON)
@@ -162,6 +164,7 @@ namespace
 			}
 		}
 	}
+
 	void mouseMotion(int x, int y)
 	{
 		if (lmbStillPressed)
@@ -188,22 +191,36 @@ namespace
 		}
 		if (altLMBStillPressed)
 		{
-			float xOffsetALTLMB = static_cast<float>(xPosOnPressALTLMB - x);
+			/*float xOffsetALTLMB = static_cast<float>(xPosOnPressALTLMB - x);
 			float yOffsetALTLMB = static_cast<float>(yPosOnPressALTLMB - y);
 			xPosOnPressALTLMB = x;
 			yPosOnPressALTLMB = y;
-			plane ? plane->UpdateOrientation(xOffsetALTLMB, yOffsetALTLMB) : GetRequiredGameOject();
+			plane ? plane->UpdateOrientation(xOffsetALTLMB, yOffsetALTLMB) : GetRequiredGameOject();*/
 		}
 		if (altRMBStillPressed)
 		{
-			float yOffsetALTRMB = static_cast<float>(yPosOnPressALTRMB - y);
-			yPosOnPressALTRMB = y;
-			plane ? plane->UpdatePosition(0.0f, yOffsetALTRMB) : GetRequiredGameOject();
+			//float yOffsetALTRMB = static_cast<float>(yPosOnPressALTRMB - y);
+			//yPosOnPressALTRMB = y;
+			if (isFirstMouseMove)
+			{
+				xLast = x;
+				yLast = y;
+				isFirstMouseMove = false;
+			}
+			float xOffset = static_cast<float>(x - xLast);
+			float yOffset = static_cast<float>(y - yLast);
+			xLast = x;
+			yLast = y;
+			cs6610::MyGame::mainScene->GetCamera()->UpdateCurrentCameraOrientation(xOffset, yOffset);
+			//plane ? plane->UpdatePosition(0.0f, yOffsetALTRMB) : GetRequiredGameOject();
 		}
-		isFirstMouseMove = true;
+		else
+		{
+			isFirstMouseMove = true;	
+		}
 	}
 
-	void mouseMotionPassive(int x, int y)
+	/*void mouseMotionPassive(int x, int y)
 	{
 		if (!lmbStillPressed && !rmbStillPressed && !ctrlLMBStillPressed && !altLMBStillPressed && !altRMBStillPressed)
 		{
@@ -219,7 +236,7 @@ namespace
 			yLast = y;
 			cs6610::MyGame::mainScene->GetCamera()->UpdateCurrentCameraOrientation(xOffset, yOffset);
 		}
-	}
+	}*/
 
 	void close()
 	{
@@ -250,9 +267,9 @@ namespace
 		{
 			light = cs6610::MyGame::mainScene->GetGameobjectByName("Light");
 		}
-		if (!plane)
+		/*if (!plane)
 		{
-			//plane = cs6610::MyGame::mainScene->GetGameobjectByName("Plane");
-		}
+			plane = cs6610::MyGame::mainScene->GetGameobjectByName("Plane");
+		}*/
 	}
 }

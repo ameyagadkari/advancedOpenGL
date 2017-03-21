@@ -32,5 +32,5 @@ void main()
 	o_fragmentPosition = vec3(vertexPosition_camera);	
 	o_lightPosition =  vec3(view * vec4(u_lightPosition, 1.0));
 	o_UV = i_UV;
-	o_fragmentPositionLightSpace = lightSpaceMatrix*vertexPosition_world;
+	o_fragmentPositionLightSpace = lightSpaceMatrix*vec4(vec3(vertexPosition_world),1.0f);
 }

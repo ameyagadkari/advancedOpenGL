@@ -37,8 +37,9 @@ namespace cs6610
 			Material(const bool i_isCubeMap, const cyTriMesh& i_meshData, const std::vector<std::string> i_shaderPaths, const std::string i_texturePathPrefix);
 			~Material();
 			Effect* GetEffect()const;
+			size_t GetNumberOfMaterials()const;
 			void Bind(size_t materialID = 0)const;
-			//private:
+		private:
 			struct sMaterial
 			{
 				std::map<const int, const cyGLTexture2D*> m_textures;

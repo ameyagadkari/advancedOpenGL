@@ -13,6 +13,9 @@ layout( std140, binding = 0 ) uniform materialBuffer
 	ivec4 textureUnitMask;
 };
 
+uniform bool u_depthShader;
+//uniform vec3 viewPosition;
+
 out vec4 o_color;
 
 /*float ShadowCalculation(vec4 fragPosLightSpace)
@@ -37,23 +40,30 @@ out vec4 o_color;
 
 void main()
 {
-	//Normalizing the normal
-	vec3 vertexNormalNormalized = normalize(i_vertexNormal);
+	if(u_depthShader)
+	{
+		//gl_FragDepth = gl_FragCoord.z;
+	}
+	else
+	{
+		//Normalizing the normal
+		vec3 vertexNormalNormalized = normalize(i_vertexNormal);
 
-	//Ambient light
-	vec3 ambient = ambientConstant.rgb;
-	
-	//Diffuse light
-	vec3 lightDirection = normalize(i_lightPosition - i_fragmentPosition); 
-	float cos_theta_diffuse = max(dot(vertexNormalNormalized, lightDirection), 0.0f);
-	vec3 diffuse = cos_theta_diffuse * diffuseConstant.rgb;
-	
-	//Specular light
-	vec3 viewDirection = normalize(-i_fragmentPosition);
-	vec3 halfwayDirection = normalize(lightDirection + viewDirection);
-	float cos_theta_specular = pow(max(dot(vertexNormalNormalized, halfwayDirection), 0.0f), specularExponent);
-	vec3 specular = cos_theta_diffuse * cos_theta_specular * specularConstant.rgb;	
-	
-	vec3 result = ambient + diffuse + specular;
-	o_color = vec4(result, 1.0f);
+		//Ambient light
+		vec3 ambient = ambientConstant.rgb;
+
+		//Diffuse light
+		vec3 lightDirection = normalize(i_lightPosition - i_fragmentPosition); 
+		float cos_theta_diffuse = max(dot(vertexNormalNormalized, lightDirection), 0.0f);
+		vec3 diffuse = cos_theta_diffuse * diffuseConstant.rgb;
+
+		//Specular light
+		vec3 viewDirection = normalize(-i_fragmentPosition);
+		vec3 halfwayDirection = normalize(lightDirection + viewDirection);
+		float cos_theta_specular = pow(max(dot(vertexNormalNormalized, halfwayDirection), 0.0f), specularExponent);
+		vec3 specular = cos_theta_diffuse * cos_theta_specular * specularConstant.rgb;	
+
+		vec3 result = ambient + diffuse + specular;
+		o_color = vec4(result, 1.0f);
+	}
 }

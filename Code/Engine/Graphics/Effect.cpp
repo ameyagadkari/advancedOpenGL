@@ -34,6 +34,10 @@ cy::GLSLProgram * cs6610::Graphics::Effect::GetProgram() const
 {
 	return m_program;
 }
+/*cs6610::Graphics::Effect::Effect(): 
+m_program(nullptr)
+{
+}*/
 
 void cs6610::Graphics::Effect::RegisterUniforms(const char * const i_names) const
 {

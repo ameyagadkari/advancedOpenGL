@@ -52,7 +52,35 @@ void cs6610::Graphics::RenderFrame()
 	cyMatrix3f normal;
 	Gameplay::GameObject* teapot = MyGame::mainScene->GetGameobjectByName("Teapot");
 	Gameplay::GameObject* light = MyGame::mainScene->GetGameobjectByName("Light");
-	//Gameplay::GameObject* plane = MyGame::mainScene->GetGameobjectByName("Plane");
+	Gameplay::GameObject* plane = MyGame::mainScene->GetGameobjectByName("Plane");
+
+	// Draw Secondary Scene
+	{
+		MyGame::secondaryScene->RenderScene();
+
+		// Draw Teapot
+		{
+			Material* teapotMaterial = teapot->GetMaterial();
+			teapotMaterial->Bind();
+
+			drawcallBufferData.model =
+				cyMatrix4f::MatrixScale(teapot->GetScale())*
+				cyMatrix4f::MatrixTrans(teapot->GetPosition())*
+				cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(teapot->GetOrientationEular().y))*
+				cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(teapot->GetOrientationEular().x));
+			drawcallBufferData.lightSpaceMatrix =
+				cyMatrix4f::MatrixPerspective(Math::ConvertDegreesToRadians(45.0f), Camera::Camera::ms_aspectRatio, 0.1f, 500.0f)*
+				cyMatrix4f::MatrixView(light->GetPosition(), cyPoint3f(0.0f), cyPoint3f(0.0f, 1.0f, 0.0f));
+
+			cyGLSLProgram* program = teapotMaterial->GetEffect()->GetProgram();
+			program->SetUniform(2, true);
+
+			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+			teapot->GetMesh()->RenderMesh();
+		}
+
+		secondarySceneRenderBuffer->Unbind();
+	}
 
 	// Draw Main Scene
 	{
@@ -60,7 +88,7 @@ void cs6610::Graphics::RenderFrame()
 
 		// Draw the light
 		{
-			Material* lightMaterial = light->GetMaterial();			
+			Material* lightMaterial = light->GetMaterial();
 
 			drawcallBufferData.model =
 				cyMatrix4f::MatrixScale(light->GetScale())*
@@ -71,7 +99,7 @@ void cs6610::Graphics::RenderFrame()
 			drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
 
 			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
-			for (size_t i = 0; i < lightMaterial->m_numbeOfMaterials; i++)
+			for (size_t i = 0; i < lightMaterial->GetNumberOfMaterials(); i++)
 			{
 				lightMaterial->Bind(i);
 				light->GetMesh()->RenderMesh(i);
@@ -88,16 +116,37 @@ void cs6610::Graphics::RenderFrame()
 				cyMatrix4f::MatrixTrans(teapot->GetPosition())*
 				cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(teapot->GetOrientationEular().y))*
 				cyMatrix4f::MatrixRotationX(Math::ConvertDegreesToRadians(teapot->GetOrientationEular().x));
-			drawcallBufferData.view = MyGame::mainScene->GetCamera()->GetViewMatrix();
-			drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
+			//drawcallBufferData.view = MyGame::mainScene->GetCamera()->GetViewMatrix();
+			//drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
 
 			normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
 			cyGLSLProgram* program = teapotMaterial->GetEffect()->GetProgram();
 			program->SetUniform(0, normal);
 			program->SetUniform(1, light->GetPosition());
+			program->SetUniform(2, false);
+			//program->SetUniform(3, MyGame::mainScene->GetCamera()->GetPosition());
 
 			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 			teapot->GetMesh()->RenderMesh();
+		}
+		secondarySceneRenderBuffer->BindTexture(0);
+		//Draw Plane
+		{
+			plane->GetMaterial()->Bind();
+
+			drawcallBufferData.model = cyMatrix4f::MatrixTrans(plane->GetPosition());
+			//drawcallBufferData.view = MyGame::mainScene->GetCamera()->GetViewMatrix();
+			//drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
+
+			normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
+			cyGLSLProgram* program = plane->GetMaterial()->GetEffect()->GetProgram();		
+			program->SetUniform(0, normal);
+			program->SetUniform(1, light->GetPosition());
+			program->SetUniform(2, 0.01f);
+			program->SetUniform(3, 500.0f);
+
+			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+			plane->GetMesh()->RenderMesh();
 		}
 	}
 
@@ -126,7 +175,7 @@ void cs6610::Graphics::RenderFrame()
 
 			light->GetMesh()->RenderMesh();
 		}
-		
+
 		// Draw Teapot
 		{
 			Material* teapotMaterial = teapot->GetMaterial();
@@ -150,7 +199,7 @@ void cs6610::Graphics::RenderFrame()
 				drawcallBufferData.view = cyMatrix4f::MatrixView(lightPositionWorld, teapot->GetPosition(), cyPoint3f(0.0f, 1.0f, 0.0f));
 			drawcallBufferData.projection = cyMatrix4f::MatrixPerspective(Math::ConvertDegreesToRadians(45.0f), Camera::Camera::ms_aspectRatio, 0.01f, 500.0f);
 			//normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
-			cyGLSLProgram* program = teapotMaterial->GetEffect()->GetProgram();	
+			cyGLSLProgram* program = teapotMaterial->GetEffect()->GetProgram();
 			//program->SetUniform(0, normal);
 			//program->SetUniform(1, lightPositionWorld);
 			program->SetUniform(2, true);
@@ -159,12 +208,12 @@ void cs6610::Graphics::RenderFrame()
 		}
 		secondarySceneRenderBuffer->Unbind();
 	}
-	
+
 	// Draw Main Scene
 	{
 		secondarySceneRenderBuffer->BindTexture();
 		MyGame::mainScene->RenderScene();
-		
+
 		// Draw the light
 		{
 			Material* lightMaterial = light->GetMaterial();
@@ -211,7 +260,7 @@ void cs6610::Graphics::RenderFrame()
 		//Draw Plane
 		{
 			plane->GetMaterial()->Bind();
-			
+
 			drawcallBufferData.model =
 				cyMatrix4f::MatrixScale(plane->GetScale())*
 				cyMatrix4f::MatrixTrans(plane->GetPosition())*
@@ -384,10 +433,10 @@ namespace
 	{
 		cs6610::Camera::Camera::ms_aspectRatio = static_cast<float>(width) / height;
 		glViewport(0, 0, width, height);
-		/*if (!secondarySceneRenderBuffer)secondarySceneRenderBuffer = cs6610::MyGame::secondaryScene->GetRenderBuffer();
+		if (!secondarySceneRenderBuffer)secondarySceneRenderBuffer = cs6610::MyGame::secondaryScene->GetRenderBuffer();
 		if (!secondarySceneRenderBuffer->Resize(width, height))
 		{
 			CS6610_ASSERTF(false, "RenderBuffer is not ready");
-		}*/
+		}
 	}
 }

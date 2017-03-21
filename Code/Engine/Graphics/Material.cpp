@@ -159,9 +159,14 @@ cs6610::Graphics::Effect * cs6610::Graphics::Material::GetEffect() const
 	return m_effect;
 }
 
+size_t cs6610::Graphics::Material::GetNumberOfMaterials() const
+{
+	return m_numbeOfMaterials;
+}
+
 void cs6610::Graphics::Material::Bind(size_t materialID)const
 {
-	if (materialID == 0)
+	//if (materialID == 0)
 	{
 		m_effect->Bind();
 	}

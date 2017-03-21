@@ -17,7 +17,8 @@ namespace cs6610
 		{
 		public:
 			void Bind()const;
-			explicit Effect(const std::vector<std::string> i_shaderPaths);
+			//Effect();
+			Effect(const std::vector<std::string> i_shaderPaths);
 			~Effect();
 			cy::GLSLProgram* GetProgram()const;
 			void RegisterUniforms(const char * const i_names) const;

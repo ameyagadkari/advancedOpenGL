@@ -15,17 +15,25 @@ layout( std140, binding = 1 ) uniform drawcallBuffer
 	mat4 lightSpaceMatrix;
 };
 
+uniform bool u_depthShader;
 uniform mat3 u_normal;
 uniform vec3 u_lightPosition;
 
 void main()
 {
-	vec4 vertexPosition_local = vec4( i_vertexPosition_local, 1.0 );
-	vec4 vertexPosition_world = model * vertexPosition_local;
-	vec4 vertexPosition_camera = view * vertexPosition_world;
-	gl_Position = projection * vertexPosition_camera;
-	
-	o_vertexNormal = u_normal*i_vertexNormal;
-	o_fragmentPosition = vec3(vertexPosition_camera);
-	o_lightPosition =  vec3(view * vec4(u_lightPosition, 1.0));
+	if(u_depthShader)
+	{
+		gl_Position = lightSpaceMatrix * model * vec4(i_vertexPosition_local, 1.0f);
+	}
+	else
+	{
+		vec4 vertexPosition_local = vec4( i_vertexPosition_local, 1.0 );
+		vec4 vertexPosition_world = model * vertexPosition_local;
+		vec4 vertexPosition_camera = view * vertexPosition_world;
+		gl_Position = projection * vertexPosition_camera;
+		
+		o_vertexNormal = u_normal*i_vertexNormal;
+		o_fragmentPosition = vec3(vertexPosition_camera);
+		o_lightPosition =  vec3(view * vec4(u_lightPosition, 1.0));
+	}
 }
