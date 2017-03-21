@@ -6,9 +6,7 @@ layout( location = 2 ) in vec3 i_lightPosition;
 layout( location = 3 ) in vec2 i_UV;
 layout( location = 4 ) in vec4 i_fragmentPositionLightSpace;
 
-//layout( binding = 0 ) uniform sampler2D u_diffuseMap;
-//layout( binding = 1 ) uniform sampler2D u_specularMap;
-layout( binding = 0 ) uniform sampler2D u_depthMap;
+layout( binding = 0 ) uniform sampler2DShadow u_depthMap;
 
 layout( std140, binding = 0 ) uniform materialBuffer
 {
@@ -18,35 +16,53 @@ layout( std140, binding = 0 ) uniform materialBuffer
 	float specularExponent;
 };
 
-//uniform vec3 viewPosition;
-
 out vec4 o_color;
 
-uniform float u_near_plane;
-uniform float u_far_plane;
+//uniform float u_near_plane;
+//uniform float u_far_plane;
 
-float LinearizeDepth(float depth)
+/*float LinearizeDepth(float depth)
 {
-    float z = depth * 2.0 - 1.0;
-    return (2.0 * u_near_plane * u_far_plane) / (u_far_plane + u_near_plane - z * (u_far_plane - u_near_plane));
-}
+    float z = depth * 2.0f - 1.0f;
+    return (2.0f * u_near_plane * u_far_plane) / (u_far_plane + u_near_plane - z * (u_far_plane - u_near_plane));
+}*/
 
 float ShadowCalculation(vec4 fragPosLightSpace,vec3 vertexNormalNormalized,vec3 lightDirection)
 {
     // perform perspective divide
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-    // Transform to [0,1] range
-    projCoords = projCoords * 0.5 + 0.5;
+   
+   // Transform to [0,1] range
+    projCoords = projCoords * 0.5f + 0.5f;
+	
+	if(projCoords.z > 1.0f)
+		return 0.0f;
+	
     // Get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
-    float closestDepth = texture(u_depthMap, projCoords.xy).r; 
-	// Linearzing Depth
-	float closestDepthLinearized = LinearizeDepth(closestDepth) / u_far_plane;	
-    // Get depth of current fragment from light's perspective
+    //float closestDepth = texture(u_depthMap, projCoords);//texture(u_depthMap, projCoords.xy).r;
+    
+	// Get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
-    // Bias Calculation
+    
+	// Bias Calculation
     float bias = max(0.05f * (1.0f - dot(vertexNormalNormalized, lightDirection)), 0.005f);
-    // Check whether current frag pos is in shadow
-    float shadow = (currentDepth - bias) > closestDepthLinearized  ? 1.0 : 0.0;
+    
+	// Check whether current frag pos is in shadow
+    //float shadow = (currentDepth - bias) > closestDepth  ? 1.0f : 0.0f;
+	
+	// Percentage Closer Filtering
+	float shadow = 0.0f;
+	vec2 texelSize = 1.0f / textureSize(u_depthMap, 0);
+	for(int x = -1; x <= 1; ++x)
+	{
+		for(int y = -1; y <= 1; ++y)
+		{
+			float pcfDepth = texture(u_depthMap, projCoords + vec3((vec2(x, y) * texelSize),0.0f));//texture(u_depthMap, projCoords.xy + vec2(x, y) * texelSize).r; 
+			//float pcfDepthLinearized = LinearizeDepth(pcfDepth) / u_far_plane;	
+			shadow += currentDepth - bias > pcfDepth ? 1.0f : 0.0f;        
+		}    
+	}
+	shadow /= 9.0;
 	
     return shadow;
 }
@@ -54,7 +70,7 @@ float ShadowCalculation(vec4 fragPosLightSpace,vec3 vertexNormalNormalized,vec3 
 void main()
 {             
 	//float depthValue = texture(u_depthMap, i_UV).r;
-	//o_color = vec4(vec3(LinearizeDepth(depthValue) / u_far_plane), 1.0); 
+	//o_color = vec4(vec3(LinearizeDepth(depthValue) / u_far_plane), 1.0f); 
 	
 	//vec3 ambientColor = (texture(u_diffuseMap, i_UV)).rgb;
 	//vec3 diffuseColor = ambientColor;

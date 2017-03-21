@@ -6,6 +6,7 @@ layout( location = 1 ) in vec3 i_vertexNormal;
 layout( location = 0 ) out vec3 o_vertexNormal;
 layout( location = 1 ) out vec3 o_fragmentPosition;
 layout( location = 2 ) out vec3 o_lightPosition;
+layout( location = 3 ) out vec4 o_fragmentPositionLightSpace;
 
 layout( std140, binding = 1 ) uniform drawcallBuffer
 {
@@ -35,5 +36,6 @@ void main()
 		o_vertexNormal = u_normal*i_vertexNormal;
 		o_fragmentPosition = vec3(vertexPosition_camera);
 		o_lightPosition =  vec3(view * vec4(u_lightPosition, 1.0));
+		o_fragmentPositionLightSpace = lightSpaceMatrix*vec4(vec3(vertexPosition_world),1.0f);
 	}
 }

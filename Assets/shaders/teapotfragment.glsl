@@ -3,6 +3,9 @@
 layout( location = 0 ) in vec3 i_vertexNormal;
 layout( location = 1 ) in vec3 i_fragmentPosition;
 layout( location = 2 ) in vec3 i_lightPosition;
+layout( location = 3 ) in vec4 i_fragmentPositionLightSpace;
+
+layout( binding = 0 ) uniform sampler2DShadow u_depthMap;
 
 layout( std140, binding = 0 ) uniform materialBuffer
 {
@@ -13,30 +16,35 @@ layout( std140, binding = 0 ) uniform materialBuffer
 	ivec4 textureUnitMask;
 };
 
-uniform bool u_depthShader;
-//uniform vec3 viewPosition;
-
 out vec4 o_color;
 
-/*float ShadowCalculation(vec4 fragPosLightSpace)
+uniform bool u_depthShader;
+
+float ShadowCalculation(vec4 fragPosLightSpace,vec3 vertexNormalNormalized,vec3 lightDirection)
 {
     // perform perspective divide
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-    // Transform to [0,1] range
-    //projCoords = projCoords * 0.5 + 0.5;
+   
+   // Transform to [0,1] range
+    projCoords = projCoords * 0.5f + 0.5f;
+	
+	if(projCoords.z > 1.0f)
+		return 0.0f;
+	
     // Get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
-    float closestDepth = texture(u_depthMap, projCoords); 
-    // Get depth of current fragment from light's perspective
+    float closestDepth = texture(u_depthMap, projCoords);//texture(u_depthMap, projCoords.xy).r;
+	
+	// Get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
+    
 	// Bias Calculation
-	vec3 vertexNormalNormalized = normalize(i_vertexNormal);
-    vec3 lightDirection = normalize(i_lightPosition - i_fragmentPosition);
     float bias = max(0.05f * (1.0f - dot(vertexNormalNormalized, lightDirection)), 0.005f);
-    // Check whether current frag pos is in shadow
+    
+	// Check whether current frag pos is in shadow
     float shadow = (currentDepth - bias) > closestDepth  ? 1.0f : 0.0f;
-
+	
     return shadow;
-}*/
+}
 
 void main()
 {
@@ -63,7 +71,11 @@ void main()
 		float cos_theta_specular = pow(max(dot(vertexNormalNormalized, halfwayDirection), 0.0f), specularExponent);
 		vec3 specular = cos_theta_diffuse * cos_theta_specular * specularConstant.rgb;	
 
-		vec3 result = ambient + diffuse + specular;
+		// Calculate shadow
+		float shadow = ShadowCalculation(i_fragmentPositionLightSpace,vertexNormalNormalized,lightDirection);       
+		vec3 result = ambient + ((1.0 - shadow) * (diffuse + specular));    
+
+		//vec3 result = ambient + diffuse + specular;
 		o_color = vec4(result, 1.0f);
 	}
 }

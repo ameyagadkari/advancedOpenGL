@@ -57,7 +57,8 @@ void cs6610::Graphics::RenderFrame()
 	// Draw Secondary Scene
 	{
 		MyGame::secondaryScene->RenderScene();
-
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);
 		// Draw Teapot
 		{
 			Material* teapotMaterial = teapot->GetMaterial();
@@ -71,6 +72,7 @@ void cs6610::Graphics::RenderFrame()
 			drawcallBufferData.lightSpaceMatrix =
 				cyMatrix4f::MatrixPerspective(Math::ConvertDegreesToRadians(45.0f), Camera::Camera::ms_aspectRatio, 0.1f, 500.0f)*
 				cyMatrix4f::MatrixView(light->GetPosition(), cyPoint3f(0.0f), cyPoint3f(0.0f, 1.0f, 0.0f));
+			drawcallBufferData.shadowMatrix = cyMatrix4f::MatrixTrans(cyPoint3f(0.5f, 0.5f, 0.495f)) * cyMatrix4f::MatrixScale(0.5f, 0.5f, 0.5f) * drawcallBufferData.lightSpaceMatrix;
 
 			cyGLSLProgram* program = teapotMaterial->GetEffect()->GetProgram();
 			program->SetUniform(2, true);
@@ -85,7 +87,7 @@ void cs6610::Graphics::RenderFrame()
 	// Draw Main Scene
 	{
 		MyGame::mainScene->RenderScene();
-
+		glDisable(GL_CULL_FACE);
 		// Draw the light
 		{
 			Material* lightMaterial = light->GetMaterial();
@@ -105,7 +107,7 @@ void cs6610::Graphics::RenderFrame()
 				light->GetMesh()->RenderMesh(i);
 			}
 		}
-
+		secondarySceneRenderBuffer->BindTexture(0);
 		// Draw Teapot
 		{
 			Material* teapotMaterial = teapot->GetMaterial();
@@ -124,12 +126,11 @@ void cs6610::Graphics::RenderFrame()
 			program->SetUniform(0, normal);
 			program->SetUniform(1, light->GetPosition());
 			program->SetUniform(2, false);
-			//program->SetUniform(3, MyGame::mainScene->GetCamera()->GetPosition());
 
 			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 			teapot->GetMesh()->RenderMesh();
 		}
-		secondarySceneRenderBuffer->BindTexture(0);
+
 		//Draw Plane
 		{
 			plane->GetMaterial()->Bind();
@@ -142,8 +143,8 @@ void cs6610::Graphics::RenderFrame()
 			cyGLSLProgram* program = plane->GetMaterial()->GetEffect()->GetProgram();		
 			program->SetUniform(0, normal);
 			program->SetUniform(1, light->GetPosition());
-			program->SetUniform(2, 0.01f);
-			program->SetUniform(3, 500.0f);
+			//program->SetUniform(2, 0.01f);
+			//program->SetUniform(3, 500.0f);
 
 			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 			plane->GetMesh()->RenderMesh();
