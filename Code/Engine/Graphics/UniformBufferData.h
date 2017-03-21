@@ -36,7 +36,6 @@ namespace cs6610
 				cyMatrix4f view;
 				cyMatrix4f projection;
 				cyMatrix4f lightSpaceMatrix;
-				cyMatrix4f shadowMatrix;
 			};
 		}
 	}

@@ -6,7 +6,7 @@ layout( location = 2 ) in vec3 i_lightPosition;
 layout( location = 3 ) in vec2 i_UV;
 layout( location = 4 ) in vec4 i_fragmentPositionLightSpace;
 
-layout( binding = 0 ) uniform sampler2DShadow u_depthMap;
+layout( binding = 2 ) uniform sampler2DShadow u_depthMap;
 
 layout( std140, binding = 0 ) uniform materialBuffer
 {
@@ -99,5 +99,4 @@ void main()
 
 	//vec3 result = ambient + diffuse + specular;
 	o_color = vec4(result, 1.0f);
-	
 } 

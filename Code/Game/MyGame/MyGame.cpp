@@ -65,32 +65,6 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 			"u_normal u_lightPosition");/*u_normal u_lightPosition u_viewPosition u_near_plane u_far_plane*/
 
 		secondaryScene = new Graphics::Scene(true, { 0.0f,0.0f,0.0f,0.0f }, 1.0f, 0x40000000);
-		/*mainScene->AddGameObjectsToScene("Teapot", new Gameplay::GameObject(cyPoint3f(0.0f, 0.0f, 0.0f), cyPoint3f(0.0f), cyPoint3f(0.05f)));
-		mainScene->GetGameobjectByName("Teapot")->LoadMeshAndMaterial(
-			false,
-			i_arguments[1],
-			{ "data/shaders/teapotvertex.glsl", "data/shaders/teapotfragment.glsl" },
-			{},
-			"u_normal u_lightPosition u_calcDepth");
-
-
-		mainScene->AddGameObjectsToScene("Plane", new Gameplay::GameObject(cyPoint3f(0.0f, -20.0f, 0.0f), cyPoint3f(0.0f), cyPoint3f(1.0f)));
-		mainScene->GetGameobjectByName("Plane")->LoadMeshAndMaterial(
-			false,
-			"data/meshes/plane/plane.obj",
-			{ "data/shaders/planevertex.glsl", "data/shaders/planefragment.glsl" },
-			{},
-			"u_normal u_lightPosition");/*u_near_plane u_far_plane
-
-		mainScene->AddGameObjectsToScene("Light", new Gameplay::GameObject(cyPoint3f(0.0f, 20.0f, 0.0f), cyPoint3f(0.0f), cyPoint3f(0.1f)));
-		mainScene->GetGameobjectByName("Light")->LoadMeshAndMaterial(
-			false,
-			"data/meshes/light/light.obj",
-			{ "data/shaders/lightvertex.glsl", "data/shaders/lightfragment.glsl" },
-			{});
-
-		secondaryScene = new Graphics::Scene(true, { 0.0f,0.0f,0.0f,0.0f }, 1.0f, 0x40000000, true);*/
-
 
 	}
 	return !wereThereErrors;

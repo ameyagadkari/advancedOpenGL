@@ -5,7 +5,7 @@ layout( location = 1 ) in vec3 i_fragmentPosition;
 layout( location = 2 ) in vec3 i_lightPosition;
 layout( location = 3 ) in vec4 i_fragmentPositionLightSpace;
 
-layout( binding = 0 ) uniform sampler2DShadow u_depthMap;
+layout( binding = 2 ) uniform sampler2DShadow u_depthMap;
 
 layout( std140, binding = 0 ) uniform materialBuffer
 {
