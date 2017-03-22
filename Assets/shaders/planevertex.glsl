@@ -16,7 +16,6 @@ layout( std140, binding = 1 ) uniform drawcallBuffer
 	mat4 view;
 	mat4 projection;
 	mat4 lightSpaceMatrix;
-	mat4 shadowMatrix;
 };
 
 uniform mat3 u_normal;
