@@ -214,7 +214,7 @@ namespace
 		cs6610::Camera::Camera::ms_aspectRatio = static_cast<float>(width) / height;
 		glViewport(0, 0, width, height);
 		if (!secondarySceneRenderBuffer)secondarySceneRenderBuffer = cs6610::MyGame::secondaryScene->GetRenderBuffer();
-		if (!secondarySceneRenderBuffer->Resize(width, height))
+		if (!secondarySceneRenderBuffer->Resize(width*4, height*4))
 		{
 			CS6610_ASSERTF(false, "RenderBuffer is not ready");
 		}

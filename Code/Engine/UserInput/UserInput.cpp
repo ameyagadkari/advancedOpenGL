@@ -23,7 +23,7 @@ namespace
 	bool lmbFirstPress = true;
 	bool lmbStillPressed = false;
 
-	int yPosOnPressRMB = 0;
+	int xPosOnPressRMB = 0, yPosOnPressRMB = 0;
 	bool rmbFirstPress = true;
 	bool rmbStillPressed = false;
 
@@ -177,13 +177,15 @@ namespace
 		}
 		if (rmbStillPressed)
 		{
+			float xOffsetRMB = static_cast<float>(x - xPosOnPressRMB);
 			float yOffsetRMB = static_cast<float>(y - yPosOnPressRMB);
+			xPosOnPressRMB = x;
 			yPosOnPressRMB = y;
-			teapot ? teapot->UpdatePosition(0.0f, yOffsetRMB) : GetRequiredGameOject();
+			teapot ? teapot->UpdatePosition(xOffsetRMB, yOffsetRMB) : GetRequiredGameOject();
 		}
 		if (ctrlLMBStillPressed)
 		{
-			float xOffsetCtrlLMB = static_cast<float>(xPosOnPressCtrlLMB - x);
+			float xOffsetCtrlLMB = static_cast<float>(x - xPosOnPressCtrlLMB);
 			float yOffsetCtrlLMB = static_cast<float>(y - yPosOnPressCtrlLMB);
 			xPosOnPressCtrlLMB = x;
 			yPosOnPressCtrlLMB = y;
@@ -216,7 +218,7 @@ namespace
 		}
 		else
 		{
-			isFirstMouseMove = true;	
+			isFirstMouseMove = true;
 		}
 	}
 

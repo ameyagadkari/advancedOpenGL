@@ -32,7 +32,7 @@ float ShadowCalculation(vec4 fragPosLightSpace,vec3 vertexNormalNormalized,vec3 
     // perform perspective divide
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
    
-   // Transform to [0,1] range
+	// Transform to [0,1] range
     projCoords = projCoords * 0.5f + 0.5f;
 	
 	if(projCoords.z > 1.0f)
@@ -57,9 +57,8 @@ float ShadowCalculation(vec4 fragPosLightSpace,vec3 vertexNormalNormalized,vec3 
 	{
 		for(int y = -1; y <= 1; ++y)
 		{
-			float pcfDepth = texture(u_depthMap, projCoords + vec3((vec2(x, y) * texelSize),0.0f));//texture(u_depthMap, projCoords.xy + vec2(x, y) * texelSize).r; 
-			//float pcfDepthLinearized = LinearizeDepth(pcfDepth) / u_far_plane;	
-			shadow += currentDepth - bias > pcfDepth ? 1.0f : 0.0f;        
+			float pcfDepth = texture(u_depthMap, projCoords + vec3((vec2(x, y) * texelSize),0.0f));//texture(u_depthMap, projCoords.xy + vec2(x, y) * texelSize).r; 	
+			shadow += currentDepth > pcfDepth ? 1.0f : 0.0f;        
 		}    
 	}
 	shadow /= 9.0;
