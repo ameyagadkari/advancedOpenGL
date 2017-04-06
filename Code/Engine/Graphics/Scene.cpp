@@ -8,7 +8,7 @@
 cs6610::Graphics::Scene::Scene(bool const i_useRenderBuffer, Color const i_clearColor, float const i_clearDepth, uint32_t const i_clearControlBits, bool const i_useDepthBuffer)
 	:
 	m_clearColor(i_clearColor),
-	m_pcamera(new Camera::Camera(cyPoint3f(0.0f,1.0f,10.0f))),
+	m_pcamera(new Camera::Camera(cyPoint3f(0.0f,5.0f,10.0f))),
 	m_renderBuffer(i_useRenderBuffer ? new cyGLRenderDepth2D() : nullptr),
 	m_clearDepth(i_clearDepth),
 	m_clearMask(0),

@@ -8,7 +8,7 @@
 #include "UniformBufferData.h"
 #include "../Math/BitManipulator.h"
 
-cs6610::Graphics::Material::Material(const bool i_isCubeMap, const cyTriMesh& i_meshData, const std::vector<std::string> i_shaderPaths, const std::string i_texturePathPrefix) :
+cs6610::Graphics::Material::Material(const bool i_isCubeMap, const cyTriMesh& i_meshData, const std::vector<std::string> i_shaderPaths, const std::vector<std::string> i_skyBoxTextures, const std::string i_texturePathPrefix) :
 	m_texturesCubeMap(nullptr),
 	m_effect(new Effect(i_shaderPaths)),
 	m_numbeOfMaterials(static_cast<size_t>(i_meshData.NM())),
@@ -77,22 +77,21 @@ cs6610::Graphics::Material::Material(const bool i_isCubeMap, const cyTriMesh& i_
 				tempTexture->BuildMipmaps();
 			}
 		}
-		else
-		{
-			m_texturesCubeMap = new cyGLTextureCubeMap();
-			m_texturesCubeMap->Initialize();
-			for (size_t j = 0; j < 6; j++)
-			{
-				std::vector<unsigned char> image;
-				//unsigned width, height;
-				unsigned error = 0;// lodepng::decode(image, width, height, i_texturePaths[i].c_str());
-				CS6610_ASSERTF(!error, "Decoder error %d: %s", error, lodepng_error_text(error));
-				//m_texturesCubeMap->SetImage(static_cast<cyGLTextureCubeMap::Side>(i), &image[0], 4, width, height);
-			}
-			m_texturesCubeMap->SetSeamless();
-		}
 		UniformBufferData::MaterialBuffer materialBufferData(i_meshData.M(ii).Ka, i_meshData.M(ii).Kd, i_meshData.M(ii).Ks, i_meshData.M(ii).Ns, textureUnitMask);
 		m_subMaterials[i].m_materialBuffer = new UniformBuffer(UniformBufferType::MATERIAL, sizeof(materialBufferData), &materialBufferData);
+	}
+	if (i_isCubeMap)
+	{
+		m_texturesCubeMap = new cyGLTextureCubeMap();
+		m_texturesCubeMap->Initialize();
+		for (size_t j = 0; j < 6; j++)
+		{
+			std::vector<unsigned char> image;
+			unsigned width, height;
+			unsigned error = lodepng::decode(image, width, height, i_skyBoxTextures[j].c_str()); CS6610_ASSERTF(!error, "Decoder error %d: %s", error, lodepng_error_text(error));
+			m_texturesCubeMap->SetImage(static_cast<cyGLTextureCubeMap::Side>(j), &image[0], 4, width, height);
+		}
+		m_texturesCubeMap->SetSeamless();
 	}
 	/*if (m_numbeOfTextures > 0)
 	{
@@ -170,8 +169,8 @@ void cs6610::Graphics::Material::Bind(size_t materialID)const
 	{
 		m_effect->Bind();
 	}
-	if (m_subMaterials[materialID].m_materialBuffer)m_subMaterials[materialID].m_materialBuffer->Bind();
-	if (!m_isCubeMap)
+	//if (m_subMaterials[materialID].m_materialBuffer)m_subMaterials[materialID].m_materialBuffer->Bind();
+	if (!m_isCubeMap && m_numbeOfMaterials)
 	{
 		for (auto const& texture : m_subMaterials[materialID].m_textures)
 		{

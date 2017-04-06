@@ -33,7 +33,7 @@ cs6610::Gameplay::GameObject::~GameObject()
 	}
 }
 
-void cs6610::Gameplay::GameObject::LoadMeshAndMaterial(const bool i_isCubeMap, const std::string i_meshRelativePath, const std::vector<std::string> i_shaderPaths, const std::string i_texturePathPrefix, const char * const i_names)
+void cs6610::Gameplay::GameObject::LoadMeshAndMaterial(const bool i_isCubeMap, const std::string i_meshRelativePath, const std::vector<std::string> i_shaderPaths, const std::vector<std::string> i_skyBoxTextures, const std::string i_texturePathPrefix,  const char * const i_names)
 {
 	s_meshData = new cyTriMesh();
 	s_meshData->LoadFromFileObj(i_meshRelativePath.c_str());
@@ -55,7 +55,7 @@ void cs6610::Gameplay::GameObject::LoadMeshAndMaterial(const bool i_isCubeMap, c
 	// Loading the material
 	if (!m_material)
 	{
-		m_material = new Graphics::Material(i_isCubeMap, *s_meshData, i_shaderPaths, i_texturePathPrefix);
+		m_material = new Graphics::Material(i_isCubeMap, *s_meshData, i_shaderPaths, i_skyBoxTextures, i_texturePathPrefix);
 		if (i_names)
 		{
 			m_material->GetEffect()->RegisterUniforms(i_names);

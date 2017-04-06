@@ -34,7 +34,7 @@ namespace cs6610
 		class Material
 		{
 		public:
-			Material(const bool i_isCubeMap, const cyTriMesh& i_meshData, const std::vector<std::string> i_shaderPaths, const std::string i_texturePathPrefix);
+			Material(const bool i_isCubeMap, const cyTriMesh& i_meshData, const std::vector<std::string> i_shaderPaths, const std::vector<std::string> i_skyBoxTextures, const std::string i_texturePathPrefix);
 			~Material();
 			Effect* GetEffect()const;
 			size_t GetNumberOfMaterials()const;

@@ -39,33 +39,18 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 
 	//Init all scenes
 	{
-		mainScene = new Graphics::Scene(false, { 0.0f,0.0f,0.25f,0.0f });
-
-		mainScene->AddGameObjectsToScene("Light", new Gameplay::GameObject(cyPoint3f(0.0f, 20.0f, 0.0f), cyPoint3f(0.0f), cyPoint3f(0.1f)));
-		mainScene->GetGameobjectByName("Light")->LoadMeshAndMaterial(
-			false,
-			"data/meshes/light/light.obj",
-			{ "data/shaders/lightvertex.glsl", "data/shaders/lightfragment.glsl" },
-			"");
-
-		mainScene->AddGameObjectsToScene("Teapot", new Gameplay::GameObject(cyPoint3f(0.0f), cyPoint3f(0.0f), cyPoint3f(0.05f)));
-		mainScene->GetGameobjectByName("Teapot")->LoadMeshAndMaterial(
-			false,
-			i_arguments[1],
-			{ "data/shaders/teapotvertex.glsl", "data/shaders/teapotfragment.glsl" },
-			"",
-			"u_normal u_lightPosition u_depthShader");
-
-		mainScene->AddGameObjectsToScene("Plane", new Gameplay::GameObject(cyPoint3f(0.0f, 0.0f, 0.0f)));
-		mainScene->GetGameobjectByName("Plane")->LoadMeshAndMaterial(
-			false,
-			"data/meshes/plane/plane.obj",
-			{ "data/shaders/planevertex.glsl", "data/shaders/planefragment.glsl" },
-			"data/meshes/plane/",
-			"u_normal u_lightPosition");/*u_normal u_lightPosition u_viewPosition u_near_plane u_far_plane*/
-
-		secondaryScene = new Graphics::Scene(true, { 0.0f,0.0f,0.0f,0.0f }, 1.0f, 0x40000000);
-
+		mainScene = new Graphics::Scene(false);
+		mainScene->AddGameObjectsToScene("Skybox", new Gameplay::GameObject());
+		mainScene->GetGameobjectByName("Skybox")->LoadMeshAndMaterial(
+			true,
+			"data/meshes/skybox/skybox.obj",
+			{ "data/shaders/skyboxvertex.glsl", "data/shaders/skyboxfragment.glsl" },
+			{ "data/meshes/skybox/pos_x.png","data/meshes/skybox/neg_x.png" ,"data/meshes/skybox/pos_y.png" ,"data/meshes/skybox/neg_y.png" ,"data/meshes/skybox/pos_z.png" ,"data/meshes/skybox/neg_z.png" });
+		mainScene->AddGameObjectsToScene("Water", new Gameplay::GameObject());
+		mainScene->GetGameobjectByName("Water")->LoadMeshAndMaterial(false,
+			"data/meshes/water/water.obj",
+			{ "data/shaders/watervertex.glsl", "data/shaders/waterfragment.glsl" }, 
+			{});
 	}
 	return !wereThereErrors;
 }

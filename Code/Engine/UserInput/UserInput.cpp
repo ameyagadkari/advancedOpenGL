@@ -261,7 +261,7 @@ namespace
 
 	void GetRequiredGameOject()
 	{
-		if (!teapot)
+		/*if (!teapot)
 		{
 			teapot = cs6610::MyGame::mainScene->GetGameobjectByName("Teapot");
 		}
@@ -269,7 +269,7 @@ namespace
 		{
 			light = cs6610::MyGame::mainScene->GetGameobjectByName("Light");
 		}
-		/*if (!plane)
+		if (!plane)
 		{
 			plane = cs6610::MyGame::mainScene->GetGameobjectByName("Plane");
 		}*/
