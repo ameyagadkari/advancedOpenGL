@@ -17,6 +17,8 @@ namespace cs6610
 			void UpdateCurrentCameraPosition();
 			void UpdateCurrentCameraOrientation(float xOffset = 0.0f, float yOffset = 0.0f, bool constrainPitch = true);
 
+			void InvertPitch();
+
 			static float ms_aspectRatio;
 
 #pragma region Sets

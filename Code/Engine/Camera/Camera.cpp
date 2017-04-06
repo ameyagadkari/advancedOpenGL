@@ -143,3 +143,10 @@ void cs6610::Camera::Camera::CalculateOrthographicProjectionMatrix()
 
 	m_orthographicProjection = scale*trans;
 }
+
+
+void cs6610::Camera::Camera::InvertPitch()
+{
+	m_eularAngles.x = -m_eularAngles.x;
+	UpdateLocalCameraAxes();
+}
