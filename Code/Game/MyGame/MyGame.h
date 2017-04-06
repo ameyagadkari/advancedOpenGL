@@ -16,6 +16,8 @@ namespace cs6610
 		bool Initialize(int i_argumentCount, char** i_arguments);
 		void CleanUp();
 		extern Graphics::Scene* mainScene;
-		extern Graphics::Scene* secondaryScene;
+		extern Graphics::Scene* reflectionTexture;
+		extern Graphics::Scene* refractionTexture;
+		extern Graphics::Scene* refractionDepthTexture;
 	}
 }

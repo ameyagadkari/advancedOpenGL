@@ -169,7 +169,10 @@ void cs6610::Graphics::Material::Bind(size_t materialID)const
 	{
 		m_effect->Bind();
 	}
-	//if (m_subMaterials[materialID].m_materialBuffer)m_subMaterials[materialID].m_materialBuffer->Bind();
+	if (m_subMaterials)
+	{
+		if (m_subMaterials[materialID].m_materialBuffer)m_subMaterials[materialID].m_materialBuffer->Bind();
+	}
 	if (!m_isCubeMap && m_numbeOfMaterials)
 	{
 		for (auto const& texture : m_subMaterials[materialID].m_textures)

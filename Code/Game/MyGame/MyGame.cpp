@@ -13,7 +13,9 @@ namespace cs6610
 	namespace MyGame
 	{
 		Graphics::Scene* mainScene;
-		Graphics::Scene* secondaryScene;
+		Graphics::Scene* reflectionTexture;
+		Graphics::Scene* refractionTexture;
+		Graphics::Scene* refractionDepthTexture;
 	}
 }
 
@@ -46,12 +48,25 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 			"data/meshes/skybox/skybox.obj",
 			{ "data/shaders/skyboxvertex.glsl", "data/shaders/skyboxfragment.glsl" },
 			{ "data/meshes/skybox/pos_x.png","data/meshes/skybox/neg_x.png" ,"data/meshes/skybox/pos_y.png" ,"data/meshes/skybox/neg_y.png" ,"data/meshes/skybox/pos_z.png" ,"data/meshes/skybox/neg_z.png" });
-		mainScene->AddGameObjectsToScene("Water", new Gameplay::GameObject());
+
+		mainScene->AddGameObjectsToScene("CartoonLand", new Gameplay::GameObject());
+		mainScene->GetGameobjectByName("CartoonLand")->LoadMeshAndMaterial(
+			false,
+			"data/meshes/cartoonland/cartoonland.obj",
+			{ "data/shaders/cartoonlandvertex.glsl", "data/shaders/cartoonlandfragment.glsl" },
+			{},
+			"",
+			"u_clippingplane");
+
+		mainScene->AddGameObjectsToScene("Water", new Gameplay::GameObject(cyPoint3f(20.0f,0.5f,-10.0f)));
 		mainScene->GetGameobjectByName("Water")->LoadMeshAndMaterial(false,
 			"data/meshes/water/water.obj",
 			{ "data/shaders/watervertex.glsl", "data/shaders/waterfragment.glsl" }, 
 			{});
 	}
+
+	reflectionTexture = new Graphics::Scene(true);
+	refractionTexture = new Graphics::Scene(true);
 	return !wereThereErrors;
 }
 
@@ -63,9 +78,21 @@ void cs6610::MyGame::CleanUp()
 		mainScene = nullptr;
 	}
 
-	if (secondaryScene)
+	if (reflectionTexture)
 	{
-		delete secondaryScene;
-		secondaryScene = nullptr;
+		delete reflectionTexture;
+		reflectionTexture = nullptr;
+	}
+
+	if (refractionTexture)
+	{
+		delete refractionTexture;
+		refractionTexture = nullptr;
+	}
+
+	if (refractionDepthTexture)
+	{
+		delete refractionDepthTexture;
+		refractionDepthTexture = nullptr;
 	}
 }

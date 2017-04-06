@@ -41,8 +41,6 @@ namespace
 	void ReShapeCallback(int width, int height);
 
 	cs6610::Graphics::UniformBuffer* s_drawcallBuffer = nullptr;
-	cyGLRenderDepth2D* secondarySceneRenderBuffer = nullptr;
-
 }
 
 void cs6610::Graphics::RenderFrame()
@@ -52,11 +50,58 @@ void cs6610::Graphics::RenderFrame()
 	UniformBufferData::DrawcallBuffer drawcallBufferData;
 	Gameplay::GameObject* skybox = MyGame::mainScene->GetGameobjectByName("Skybox");
 	Gameplay::GameObject* water = MyGame::mainScene->GetGameobjectByName("Water");
+	//Gameplay::GameObject* lavaland = MyGame::mainScene->GetGameobjectByName("Lavaland");
+	Gameplay::GameObject* cartoonland = MyGame::mainScene->GetGameobjectByName("CartoonLand");
+
+	// Draw Reflection Texture
+	{
+		MyGame::reflectionTexture->RenderScene();
+		//glEnable(GL_CLIP_DISTANCE0);
+		//Draw Cartoon Land
+		{
+			Material* cartoonlandMaterial = cartoonland->GetMaterial();
+			Mesh* cartoonlandMesh = cartoonland->GetMesh();
+			drawcallBufferData.model = cyMatrix4f::MatrixScale(1.0f);
+			drawcallBufferData.view = MyGame::mainScene->GetCamera()->GetViewMatrix();
+			drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
+			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+			cartoonlandMaterial->GetEffect()->GetProgram()->SetUniform(0, cyPoint4f(0.0f, 1.0f, 0.0f, -water->GetPosition().y));
+			CS6610_ASSERT(glGetError() == GL_NO_ERROR);
+			for (size_t i = 0; i < cartoonlandMaterial->GetNumberOfMaterials(); i++)
+			{
+				cartoonlandMaterial->Bind(i);
+				cartoonlandMesh->RenderMesh(i);
+			}
+		}
+		MyGame::reflectionTexture->GetRenderBuffer()->Unbind();
+	}
+
+	// Draw Refraction Texture
+	{
+		MyGame::refractionTexture->RenderScene();
+		
+		//Draw Cartoon Land
+		{
+			Material* cartoonlandMaterial = cartoonland->GetMaterial();
+			Mesh* cartoonlandMesh = cartoonland->GetMesh();
+			drawcallBufferData.model = cyMatrix4f::MatrixScale(1.0f);
+			drawcallBufferData.view = MyGame::mainScene->GetCamera()->GetViewMatrix();
+			drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
+			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+			//cartoonlandMaterial->GetEffect()->GetProgram()->SetUniform(0, cyPoint4f(0.0f, -1.0f, 0.0f, water->GetPosition().y));
+			for (size_t i = 0; i < cartoonlandMaterial->GetNumberOfMaterials(); i++)
+			{
+				cartoonlandMaterial->Bind(i);
+				cartoonlandMesh->RenderMesh(i);
+			}
+		}
+		MyGame::refractionTexture->GetRenderBuffer()->Unbind();
+	}
 
 	// Draw Main Scene
 	{
 		MyGame::mainScene->RenderScene();
-
+		//glDisable(GL_CLIP_DISTANCE0);
 		glDepthMask(GL_FALSE);
 		CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to reset depth mask for writing to depth buffer");
 		//Draw Env Cube
@@ -70,17 +115,33 @@ void cs6610::Graphics::RenderFrame()
 		glDepthMask(GL_TRUE);
 		CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to reset depth mask for writing to depth buffer");
 
-		//Draw Water Quad
+		//Draw Water
 		{
 			water->GetMaterial()->Bind();
-			drawcallBufferData.model.SetIdentity();
+			drawcallBufferData.model = cyMatrix4f::MatrixTrans(water->GetPosition());
 			drawcallBufferData.view = MyGame::mainScene->GetCamera()->GetViewMatrix();
 			drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
 			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 			water->GetMesh()->RenderMesh();
 		}
+
+		//Draw Cartoon Land
+		{
+			Material* cartoonlandMaterial = cartoonland->GetMaterial();
+			Mesh* cartoonlandMesh = cartoonland->GetMesh();
+			drawcallBufferData.model = cyMatrix4f::MatrixScale(1.0f);
+			drawcallBufferData.view = MyGame::mainScene->GetCamera()->GetViewMatrix();
+			drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
+			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+			//cartoonlandMaterial->GetEffect()->GetProgram()->SetUniform(0, cyPoint4f(0.0f, -1.0f, 0.0f, 2.0f));
+			for (size_t i = 0; i < cartoonlandMaterial->GetNumberOfMaterials(); i++)
+			{
+				cartoonlandMaterial->Bind(i);
+				cartoonlandMesh->RenderMesh(i);
+			}
+		}
 	}
-	
+
 	glutSwapBuffers();
 }
 bool cs6610::Graphics::Initialize(int i_argumentCount, char** i_arguments)
@@ -117,6 +178,7 @@ bool cs6610::Graphics::Initialize(int i_argumentCount, char** i_arguments)
 		glDepthMask(GL_TRUE);
 		CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to set depth mask for writing to depth buffer");
 	}
+	glEnable(GL_CLIP_DISTANCE0);
 	const GLenum option = GLUT_ACTION_ON_WINDOW_CLOSE;
 	const int mode = GLUT_ACTION_GLUTMAINLOOP_RETURNS;
 	glutSetOption(option, mode);
@@ -149,10 +211,13 @@ namespace
 	{
 		cs6610::Camera::Camera::ms_aspectRatio = static_cast<float>(width) / height;
 		glViewport(0, 0, width, height);
-		//if (!secondarySceneRenderBuffer)secondarySceneRenderBuffer = cs6610::MyGame::secondaryScene->GetRenderBuffer();
-		/*if (!secondarySceneRenderBuffer->Resize(width*4, height*4))
+		if (!cs6610::MyGame::reflectionTexture->GetRenderBuffer()->Resize(4, width, height))
 		{
 			CS6610_ASSERTF(false, "RenderBuffer is not ready");
-		}*/
+		}
+		if (!cs6610::MyGame::refractionTexture->GetRenderBuffer()->Resize(4, width, height))
+		{
+			CS6610_ASSERTF(false, "RenderBuffer is not ready");
+		}
 	}
 }

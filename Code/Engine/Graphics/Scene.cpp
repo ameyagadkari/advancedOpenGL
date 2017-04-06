@@ -9,7 +9,7 @@ cs6610::Graphics::Scene::Scene(bool const i_useRenderBuffer, Color const i_clear
 	:
 	m_clearColor(i_clearColor),
 	m_pcamera(new Camera::Camera(cyPoint3f(0.0f,5.0f,10.0f))),
-	m_renderBuffer(i_useRenderBuffer ? new cyGLRenderDepth2D() : nullptr),
+	m_renderBuffer(i_useRenderBuffer ? new cyGLRenderTexture2D() : nullptr),
 	m_clearDepth(i_clearDepth),
 	m_clearMask(0),
 	m_useDepthBuffer(i_useDepthBuffer)
@@ -41,7 +41,7 @@ cs6610::Camera::Camera* cs6610::Graphics::Scene::GetCamera()const
 {
 	return m_pcamera;
 }
-cyGLRenderDepth2D* cs6610::Graphics::Scene::GetRenderBuffer()const
+cyGLRenderTexture2D* cs6610::Graphics::Scene::GetRenderBuffer()const
 {
 	return m_renderBuffer;
 }

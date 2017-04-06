@@ -9,7 +9,7 @@ typedef unsigned int GLenum;
 namespace cy
 {
 	template <GLenum TEXTURE_TYPE>
-	class GLRenderDepth;
+	class GLRenderTexture;
 }
 
 namespace cs6610
@@ -44,13 +44,13 @@ namespace cs6610
 			Gameplay::GameObject * GetGameobjectByName(std::string const i_name)const;
 			Camera::Camera* GetCamera()const;
 #define GL_TEXTURE_2D 0x0DE1
-			cy::GLRenderDepth<GL_TEXTURE_2D>* GetRenderBuffer()const;
+			cy::GLRenderTexture<GL_TEXTURE_2D>* GetRenderBuffer()const;
 #pragma endregion 
 		private:
 			Color m_clearColor;
 			std::map<const std::string, Gameplay::GameObject*> m_gameobjects;
 			Camera::Camera* m_pcamera;
-			cy::GLRenderDepth<GL_TEXTURE_2D>* m_renderBuffer;
+			cy::GLRenderTexture<GL_TEXTURE_2D>* m_renderBuffer;
 			float m_clearDepth;
 			GLbitfield m_clearMask;
 			bool m_useDepthBuffer;
