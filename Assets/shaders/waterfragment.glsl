@@ -56,14 +56,18 @@ void main()
 	vec4 reflectionColor = texture(u_reflectionTexture, reflectionTextureCoords);
 	vec4 refractionColor = texture(u_refractionTexture, refractionTextureCoords);
 	
-	vec3 viewVector = normalize(i_toCameraVector);
+	/*vec3 viewVector = normalize(i_toCameraVector);
 	vec3 normalizedNormal = normalize(i_vertexNormal);
 	float refractiveFactor = dot(viewVector,normalizedNormal);
-	refractiveFactor = pow(refractiveFactor, 0.5);
+	refractiveFactor = pow(refractiveFactor, 0.5);*/
 	
 	vec4 normalColor = texture(u_normalTexture, distortedUVs);
 	vec3 normal = vec3(normalColor.r * 2.0 - 1.0, normalColor.b, normalColor.g * 2.0 - 1.0);
 	normal = normalize(normal);
+	
+	vec3 viewVector = normalize(i_toCameraVector);
+	float refractiveFactor = dot(viewVector,normal);
+	refractiveFactor = pow(refractiveFactor, 0.5);
 	
 	/*vec3 reflectedLight = reflect(normalize(i_fromLightVector), normal);
 	float specular =  pow(max(dot(reflectedLight, viewVector), 0.0), specularExponent);*/
