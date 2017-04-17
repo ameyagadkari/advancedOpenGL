@@ -65,7 +65,8 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 			"data/meshes/water/water.obj",
 			{ "data/shaders/watervertex.glsl", "data/shaders/waterfragment.glsl" }, 
 			{},
-			"data/meshes/water/");
+			"data/meshes/water/",
+			"moveFactor");
 	}
 
 	reflectionTexture = new Graphics::Scene(true);

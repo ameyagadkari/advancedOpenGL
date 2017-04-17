@@ -41,6 +41,9 @@ namespace
 	void ReShapeCallback(int width, int height);
 
 	cs6610::Graphics::UniformBuffer* s_drawcallBuffer = nullptr;
+
+	const float waveSpeed = 0.03f;
+	float moveFactor = 0.0f;
 }
 
 void cs6610::Graphics::RenderFrame()
@@ -166,6 +169,9 @@ void cs6610::Graphics::RenderFrame()
 			drawcallBufferData.view = MyGame::mainScene->GetCamera()->GetViewMatrix();
 			drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
 			s_drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+			moveFactor += waveSpeed * static_cast<float>(Time::GetElapsedTimeDuringPreviousFrame());
+			moveFactor = fmodf(moveFactor, 1.0f);
+			water->GetMaterial()->GetEffect()->GetProgram()->SetUniform(0, moveFactor);
 			water->GetMesh()->RenderMesh();
 		}
 		

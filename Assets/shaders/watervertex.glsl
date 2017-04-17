@@ -25,5 +25,5 @@ void main()
 	o_clipSpaceCoords = projection * vertexPosition_camera;	
 	gl_Position = o_clipSpaceCoords;
 	
-	o_UV = vec2(i_vertexPosition_local.x*0.5+0.5,i_vertexPosition_local.z*0.5+0.5);
+	o_UV = vec2(i_vertexPosition_local.x*0.5+0.5,i_vertexPosition_local.z*0.5+0.5) * tiling;
 }
