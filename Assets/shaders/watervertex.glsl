@@ -15,6 +15,8 @@ layout( std140, binding = 1 ) uniform drawcallBuffer
 	mat4 lightSpaceMatrix;
 };
 
+uniform vec3 cameraPosition;
+
 float tiling = 6.0;
 
 void main()
