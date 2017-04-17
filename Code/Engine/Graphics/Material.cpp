@@ -165,7 +165,7 @@ size_t cs6610::Graphics::Material::GetNumberOfMaterials() const
 
 void cs6610::Graphics::Material::Bind(size_t materialID)const
 {
-	//if (materialID == 0)
+	if (materialID == 0)
 	{
 		m_effect->Bind();
 	}

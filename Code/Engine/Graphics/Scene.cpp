@@ -22,12 +22,15 @@ cs6610::Graphics::Scene::Scene(bool const i_useRenderBuffer, Color const i_clear
 		{
 			CS6610_ASSERTF(false, "RenderBuffer is not ready");
 		}
-		//else
-		//{
-		//	//m_renderBuffer->SetTextureWrappingMode(GL_REPEAT,GL_REPEAT);
-		//	//m_renderBuffer->SetTextureFilteringMode(GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
-		//	//m_renderBuffer->SetTextureMaxAnisotropy();
-		//}
+		else
+		{
+			m_renderBuffer->SetTextureWrappingMode(GL_REPEAT,GL_REPEAT);
+			CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to Set Texture Wrapping Mode");
+			//m_renderBuffer->SetTextureFilteringMode(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+			//CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to Set Texture Filtering Mode");
+			m_renderBuffer->SetTextureMaxAnisotropy();
+			CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to Set Texture MaxAnisotropy");
+		}
 	}
 }
 

@@ -1333,10 +1333,10 @@ namespace cy {
 		glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);
 		texture.Initialize();
 		texture.SetFilteringMode(GL_NEAREST, GL_NEAREST);
-		//texture.SetWrappingMode(GL_CLAMP_TO_EDGE,GL_CLAMP_TO_EDGE);
-		texture.SetWrappingMode(GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER);
-		GLfloat borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
-		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+		texture.SetWrappingMode(GL_CLAMP_TO_EDGE,GL_CLAMP_TO_EDGE);
+		//texture.SetWrappingMode(GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER);
+		//GLfloat borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+		//glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 	}
 
 	template <GLenum TEXTURE_TYPE>
