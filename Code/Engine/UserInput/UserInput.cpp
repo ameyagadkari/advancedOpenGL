@@ -161,6 +161,8 @@ namespace
 
 				altRMBFirstPress = true;
 				altRMBStillPressed = false;
+
+				isFirstMouseMove = true;
 			}
 		}
 	}

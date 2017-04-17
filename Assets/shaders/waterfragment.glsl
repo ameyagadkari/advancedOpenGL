@@ -1,9 +1,8 @@
 #version 420 core
 
-layout( location = 2 ) in vec4 i_clipSpaceCoords;
-layout( location = 3 ) in vec2 i_UV;
+layout( location = 0 ) in vec4 i_clipSpaceCoords;
+layout( location = 1 ) in vec2 i_UV;
 
-layout( binding = 0 ) uniform sampler2D u_diffuse;
 layout( binding = 5 ) uniform sampler2D u_dudvTexture;
 layout( binding = 10 ) uniform sampler2D u_reflectionTexture;
 layout( binding = 11 ) uniform sampler2D u_refractionTexture;
@@ -34,10 +33,4 @@ void main()
 	
 	o_color = mix(reflectionColor,refractionColor,0.5);
 	//o_color = vec4(refractionColor.rgb, 1.0);
-	
-	/*vec2 reflectionTextureCoords = vec2(-normalizedDeviceCoords.x,normalizedDeviceCoords.y);
-	vec2 refractionTextureCoords = vec2(normalizedDeviceCoords.x,normalizedDeviceCoords.y);
-	
-	vec4 diffuseColor = texture(u_diffuse,reflectionTextureCoords);
-	o_color = vec4(diffuseColor.rgb, 1.0);*/
 } 

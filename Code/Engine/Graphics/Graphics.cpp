@@ -80,9 +80,6 @@ void cs6610::Graphics::RenderFrame()
 		{
 			Material* cartoonlandMaterial = cartoonland->GetMaterial();
 			Mesh* cartoonlandMesh = cartoonland->GetMesh();
-			/*float distanceToMoveCameraBelowWater = 2.0f*(MyGame::mainScene->GetCamera()->GetPosition().y - water->GetPosition().y);
-			MyGame::mainScene->GetCamera()->SetPosition(MyGame::mainScene->GetCamera()->GetPosition() - cyPoint3f(0.0f, distanceToMoveCameraBelowWater, 0.0f));
-			MyGame::mainScene->GetCamera()->InvertPitch();*/
 			drawcallBufferData.model = cyMatrix4f::MatrixScale(1.0f);
 			drawcallBufferData.view = MyGame::mainScene->GetCamera()->GetViewMatrix();
 			drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
@@ -94,8 +91,6 @@ void cs6610::Graphics::RenderFrame()
 				cartoonlandMaterial->Bind(i);
 				cartoonlandMesh->RenderMesh(i);
 			}
-			/*MyGame::mainScene->GetCamera()->SetPosition(MyGame::mainScene->GetCamera()->GetPosition() + cyPoint3f(0.0f, distanceToMoveCameraBelowWater, 0.0f));
-			MyGame::mainScene->GetCamera()->InvertPitch();*/
 		}
 
 		MyGame::mainScene->GetCamera()->SetPosition(MyGame::mainScene->GetCamera()->GetPosition() + cyPoint3f(0.0f, distanceToMoveCameraBelowWater, 0.0f));
