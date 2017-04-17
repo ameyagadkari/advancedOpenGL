@@ -66,7 +66,14 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 			{ "data/shaders/watervertex.glsl", "data/shaders/waterfragment.glsl" }, 
 			{},
 			"data/meshes/water/",
-			"u_moveFactor u_cameraPosition u_lightPosition u_lightColor");
+			"u_moveFactor u_cameraPosition u_lightPosition");
+
+		mainScene->AddGameObjectsToScene("Light", new Gameplay::GameObject(cyPoint3f(0.0f, 20.0f, 0.0f), cyPoint3f(0.0f), cyPoint3f(0.1f)));
+		mainScene->GetGameobjectByName("Light")->LoadMeshAndMaterial(
+			false,
+			"data/meshes/light/light.obj",
+			{ "data/shaders/lightvertex.glsl", "data/shaders/lightfragment.glsl" },
+			{});
 	}
 
 	reflectionTexture = new Graphics::Scene(true);

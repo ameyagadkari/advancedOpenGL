@@ -266,12 +266,12 @@ namespace
 		/*if (!teapot)
 		{
 			teapot = cs6610::MyGame::mainScene->GetGameobjectByName("Teapot");
-		}
+		}*/
 		if (!light)
 		{
 			light = cs6610::MyGame::mainScene->GetGameobjectByName("Light");
 		}
-		if (!plane)
+		/*if (!plane)
 		{
 			plane = cs6610::MyGame::mainScene->GetGameobjectByName("Plane");
 		}*/

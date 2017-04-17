@@ -13,11 +13,11 @@
 #include "UniformBuffer.h"
 #include "UniformBufferData.h"
 #include "Scene.h"
-#include "../Math/Functions.h"
+//#include "../Math/Functions.h"
 
 namespace
 {
-#define FPS 0.0166666666666667
+	const double fps = 1.0 / 60.0;
 	const int windowPositionX = 100;
 	const int windowPositionY = 100;
 	const int windowWidth = 800;
@@ -65,6 +65,9 @@ void cs6610::Graphics::RenderFrame()
 	Material const * const cartoonlandMaterial = cartoonland->GetMaterial();
 	cyGLSLProgram * const cartoonlandProgram = cartoonlandMaterial->GetEffect()->GetProgram();
 	Mesh const * const cartoonlandMesh = cartoonland->GetMesh();
+
+	Gameplay::GameObject const * const light = MyGame::mainScene->GetGameobjectByName("Light");
+	Material const * const lightMaterial = light->GetMaterial();
 
 	Camera::Camera * const currentCamera = MyGame::mainScene->GetCamera();
 
@@ -207,8 +210,7 @@ void cs6610::Graphics::RenderFrame()
 			moveFactor = fmodf(moveFactor, 1.0f);
 			waterProgram->SetUniform(0, moveFactor);
 			waterProgram->SetUniform(1, currentCamera->GetPosition());
-			waterProgram->SetUniform(2, cyPoint3f(0.0f, 20.0f, 0.0f));
-			waterProgram->SetUniform(3, cyPoint3f(1.0f,1.0f,1.0f));
+			waterProgram->SetUniform(2, light->GetPosition());
 
 			water->GetMesh()->RenderMesh();
 		}
@@ -216,8 +218,8 @@ void cs6610::Graphics::RenderFrame()
 		//Draw Cartoon Land
 		{
 			drawcallBufferData.model = cyMatrix4f::MatrixScale(1.0f);
-			drawcallBufferData.view = MyGame::mainScene->GetCamera()->GetViewMatrix();
-			drawcallBufferData.projection = MyGame::mainScene->GetCamera()->GetPerspectiveProjectionMatrix();
+			drawcallBufferData.view = currentCamera->GetViewMatrix();
+			drawcallBufferData.projection = currentCamera->GetPerspectiveProjectionMatrix();
 
 			cartoonlandProgram->Bind();
 
@@ -228,6 +230,20 @@ void cs6610::Graphics::RenderFrame()
 				cartoonlandMaterial->Bind(i);
 				cartoonlandMesh->RenderMesh(i);
 			}
+		}
+
+		//Draw Light
+		{
+			drawcallBufferData.model = cyMatrix4f::MatrixTrans(light->GetPosition())*
+				cyMatrix4f::MatrixScale(light->GetScale());
+			drawcallBufferData.view = currentCamera->GetViewMatrix();
+			drawcallBufferData.projection = currentCamera->GetPerspectiveProjectionMatrix();
+
+			lightMaterial->Bind();
+
+			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+
+			light->GetMesh()->RenderMesh();		
 		}
 	}
 
@@ -289,7 +305,7 @@ namespace
 {
 	void CallingRedisplay()
 	{
-		if (cs6610::Time::GetElapsedTimeDuringPreviousFrame() > FPS)
+		if (cs6610::Time::GetElapsedTimeDuringPreviousFrame() > fps)
 		{
 			cs6610::MyGame::mainScene->GetCamera()->UpdateCurrentCameraPosition();
 			glutPostWindowRedisplay(currentWindowID);
@@ -301,11 +317,11 @@ namespace
 		glViewport(0, 0, width, height);
 		if (!cs6610::MyGame::reflectionTexture->GetRenderBuffer()->Resize(4, width, height))
 		{
-			CS6610_ASSERTF(false, "RenderBuffer is not ready");
+			CS6610_ASSERTF(false, "Reflection RenderBuffer is not ready");
 		}
 		if (!cs6610::MyGame::refractionTexture->GetRenderBuffer()->Resize(4, width, height))
 		{
-			CS6610_ASSERTF(false, "RenderBuffer is not ready");
+			CS6610_ASSERTF(false, "Refraction RenderBuffer is not ready");
 		}
 	}
 }

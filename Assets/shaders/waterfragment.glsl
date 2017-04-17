@@ -5,19 +5,28 @@ layout( location = 1 ) in vec2 i_UV;
 layout( location = 2 ) in vec3 i_toCameraVector;
 layout( location = 3 ) in vec3 i_vertexNormal;
 layout( location = 4 ) in vec3 i_fromLightVector;
+layout( location = 5 ) in vec3 i_fragmentPosition;
+layout( location = 6 ) in vec3 i_lightPosition;
 
 layout( binding = 2 ) uniform sampler2D u_normalTexture;
 layout( binding = 5 ) uniform sampler2D u_dudvTexture;
 layout( binding = 10 ) uniform sampler2D u_reflectionTexture;
 layout( binding = 11 ) uniform sampler2D u_refractionTexture;
 
+layout( std140, binding = 0 ) uniform materialBuffer
+{
+	vec4 ambientConstant;
+	vec4 diffuseConstant;
+	vec4 specularConstant;
+	float specularExponent;
+	ivec4 textureUnitMask;
+};
+
 uniform float u_moveFactor;
-uniform vec3 u_lightColor;
 
 float waveStrength = 0.02;
-float shineDamper = 20.0;
-float reflectivity = 0.6;
-vec4 greenishBlueTint = vec4(0.0, 0.3, 0.5, 1.0);
+float reflectivity = 0.5;
+//vec4 greenishBlueTint = vec4(0.0, 0.3, 0.5, 1.0);
 
 out vec4 o_color;
 
@@ -56,15 +65,24 @@ void main()
 	vec3 normal = vec3(normalColor.r * 2.0 - 1.0, normalColor.b, normalColor.g * 2.0 - 1.0);
 	normal = normalize(normal);
 	
-	vec3 reflectedLight = reflect(normalize(i_fromLightVector), normal);
-	float specular =  pow(max(dot(reflectedLight, viewVector), 0.0), shineDamper);
+	/*vec3 reflectedLight = reflect(normalize(i_fromLightVector), normal);
+	float specular =  pow(max(dot(reflectedLight, viewVector), 0.0), specularExponent);*/
 	
-	/*vec3 halfwayDirection = normalize(i_fromLightVector + viewVector);
-	float specular = pow(max(dot(normal, halfwayDirection), 0.0f), shineDamper);*/
+	vec3 lightDirection = normalize(i_lightPosition - i_fragmentPosition); 
+	float diffuse = 1.0 - max(dot(normal, lightDirection), 0.0f);
 	
-	vec3 specularHighlights = u_lightColor * specular * reflectivity;
+	vec3 diffuseHighlights = diffuse * diffuseConstant.rgb;
+	
+	//vec3 lightDirection = normalize(i_lightPosition - i_fragmentPosition);
+	vec3 viewDirection = normalize(-i_fragmentPosition);	
+	vec3 halfwayDirection = normalize(lightDirection + viewDirection);
+	float specular = pow(max(dot(normal, halfwayDirection), 0.0f), specularExponent);
+	
+	vec3 specularHighlights = specularConstant.rgb * specular * reflectivity;
 	
 	o_color = mix(reflectionColor, refractionColor, refractiveFactor);
-	o_color = mix(o_color, greenishBlueTint, 0.2) + vec4(specularHighlights, 0.0);
+	//o_color = o_color + vec4(diffuseHighlights + specularHighlights, 0.0);
+	o_color = mix(o_color, vec4(diffuseHighlights, 1.0), 0.2) + vec4(specularHighlights, 0.0);
+	//o_color = mix(o_color, greenishBlueTint, 0.2) + vec4(specularHighlights, 0.0);
 	//o_color = vec4(normalColor.rgb, 1.0);
 } 

@@ -1,7 +1,6 @@
 #version 420 core
 
 layout( location = 0 ) in vec3 i_vertexPosition_local;
-layout( location = 1 ) in vec3 i_vertexNormal;
 
 layout( std140, binding = 1 ) uniform drawcallBuffer
 {
