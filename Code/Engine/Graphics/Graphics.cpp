@@ -206,6 +206,9 @@ void cs6610::Graphics::RenderFrame()
 			moveFactor += waveSpeed * static_cast<float>(Time::GetElapsedTimeDuringPreviousFrame());
 			moveFactor = fmodf(moveFactor, 1.0f);
 			waterProgram->SetUniform(0, moveFactor);
+			waterProgram->SetUniform(1, currentCamera->GetPosition());
+			waterProgram->SetUniform(2, cyPoint3f(0.0f, 20.0f, 0.0f));
+			waterProgram->SetUniform(3, cyPoint3f(1.0f,1.0f,1.0f));
 
 			water->GetMesh()->RenderMesh();
 		}

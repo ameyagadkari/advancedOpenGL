@@ -9,5 +9,6 @@ newmtl water
   Kd 1.0 1.0 1.0
   Ks 0.0 0.0 0.0
   Ke 0.0000 0.0000 0.0000
-  map_disp waterDUDV.png
+  map_disp waterDUDVMap.png
+  map_bump waterNormalMap.png
   

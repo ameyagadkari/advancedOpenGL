@@ -66,7 +66,7 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 			{ "data/shaders/watervertex.glsl", "data/shaders/waterfragment.glsl" }, 
 			{},
 			"data/meshes/water/",
-			"moveFactor cameraPosition");
+			"u_moveFactor u_cameraPosition u_lightPosition u_lightColor");
 	}
 
 	reflectionTexture = new Graphics::Scene(true);
