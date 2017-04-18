@@ -110,7 +110,7 @@ void cs6610::Graphics::RenderFrame()
 			cartoonlandProgram->Bind();
 
 			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
-			cartoonlandProgram->SetUniform(0, cyPoint4f(0.0f, 1.0f, 0.0f, -water->GetPosition().y + 0.1f));
+			cartoonlandProgram->SetUniform(0, cyPoint4f(0.0f, 1.0f, 0.0f, -water->GetPosition().y));
 
 			for (size_t i = 0; i < cartoonlandMaterial->GetNumberOfMaterials(); i++)
 			{
@@ -275,15 +275,15 @@ void cs6610::Graphics::RenderFrame()
 			drawcallBufferData.view = currentCamera->GetViewMatrix();
 			drawcallBufferData.projection = currentCamera->GetPerspectiveProjectionMatrix();
 
-			//glEnable(GL_BLEND);
-			//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			waterMaterial->Bind();
 
 			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 			MyGame::reflectionTexture->GetColorBuffer()->BindTexture(10);
 			MyGame::refractionTexture->GetColorBuffer()->BindTexture(11);
-			MyGame::refractionTexture->GetDepthBuffer()->BindTexture(12);
+			MyGame::refractionTexture->GetDepthBuffer()->BindTexture(9);
 			moveFactor += waveSpeed * static_cast<float>(Time::GetElapsedTimeDuringPreviousFrame());
 			moveFactor = fmodf(moveFactor, 1.0f);
 			waterProgram->SetUniform(0, moveFactor);
@@ -294,7 +294,7 @@ void cs6610::Graphics::RenderFrame()
 
 			water->GetMesh()->RenderMesh();
 
-			//glDisable(GL_BLEND);
+			glDisable(GL_BLEND);
 		}
 	}
 
