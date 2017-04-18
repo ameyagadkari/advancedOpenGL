@@ -71,7 +71,7 @@ void cs6610::Graphics::RenderFrame()
 
 	Camera::Camera * const currentCamera = MyGame::mainScene->GetCamera();
 
-	// Draw Reflection Texture
+	// Draw Reflection Color Texture
 	{
 		MyGame::reflectionTexture->RenderSceneUsingColorTexture();
 
@@ -110,7 +110,7 @@ void cs6610::Graphics::RenderFrame()
 			cartoonlandProgram->Bind();
 
 			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
-			cartoonlandProgram->SetUniform(0, cyPoint4f(0.0f, 1.0f, 0.0f, -water->GetPosition().y));
+			cartoonlandProgram->SetUniform(0, cyPoint4f(0.0f, 1.0f, 0.0f, -water->GetPosition().y + 0.1f));
 
 			for (size_t i = 0; i < cartoonlandMaterial->GetNumberOfMaterials(); i++)
 			{
@@ -125,7 +125,7 @@ void cs6610::Graphics::RenderFrame()
 		MyGame::reflectionTexture->GetColorBuffer()->Unbind();
 	}
 
-	// Draw Refraction Texture
+	// Draw Refraction Color Texture
 	{
 		MyGame::refractionTexture->RenderSceneUsingColorTexture();
 
@@ -168,6 +168,49 @@ void cs6610::Graphics::RenderFrame()
 		MyGame::refractionTexture->GetColorBuffer()->Unbind();
 	}
 
+	// Draw Refraction Depth Texture
+	{
+		MyGame::refractionTexture->RenderSceneUsingDepthTexture();
+
+		//Draw Env Cube
+		{
+			glDepthMask(GL_FALSE);
+			CS6610_ASSERT(glGetError() == GL_NO_ERROR);
+
+			drawcallBufferData.view = cyMatrix4f(cyMatrix3f(currentCamera->GetViewMatrix()));
+			drawcallBufferData.projection = currentCamera->GetPerspectiveProjectionMatrix();
+
+			skyBoxMaterial->Bind();
+
+			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+			skyBoxProgram->SetUniform(0, cyPoint4f(0.0f, -1.0f, 0.0f, water->GetPosition().y));
+
+			skyboxMesh->RenderMesh();
+
+			glDepthMask(GL_TRUE);
+			CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to reset depth mask for writing to depth buffer");
+		}
+
+		//Draw Cartoon Land
+		{
+			drawcallBufferData.model = cyMatrix4f::MatrixScale(1.0f);
+			drawcallBufferData.view = currentCamera->GetViewMatrix();
+			drawcallBufferData.projection = currentCamera->GetPerspectiveProjectionMatrix();
+
+			cartoonlandProgram->Bind();
+
+			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+			cartoonlandProgram->SetUniform(0, cyPoint4f(0.0f, -1.0f, 0.0f, water->GetPosition().y));
+
+			for (size_t i = 0; i < cartoonlandMaterial->GetNumberOfMaterials(); i++)
+			{
+				cartoonlandMaterial->Bind(i);
+				cartoonlandMesh->RenderMesh(i);
+			}
+		}
+		MyGame::refractionTexture->GetDepthBuffer()->Unbind();
+	}
+
 	// Draw Main Scene
 	{
 		MyGame::mainScene->ClearScreen();
@@ -191,30 +234,6 @@ void cs6610::Graphics::RenderFrame()
 
 			glDepthMask(GL_TRUE);
 			CS6610_ASSERT(glGetError() == GL_NO_ERROR);
-		}
-
-		//Draw Water
-		{
-			drawcallBufferData.model =
-				cyMatrix4f::MatrixTrans(water->GetPosition())*
-				cyMatrix4f::MatrixScale(water->GetScale());
-			drawcallBufferData.view = currentCamera->GetViewMatrix();
-			drawcallBufferData.projection = currentCamera->GetPerspectiveProjectionMatrix();
-
-			waterMaterial->Bind();
-
-			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
-			MyGame::reflectionTexture->GetColorBuffer()->BindTexture(10);
-			MyGame::refractionTexture->GetColorBuffer()->BindTexture(11);		
-			moveFactor += waveSpeed * static_cast<float>(Time::GetElapsedTimeDuringPreviousFrame());
-			moveFactor = fmodf(moveFactor, 1.0f);
-			waterProgram->SetUniform(0, moveFactor);
-			waterProgram->SetUniform(1, currentCamera->GetPosition());
-			waterProgram->SetUniform(2, light->GetPosition());
-			waterProgram->SetUniform(3, currentCamera->GetNearPlaneDistance());
-			waterProgram->SetUniform(4, currentCamera->GetFarPlaneDistance());
-
-			water->GetMesh()->RenderMesh();
 		}
 
 		//Draw Cartoon Land
@@ -246,6 +265,36 @@ void cs6610::Graphics::RenderFrame()
 			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 
 			light->GetMesh()->RenderMesh();		
+		}
+
+		//Draw Water
+		{
+			drawcallBufferData.model =
+				cyMatrix4f::MatrixTrans(water->GetPosition())*
+				cyMatrix4f::MatrixScale(water->GetScale());
+			drawcallBufferData.view = currentCamera->GetViewMatrix();
+			drawcallBufferData.projection = currentCamera->GetPerspectiveProjectionMatrix();
+
+			//glEnable(GL_BLEND);
+			//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+			waterMaterial->Bind();
+
+			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+			MyGame::reflectionTexture->GetColorBuffer()->BindTexture(10);
+			MyGame::refractionTexture->GetColorBuffer()->BindTexture(11);
+			MyGame::refractionTexture->GetDepthBuffer()->BindTexture(12);
+			moveFactor += waveSpeed * static_cast<float>(Time::GetElapsedTimeDuringPreviousFrame());
+			moveFactor = fmodf(moveFactor, 1.0f);
+			waterProgram->SetUniform(0, moveFactor);
+			waterProgram->SetUniform(1, currentCamera->GetPosition());
+			waterProgram->SetUniform(2, light->GetPosition());
+			waterProgram->SetUniform(3, currentCamera->GetNearPlaneDistance());
+			waterProgram->SetUniform(4, currentCamera->GetFarPlaneDistance());
+
+			water->GetMesh()->RenderMesh();
+
+			//glDisable(GL_BLEND);
 		}
 	}
 
@@ -319,11 +368,15 @@ namespace
 		glViewport(0, 0, width, height);
 		if (!cs6610::MyGame::reflectionTexture->GetColorBuffer()->Resize(4, width, height))
 		{
-			CS6610_ASSERTF(false, "Reflection RenderBuffer is not ready");
+			CS6610_ASSERTF(false, "Reflection Color Buffer is not ready");
 		}
 		if (!cs6610::MyGame::refractionTexture->GetColorBuffer()->Resize(4, width, height))
 		{
-			CS6610_ASSERTF(false, "Refraction RenderBuffer is not ready");
+			CS6610_ASSERTF(false, "Refraction Color Buffer is not ready");
+		}
+		if (!cs6610::MyGame::refractionTexture->GetDepthBuffer()->Resize(width, height))
+		{
+			CS6610_ASSERTF(false, "Refraction Depth Buffer is not ready");
 		}
 	}
 }
