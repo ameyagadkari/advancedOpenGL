@@ -39,14 +39,17 @@ cs6610::Gameplay::GameObject* cs6610::Graphics::Scene::GetGameobjectByName(std::
 {
 	return m_gameobjects.at(i_name);
 }
-
 cs6610::Camera::Camera* cs6610::Graphics::Scene::GetCamera()const
 {
-	return m_pcamera;
+	return m_perspectiveCamera;
 }
-cyGLRenderTexture2D* cs6610::Graphics::Scene::GetRenderBuffer()const
+cyGLRenderTexture2D* cs6610::Graphics::Scene::GetColorBuffer()const
 {
-	return m_renderBuffer;
+	return m_colorBuffer;
+}
+cy::GLRenderDepth<3553>* cs6610::Graphics::Scene::GetDepthBuffer()const
+{
+	return m_depthBuffer;
 }
 #pragma endregion 
 
@@ -55,28 +58,28 @@ void cs6610::Graphics::Scene::AddGameObjectsToScene(std::string const i_name, Ga
 	if (i_gameOject)m_gameobjects[i_name] = i_gameOject;
 }
 
-void cs6610::Graphics::Scene::RenderScene() const
+void cs6610::Graphics::Scene::RenderSceneUsingDepthTexture() const
 {
 	if (m_renderBuffer)m_renderBuffer->Bind();
-	glClearColor(m_clearColor.r, m_clearColor.g, m_clearColor.b, m_clearColor.a);
-	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to set clear color");
-	glClearDepth(m_clearDepth);
-	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to set clear depth");
-	glClear(m_clearMask);
-	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to clear color buffer and depth buffer");
+	
 }
 
 cs6610::Graphics::Scene::~Scene()
 {
-	if (m_pcamera)
+	if (m_perspectiveCamera)
 	{
-		delete m_pcamera;
-		m_pcamera = nullptr;
+		delete m_perspectiveCamera;
+		m_perspectiveCamera = nullptr;
 	}
-	if (m_renderBuffer)
+	if (m_colorBuffer)
 	{
-		delete m_renderBuffer;
-		m_renderBuffer = nullptr;
+		delete m_colorBuffer;
+		m_colorBuffer = nullptr;
+	}
+	if (m_depthBuffer)
+	{
+		delete m_depthBuffer;
+		m_depthBuffer = nullptr;
 	}
 	auto begin = m_gameobjects.begin();
 	auto end = m_gameobjects.end();
@@ -86,4 +89,14 @@ cs6610::Graphics::Scene::~Scene()
 		it->second = nullptr;
 	}
 	m_gameobjects.clear();
+}
+
+void cs6610::Graphics::Scene::ClearScreen()const
+{
+	glClearColor(m_clearColor.r, m_clearColor.g, m_clearColor.b, m_clearColor.a);
+	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to set clear color");
+	glClearDepth(m_clearDepth);
+	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to set clear depth");
+	glClear(m_clearMask);
+	CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to clear color buffer and depth buffer");
 }
