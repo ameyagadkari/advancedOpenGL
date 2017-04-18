@@ -1,11 +1,10 @@
 #include "Scene.h"
 #include "../../External/cyCodeBase/cyGL.h"
-#include "../Math/BitManipulator.h"
 #include "../Camera/Camera.h"
 #include "../../Game/Gameplay/Gameobject.h"
 #include "../Asserts/Asserts.h"
 
-cs6610::Graphics::Scene::Scene(bool const i_useRenderBuffer, Color const i_clearColor, float const i_clearDepth, uint32_t const i_clearControlBits, bool const i_useDepthBuffer)
+/*cs6610::Graphics::Scene::Scene(bool const i_useRenderBuffer, Color const i_clearColor, float const i_clearDepth, uint32_t const i_clearControlBits, bool const i_useDepthBuffer)
 	:
 	m_clearColor(i_clearColor),
 	m_pcamera(new Camera::Camera(cyPoint3f(0.0f,5.0f,10.0f))),
@@ -32,6 +31,67 @@ cs6610::Graphics::Scene::Scene(bool const i_useRenderBuffer, Color const i_clear
 			CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to Set Texture MaxAnisotropy");
 		}
 	}
+}*/
+
+cs6610::Graphics::Scene::Scene(
+	Camera::Camera* i_perspectiveCamera,
+	const bool i_hasColorTexture,
+	const bool i_useDepthBufferOfColorTexture,
+	const bool i_hasDepthTexture,
+	const bool i_useHardwareDepthComparisonInDepthTexture,	
+	const Color i_clearColor,
+	const float i_clearDepth,
+	const GLbitfield i_clearMask)
+	:
+	m_clearColor(i_clearColor),
+	m_perspectiveCamera(i_perspectiveCamera),
+	m_colorBuffer(i_hasColorTexture ? new cyGLRenderTexture2D() : nullptr),
+	m_depthBuffer(i_hasDepthTexture ? new cyGLRenderDepth2D() : nullptr),
+	m_clearDepth(i_clearDepth),
+	m_clearMask(i_clearMask),
+	m_hasColorTexture(i_hasColorTexture),
+	m_useDepthBufferOfColorTexture(i_useDepthBufferOfColorTexture),
+	m_hasDepthTexture(i_hasDepthTexture),
+	m_useHardwareDepthComparisonInDepthTexture(i_useHardwareDepthComparisonInDepthTexture)
+{
+
+	if (m_hasColorTexture && m_colorBuffer)
+	{
+		if (!m_colorBuffer->Initialize(m_useDepthBufferOfColorTexture))
+		{
+			CS6610_ASSERTF(false, "Color Buffer is not ready");
+		}
+		else
+		{
+			m_colorBuffer->SetTextureWrappingMode(GL_REPEAT, GL_REPEAT);
+			CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to Set Texture Wrapping Mode");
+			/*m_colorBuffer->BuildTextureMipmaps();
+			CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to Build MipMaps");
+			m_colorBuffer->SetTextureFilteringMode(GL_LINEAR, GL_LINEAR);
+			CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to Set Texture Filtering Mode");*/
+			m_colorBuffer->SetTextureMaxAnisotropy();
+			CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to Set Texture MaxAnisotropy");
+		}
+	}
+
+	if (m_hasDepthTexture && m_depthBuffer)
+	{
+		if (!m_depthBuffer->Initialize(m_useHardwareDepthComparisonInDepthTexture))
+		{
+			CS6610_ASSERTF(false, "Depth Buffer is not ready");
+		}
+		else
+		{
+			m_colorBuffer->SetTextureWrappingMode(GL_REPEAT, GL_REPEAT);
+			CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to Set Texture Wrapping Mode");
+			/*m_colorBuffer->BuildTextureMipmaps();
+			CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to Build MipMaps");
+			m_colorBuffer->SetTextureFilteringMode(GL_LINEAR, GL_LINEAR);
+			CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to Set Texture Filtering Mode");*/
+			m_colorBuffer->SetTextureMaxAnisotropy();
+			CS6610_ASSERTF(glGetError() == GL_NO_ERROR, "OpenGL failed to Set Texture MaxAnisotropy");
+		}
+	}
 }
 
 #pragma region Gets
@@ -47,7 +107,7 @@ cyGLRenderTexture2D* cs6610::Graphics::Scene::GetColorBuffer()const
 {
 	return m_colorBuffer;
 }
-cy::GLRenderDepth<3553>* cs6610::Graphics::Scene::GetDepthBuffer()const
+cyGLRenderDepth2D* cs6610::Graphics::Scene::GetDepthBuffer()const
 {
 	return m_depthBuffer;
 }
@@ -60,8 +120,14 @@ void cs6610::Graphics::Scene::AddGameObjectsToScene(std::string const i_name, Ga
 
 void cs6610::Graphics::Scene::RenderSceneUsingDepthTexture() const
 {
-	if (m_renderBuffer)m_renderBuffer->Bind();
-	
+	if (m_depthBuffer)m_depthBuffer->Bind();
+	ClearScreen();
+}
+
+void cs6610::Graphics::Scene::RenderSceneUsingColorTexture()const
+{
+	if (m_colorBuffer)m_colorBuffer->Bind();
+	ClearScreen();
 }
 
 cs6610::Graphics::Scene::~Scene()

@@ -7,6 +7,7 @@
 #include "../../Engine/Asserts/Asserts.h"
 #include "../../Engine/Graphics/Scene.h"
 #include "../Gameplay/Gameobject.h"
+#include "../../Engine/Camera/Camera.h"
 
 namespace cs6610
 {
@@ -15,7 +16,6 @@ namespace cs6610
 		Graphics::Scene* mainScene;
 		Graphics::Scene* reflectionTexture;
 		Graphics::Scene* refractionTexture;
-		Graphics::Scene* refractionDepthTexture;
 	}
 }
 
@@ -41,7 +41,7 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 
 	//Init all scenes
 	{
-		mainScene = new Graphics::Scene(false);
+		mainScene = new Graphics::Scene(new Camera::Camera(cyPoint3f(0.0f, 5.0f, 10.0f)));
 		mainScene->AddGameObjectsToScene("Skybox", new Gameplay::GameObject());
 		mainScene->GetGameobjectByName("Skybox")->LoadMeshAndMaterial(
 			true,
@@ -76,8 +76,8 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 			{});
 	}
 
-	reflectionTexture = new Graphics::Scene(true);
-	refractionTexture = new Graphics::Scene(true);
+	reflectionTexture = new Graphics::Scene(nullptr, true, true, false, false);
+	refractionTexture = new Graphics::Scene(nullptr, true, true, true, false);
 	return !wereThereErrors;
 }
 
@@ -99,11 +99,5 @@ void cs6610::MyGame::CleanUp()
 	{
 		delete refractionTexture;
 		refractionTexture = nullptr;
-	}
-
-	if (refractionDepthTexture)
-	{
-		delete refractionDepthTexture;
-		refractionDepthTexture = nullptr;
 	}
 }

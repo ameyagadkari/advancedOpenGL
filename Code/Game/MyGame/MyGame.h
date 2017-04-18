@@ -18,6 +18,5 @@ namespace cs6610
 		extern Graphics::Scene* mainScene;
 		extern Graphics::Scene* reflectionTexture;
 		extern Graphics::Scene* refractionTexture;
-		extern Graphics::Scene* refractionDepthTexture;
 	}
 }

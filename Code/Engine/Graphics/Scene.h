@@ -39,11 +39,12 @@ namespace cs6610
 			//Scene(bool const i_useRenderBuffer = false, Color const i_clearColor = { 0.0f,0.0f,0.0f,0.0f }, float const i_clearDepth = 1.0f, uint32_t const i_clearControlBits = 0xc0000000, bool const i_useDepthBuffer = true);
 #define GL_COLOR_BUFFER_BIT 0x00004000
 #define GL_DEPTH_BUFFER_BIT 0x00000100
-			Scene(
+			explicit Scene(
+				Camera::Camera* i_perspectiveCamera = nullptr,
 				const bool i_hasColorTexture = false, 
 				const bool i_useDepthBufferOfColorTexture = false, 
 				const bool i_hasDepthTexture = false, 
-				const bool i_useHardwareDepthComparisonInDepthTexture = false, 
+				const bool i_useHardwareDepthComparisonInDepthTexture = false, 			
 				const Color i_clearColor = { 0.0f,0.0f,0.0f,1.0f },
 				const float i_clearDepth = 1.0f, 
 				const GLbitfield i_clearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -51,6 +52,7 @@ namespace cs6610
 			void RenderSceneUsingColorTexture()const;
 			void RenderSceneUsingDepthTexture()const;
 			void AddGameObjectsToScene(std::string const i_name, Gameplay::GameObject* i_gameOject);
+			void ClearScreen()const;
 
 #pragma region Gets
 			Gameplay::GameObject * GetGameobjectByName(std::string const i_name)const;
@@ -59,8 +61,7 @@ namespace cs6610
 			cy::GLRenderTexture<GL_TEXTURE_2D>* GetColorBuffer()const;
 			cy::GLRenderDepth<GL_TEXTURE_2D>* GetDepthBuffer()const;
 #pragma endregion 
-		private:		
-			void ClearScreen() const;
+		private:					
 			std::map<const std::string, Gameplay::GameObject*> m_gameobjects;			
 			Color m_clearColor;
 			Camera::Camera* m_perspectiveCamera;

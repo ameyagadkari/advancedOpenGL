@@ -73,7 +73,7 @@ void cs6610::Graphics::RenderFrame()
 
 	// Draw Reflection Texture
 	{
-		MyGame::reflectionTexture->RenderScene();
+		MyGame::reflectionTexture->RenderSceneUsingColorTexture();
 
 		glEnable(GL_CLIP_DISTANCE0);
 		CS6610_ASSERT(glGetError() == GL_NO_ERROR);
@@ -122,12 +122,12 @@ void cs6610::Graphics::RenderFrame()
 		currentCamera->SetPosition(currentCamera->GetPosition() + distanceToMoveCameraBelowWater);
 		currentCamera->InvertPitch();
 
-		MyGame::reflectionTexture->GetRenderBuffer()->Unbind();
+		MyGame::reflectionTexture->GetColorBuffer()->Unbind();
 	}
 
 	// Draw Refraction Texture
 	{
-		MyGame::refractionTexture->RenderScene();
+		MyGame::refractionTexture->RenderSceneUsingColorTexture();
 
 		//Draw Env Cube
 		{
@@ -165,12 +165,12 @@ void cs6610::Graphics::RenderFrame()
 				cartoonlandMesh->RenderMesh(i);
 			}
 		}
-		MyGame::refractionTexture->GetRenderBuffer()->Unbind();
+		MyGame::refractionTexture->GetColorBuffer()->Unbind();
 	}
 
 	// Draw Main Scene
 	{
-		MyGame::mainScene->RenderScene();
+		MyGame::mainScene->ClearScreen();
 
 		glDisable(GL_CLIP_DISTANCE0);
 		CS6610_ASSERT(glGetError() == GL_NO_ERROR);
@@ -204,8 +204,8 @@ void cs6610::Graphics::RenderFrame()
 			waterMaterial->Bind();
 
 			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
-			MyGame::reflectionTexture->GetRenderBuffer()->BindTexture(10);
-			MyGame::refractionTexture->GetRenderBuffer()->BindTexture(11);		
+			MyGame::reflectionTexture->GetColorBuffer()->BindTexture(10);
+			MyGame::refractionTexture->GetColorBuffer()->BindTexture(11);		
 			moveFactor += waveSpeed * static_cast<float>(Time::GetElapsedTimeDuringPreviousFrame());
 			moveFactor = fmodf(moveFactor, 1.0f);
 			waterProgram->SetUniform(0, moveFactor);
@@ -317,11 +317,11 @@ namespace
 	{
 		cs6610::Camera::Camera::ms_aspectRatio = static_cast<float>(width) / height;
 		glViewport(0, 0, width, height);
-		if (!cs6610::MyGame::reflectionTexture->GetRenderBuffer()->Resize(4, width, height))
+		if (!cs6610::MyGame::reflectionTexture->GetColorBuffer()->Resize(4, width, height))
 		{
 			CS6610_ASSERTF(false, "Reflection RenderBuffer is not ready");
 		}
-		if (!cs6610::MyGame::refractionTexture->GetRenderBuffer()->Resize(4, width, height))
+		if (!cs6610::MyGame::refractionTexture->GetColorBuffer()->Resize(4, width, height))
 		{
 			CS6610_ASSERTF(false, "Refraction RenderBuffer is not ready");
 		}

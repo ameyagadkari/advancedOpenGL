@@ -98,5 +98,4 @@ void main()
 	//o_color = o_color + vec4(diffuseHighlights + specularHighlights, 0.0);
 	o_color = mix(o_color, vec4(diffuseHighlights, 1.0), 0.2) + vec4(specularHighlights, 0.0);
 	//o_color = mix(o_color, greenishBlueTint, 0.2) + vec4(specularHighlights, 0.0);
-	//o_color = vec4(waterDepth/50.0);
 } 
