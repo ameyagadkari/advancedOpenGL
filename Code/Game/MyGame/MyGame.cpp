@@ -60,13 +60,13 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 			"",
 			"u_clippingplane");
 
-		mainScene->AddGameObjectsToScene("Water", new Gameplay::GameObject(cyPoint3f(20.0f,0.75f,-10.0f), cyPoint3f(0.0f), cyPoint3f(10.0f)));
+		mainScene->AddGameObjectsToScene("Water", new Gameplay::GameObject(cyPoint3f(20.0f, 0.75f, -10.0f), cyPoint3f(0.0f), cyPoint3f(10.0f)));
 		mainScene->GetGameobjectByName("Water")->LoadMeshAndMaterial(false,
 			"data/meshes/water/water.obj",
 			{ "data/shaders/watervertex.glsl", "data/shaders/waterfragment.glsl" }, 
 			{},
 			"data/meshes/water/",
-			"u_moveFactor u_cameraPosition u_lightPosition");
+			"u_moveFactor u_cameraPosition u_lightPosition u_nearPlane u_farPlane");
 
 		mainScene->AddGameObjectsToScene("Light", new Gameplay::GameObject(cyPoint3f(0.0f, 20.0f, 0.0f), cyPoint3f(0.0f), cyPoint3f(0.1f)));
 		mainScene->GetGameobjectByName("Light")->LoadMeshAndMaterial(

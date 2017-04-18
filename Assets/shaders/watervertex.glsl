@@ -23,7 +23,7 @@ layout( std140, binding = 1 ) uniform drawcallBuffer
 uniform vec3 u_cameraPosition;
 uniform vec3 u_lightPosition;
 
-float tiling = 6.0;
+float tiling = 4.0;
 
 void main()
 {	

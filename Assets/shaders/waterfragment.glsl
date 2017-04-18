@@ -12,6 +12,7 @@ layout( binding = 2 ) uniform sampler2D u_normalTexture;
 layout( binding = 5 ) uniform sampler2D u_dudvTexture;
 layout( binding = 10 ) uniform sampler2D u_reflectionTexture;
 layout( binding = 11 ) uniform sampler2D u_refractionTexture;
+//layout( binding = 12 ) uniform sampler2D u_refractionDepthTexture;
 
 layout( std140, binding = 0 ) uniform materialBuffer
 {
@@ -23,8 +24,10 @@ layout( std140, binding = 0 ) uniform materialBuffer
 };
 
 uniform float u_moveFactor;
+uniform float u_nearPlane;
+uniform float u_farPlane;
 
-float waveStrength = 0.02;
+float waveStrength = 0.04;
 float reflectivity = 0.5;
 //vec4 greenishBlueTint = vec4(0.0, 0.3, 0.5, 1.0);
 
@@ -36,6 +39,13 @@ void main()
 	
 	vec2 reflectionTextureCoords = vec2(normalizedDeviceCoords.x,-normalizedDeviceCoords.y);
 	vec2 refractionTextureCoords = vec2(normalizedDeviceCoords.x,normalizedDeviceCoords.y);
+	
+	/*float depth = texture(u_refractionTexture, refractionTextureCoords).r;
+	float floorDistance = (2.0 * u_nearPlane * u_farPlane) / (u_farPlane + u_nearPlane - (depth * 2.0 - 1.0) * (u_farPlane - u_nearPlane));
+	depth = gl_FragCoord.z;
+	float waterDistance = (2.0 * u_nearPlane * u_farPlane) / (u_farPlane + u_nearPlane - (depth * 2.0 - 1.0) * (u_farPlane - u_nearPlane));
+	
+	float waterDepth = floorDistance - waterDistance;*/
 	
 	/*vec2 distortion1 = (texture(u_dudvTexture,vec2(i_UV.x + u_moveFactor, i_UV.y)).rg * 2.0 - 1.0) * waveStrength;
 	vec2 distortion2 = (texture(u_dudvTexture,vec2(-i_UV.x + u_moveFactor, i_UV.y + u_moveFactor)).rg * 2.0 - 1.0) * waveStrength;
@@ -88,5 +98,5 @@ void main()
 	//o_color = o_color + vec4(diffuseHighlights + specularHighlights, 0.0);
 	o_color = mix(o_color, vec4(diffuseHighlights, 1.0), 0.2) + vec4(specularHighlights, 0.0);
 	//o_color = mix(o_color, greenishBlueTint, 0.2) + vec4(specularHighlights, 0.0);
-	//o_color = vec4(normalColor.rgb, 1.0);
+	//o_color = vec4(waterDepth/50.0);
 } 

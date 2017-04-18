@@ -211,6 +211,8 @@ void cs6610::Graphics::RenderFrame()
 			waterProgram->SetUniform(0, moveFactor);
 			waterProgram->SetUniform(1, currentCamera->GetPosition());
 			waterProgram->SetUniform(2, light->GetPosition());
+			waterProgram->SetUniform(3, currentCamera->GetNearPlaneDistance());
+			waterProgram->SetUniform(4, currentCamera->GetFarPlaneDistance());
 
 			water->GetMesh()->RenderMesh();
 		}
