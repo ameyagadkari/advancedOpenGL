@@ -13,7 +13,6 @@
 #include "UniformBuffer.h"
 #include "UniformBufferData.h"
 #include "Scene.h"
-//#include "../Math/Functions.h"
 
 namespace
 {
@@ -69,6 +68,14 @@ void cs6610::Graphics::RenderFrame()
 	Gameplay::GameObject const * const light = MyGame::mainScene->GetGameobjectByName("Light");
 	Material const * const lightMaterial = light->GetMaterial();
 
+	Gameplay::GameObject const * const boat = MyGame::mainScene->GetGameobjectByName("Boat");
+	Material const * const boatMaterial = boat->GetMaterial();
+	cyGLSLProgram * const boatProgram = boatMaterial->GetEffect()->GetProgram();
+
+	Gameplay::GameObject const * const woodenBridge = MyGame::mainScene->GetGameobjectByName("WoodenBridge");
+	Material const * const woodenBridgeMaterial = woodenBridge->GetMaterial();
+	cyGLSLProgram * const woodenBridgeProgram = woodenBridgeMaterial->GetEffect()->GetProgram();
+
 	Camera::Camera * const currentCamera = MyGame::mainScene->GetCamera();
 
 	// Draw Reflection Color Texture
@@ -93,7 +100,7 @@ void cs6610::Graphics::RenderFrame()
 			skyBoxMaterial->Bind();
 
 			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
-			skyBoxProgram->SetUniform(0, cyPoint4f(0.0f, 1.0f, 0.0f, -water->GetPosition().y));
+			skyBoxProgram->SetUniform(0, cyPoint4f(0.0f, 1.0f, 0.0f, -water->GetPosition().y + 0.1f));
 
 			skyboxMesh->RenderMesh();
 
@@ -106,17 +113,58 @@ void cs6610::Graphics::RenderFrame()
 			drawcallBufferData.model = cyMatrix4f::MatrixScale(1.0f);
 			drawcallBufferData.view = currentCamera->GetViewMatrix();
 			drawcallBufferData.projection = currentCamera->GetPerspectiveProjectionMatrix();
+			cyMatrix3f normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
 
 			cartoonlandProgram->Bind();
 
 			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
-			cartoonlandProgram->SetUniform(0, cyPoint4f(0.0f, 1.0f, 0.0f, -water->GetPosition().y));
+			cartoonlandProgram->SetUniform(0, cyPoint4f(0.0f, 1.0f, 0.0f, -water->GetPosition().y + 0.1f));
+			cartoonlandProgram->SetUniform(1, normal);
+			cartoonlandProgram->SetUniform(2, light->GetPosition());
 
 			for (size_t i = 0; i < cartoonlandMaterial->GetNumberOfMaterials(); i++)
 			{
 				cartoonlandMaterial->Bind(i);
 				cartoonlandMesh->RenderMesh(i);
 			}
+		}
+
+		//Draw Boat
+		{
+			drawcallBufferData.model = cyMatrix4f::MatrixTrans(boat->GetPosition())*
+				cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(boat->GetOrientationEular().y))*
+				cyMatrix4f::MatrixScale(boat->GetScale());
+			drawcallBufferData.view = currentCamera->GetViewMatrix();
+			drawcallBufferData.projection = currentCamera->GetPerspectiveProjectionMatrix();
+			cyMatrix3f normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
+
+			boatMaterial->Bind();
+			boatProgram->SetUniform(0, cyPoint4f(0.0f, 1.0f, 0.0f, -water->GetPosition().y + 0.1f));
+			boatProgram->SetUniform(1, normal);
+			boatProgram->SetUniform(2, light->GetPosition());
+
+			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+
+			boat->GetMesh()->RenderMesh();
+		}
+
+		//Draw Wooden Bridge
+		{
+			drawcallBufferData.model = cyMatrix4f::MatrixTrans(woodenBridge->GetPosition())*
+				cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(woodenBridge->GetOrientationEular().y))*
+				cyMatrix4f::MatrixScale(woodenBridge->GetScale());
+			drawcallBufferData.view = currentCamera->GetViewMatrix();
+			drawcallBufferData.projection = currentCamera->GetPerspectiveProjectionMatrix();
+			cyMatrix3f normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
+
+			woodenBridgeMaterial->Bind();
+			woodenBridgeProgram->SetUniform(0, cyPoint4f(0.0f, 1.0f, 0.0f, -water->GetPosition().y + 0.1f));
+			woodenBridgeProgram->SetUniform(1, normal);
+			woodenBridgeProgram->SetUniform(2, light->GetPosition());
+
+			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+
+			woodenBridge->GetMesh()->RenderMesh();
 		}
 
 		currentCamera->SetPosition(currentCamera->GetPosition() + distanceToMoveCameraBelowWater);
@@ -153,11 +201,14 @@ void cs6610::Graphics::RenderFrame()
 			drawcallBufferData.model = cyMatrix4f::MatrixScale(1.0f);
 			drawcallBufferData.view = currentCamera->GetViewMatrix();
 			drawcallBufferData.projection = currentCamera->GetPerspectiveProjectionMatrix();
+			cyMatrix3f normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
 
 			cartoonlandProgram->Bind();
 
 			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 			cartoonlandProgram->SetUniform(0, cyPoint4f(0.0f, -1.0f, 0.0f, water->GetPosition().y));
+			cartoonlandProgram->SetUniform(1, normal);
+			cartoonlandProgram->SetUniform(2, light->GetPosition());
 
 			for (size_t i = 0; i < cartoonlandMaterial->GetNumberOfMaterials(); i++)
 			{
@@ -165,6 +216,45 @@ void cs6610::Graphics::RenderFrame()
 				cartoonlandMesh->RenderMesh(i);
 			}
 		}
+
+		//Draw Boat
+		{
+			drawcallBufferData.model = cyMatrix4f::MatrixTrans(boat->GetPosition())*
+				cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(boat->GetOrientationEular().y))*
+				cyMatrix4f::MatrixScale(boat->GetScale());
+			drawcallBufferData.view = currentCamera->GetViewMatrix();
+			drawcallBufferData.projection = currentCamera->GetPerspectiveProjectionMatrix();
+			cyMatrix3f normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
+
+			boatMaterial->Bind();
+			boatProgram->SetUniform(0, cyPoint4f(0.0f, -1.0f, 0.0f, water->GetPosition().y));
+			boatProgram->SetUniform(1, normal);
+			boatProgram->SetUniform(2, light->GetPosition());
+
+			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+
+			boat->GetMesh()->RenderMesh();
+		}
+
+		//Draw Wooden Bridge
+		{
+			drawcallBufferData.model = cyMatrix4f::MatrixTrans(woodenBridge->GetPosition())*
+				cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(woodenBridge->GetOrientationEular().y))*
+				cyMatrix4f::MatrixScale(woodenBridge->GetScale());
+			drawcallBufferData.view = currentCamera->GetViewMatrix();
+			drawcallBufferData.projection = currentCamera->GetPerspectiveProjectionMatrix();
+			cyMatrix3f normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
+
+			woodenBridgeMaterial->Bind();
+			woodenBridgeProgram->SetUniform(0, cyPoint4f(0.0f, -1.0f, 0.0f, water->GetPosition().y));
+			woodenBridgeProgram->SetUniform(1, normal);
+			woodenBridgeProgram->SetUniform(2, light->GetPosition());
+
+			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+
+			woodenBridge->GetMesh()->RenderMesh();
+		}
+
 		MyGame::refractionTexture->GetColorBuffer()->Unbind();
 	}
 
@@ -196,11 +286,14 @@ void cs6610::Graphics::RenderFrame()
 			drawcallBufferData.model = cyMatrix4f::MatrixScale(1.0f);
 			drawcallBufferData.view = currentCamera->GetViewMatrix();
 			drawcallBufferData.projection = currentCamera->GetPerspectiveProjectionMatrix();
+			cyMatrix3f normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
 
 			cartoonlandProgram->Bind();
 
 			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 			cartoonlandProgram->SetUniform(0, cyPoint4f(0.0f, -1.0f, 0.0f, water->GetPosition().y));
+			cartoonlandProgram->SetUniform(1, normal);
+			cartoonlandProgram->SetUniform(2, light->GetPosition());
 
 			for (size_t i = 0; i < cartoonlandMaterial->GetNumberOfMaterials(); i++)
 			{
@@ -208,6 +301,45 @@ void cs6610::Graphics::RenderFrame()
 				cartoonlandMesh->RenderMesh(i);
 			}
 		}
+
+		//Draw Boat
+		{
+			drawcallBufferData.model = cyMatrix4f::MatrixTrans(boat->GetPosition())*
+				cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(boat->GetOrientationEular().y))*
+				cyMatrix4f::MatrixScale(boat->GetScale());
+			drawcallBufferData.view = currentCamera->GetViewMatrix();
+			drawcallBufferData.projection = currentCamera->GetPerspectiveProjectionMatrix();
+			cyMatrix3f normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
+
+			boatMaterial->Bind();
+			boatProgram->SetUniform(0, cyPoint4f(0.0f, -1.0f, 0.0f, water->GetPosition().y));
+			boatProgram->SetUniform(1, normal);
+			boatProgram->SetUniform(2, light->GetPosition());
+
+			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+
+			boat->GetMesh()->RenderMesh();
+		}
+
+		//Draw Wooden Bridge
+		{
+			drawcallBufferData.model = cyMatrix4f::MatrixTrans(woodenBridge->GetPosition())*
+				cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(woodenBridge->GetOrientationEular().y))*
+				cyMatrix4f::MatrixScale(woodenBridge->GetScale());
+			drawcallBufferData.view = currentCamera->GetViewMatrix();
+			drawcallBufferData.projection = currentCamera->GetPerspectiveProjectionMatrix();
+			cyMatrix3f normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
+
+			woodenBridgeMaterial->Bind();
+			woodenBridgeProgram->SetUniform(0, cyPoint4f(0.0f, -1.0f, 0.0f, water->GetPosition().y));
+			woodenBridgeProgram->SetUniform(1, normal);
+			woodenBridgeProgram->SetUniform(2, light->GetPosition());
+
+			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+
+			woodenBridge->GetMesh()->RenderMesh();
+		}
+
 		MyGame::refractionTexture->GetDepthBuffer()->Unbind();
 	}
 
@@ -241,10 +373,13 @@ void cs6610::Graphics::RenderFrame()
 			drawcallBufferData.model = cyMatrix4f::MatrixScale(1.0f);
 			drawcallBufferData.view = currentCamera->GetViewMatrix();
 			drawcallBufferData.projection = currentCamera->GetPerspectiveProjectionMatrix();
+			cyMatrix3f normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
 
 			cartoonlandProgram->Bind();
 
 			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+			cartoonlandProgram->SetUniform(1, normal);
+			cartoonlandProgram->SetUniform(2, light->GetPosition());
 
 			for (size_t i = 0; i < cartoonlandMaterial->GetNumberOfMaterials(); i++)
 			{
@@ -265,6 +400,42 @@ void cs6610::Graphics::RenderFrame()
 			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 
 			light->GetMesh()->RenderMesh();
+		}
+
+		//Draw Boat
+		{
+			drawcallBufferData.model = cyMatrix4f::MatrixTrans(boat->GetPosition())*
+				cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(boat->GetOrientationEular().y))*
+				cyMatrix4f::MatrixScale(boat->GetScale());
+			drawcallBufferData.view = currentCamera->GetViewMatrix();
+			drawcallBufferData.projection = currentCamera->GetPerspectiveProjectionMatrix();
+			cyMatrix3f normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
+
+			boatMaterial->Bind();
+			boatProgram->SetUniform(1, normal);
+			boatProgram->SetUniform(2, light->GetPosition());
+
+			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+
+			boat->GetMesh()->RenderMesh();
+		}
+
+		//Draw Wooden Bridge
+		{
+			drawcallBufferData.model = cyMatrix4f::MatrixTrans(woodenBridge->GetPosition())*
+				cyMatrix4f::MatrixRotationY(Math::ConvertDegreesToRadians(woodenBridge->GetOrientationEular().y))*
+				cyMatrix4f::MatrixScale(woodenBridge->GetScale());
+			drawcallBufferData.view = currentCamera->GetViewMatrix();
+			drawcallBufferData.projection = currentCamera->GetPerspectiveProjectionMatrix();
+			cyMatrix3f normal = cyMatrix3f(((drawcallBufferData.view*drawcallBufferData.model).GetInverse()).GetTranspose());
+
+			woodenBridgeMaterial->Bind();
+			woodenBridgeProgram->SetUniform(1, normal);
+			woodenBridgeProgram->SetUniform(2, light->GetPosition());
+
+			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
+
+			woodenBridge->GetMesh()->RenderMesh();
 		}
 
 		//Draw Water
