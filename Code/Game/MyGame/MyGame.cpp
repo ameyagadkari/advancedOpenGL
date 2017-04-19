@@ -68,7 +68,7 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 			"data/meshes/water/",
 			"u_moveFactor u_cameraPosition u_lightPosition u_nearPlane u_farPlane u_tiling u_waveStrength u_reflectivity");
 
-		mainScene->AddGameObjectsToScene("Light", new Gameplay::GameObject(cyPoint3f(0.0f, 20.0f, 0.0f), cyPoint3f(0.0f), cyPoint3f(0.1f)));
+		mainScene->AddGameObjectsToScene("Light", new Gameplay::GameObject(cyPoint3f(0.0f, 30.0f, 0.0f), cyPoint3f(0.0f), cyPoint3f(0.1f)));
 		mainScene->GetGameobjectByName("Light")->LoadMeshAndMaterial(
 			false,
 			"data/meshes/light/light.obj",
