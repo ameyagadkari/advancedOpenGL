@@ -7,6 +7,7 @@
 #include "../Graphics/Graphics.h"
 #include "../Graphics/Scene.h"
 #include "../Camera/Camera.h"
+#include "ConfigurableParameters.h"
 
 namespace
 {
@@ -79,6 +80,10 @@ namespace
 		{
 			cs6610::UserInput::isCameraPerspective = !cs6610::UserInput::isCameraPerspective;
 		}*/
+		if (c == 'r' && !cs6610::UserInput::keys['r'])
+		{
+			cs6610::ConfigurableParameters::autoLight = !cs6610::ConfigurableParameters::autoLight;
+		}
 		if (c == VK_ESCAPE)
 		{
 			cs6610::MyGame::CleanUp();
@@ -191,7 +196,7 @@ namespace
 			float yOffsetCtrlLMB = static_cast<float>(y - yPosOnPressCtrlLMB);
 			xPosOnPressCtrlLMB = x;
 			yPosOnPressCtrlLMB = y;
-			light ? light->UpdatePosition(xOffsetCtrlLMB, yOffsetCtrlLMB) : GetRequiredGameOject();
+			light && !cs6610::ConfigurableParameters::autoLight ? light->UpdatePosition(xOffsetCtrlLMB, yOffsetCtrlLMB) : GetRequiredGameOject();
 		}
 		if (altLMBStillPressed)
 		{

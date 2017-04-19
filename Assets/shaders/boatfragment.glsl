@@ -34,5 +34,11 @@ void main()
 	float cosThetaDiffuse = max(dot(vertexNormalNormalized, lightDirection), 0.0f);
 	vec3 diffuse = cosThetaDiffuse *  diffuseColor;
 
-	o_color = vec4((ambient + diffuse), 1.0f);
+	//Specular light
+	vec3 viewDirection = normalize(-i_fragmentPosition);
+	vec3 halfwayDirection = normalize(lightDirection + viewDirection);
+	float cosThetaSpecular = pow(max(dot(vertexNormalNormalized, halfwayDirection), 0.0f), specularExponent);
+	vec3 specular = cosThetaDiffuse * cosThetaSpecular * specularConstant.rgb;
+
+	o_color = vec4((ambient + diffuse + specular), 1.0f);
 } 

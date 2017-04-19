@@ -26,8 +26,8 @@ uniform float u_moveFactor;
 uniform float u_nearPlane;
 uniform float u_farPlane;
 
-float waveStrength = 0.02;
-float reflectivity = 0.5;
+uniform float u_waveStrength;
+uniform float u_reflectivity;
 
 out vec4 o_color;
 
@@ -44,9 +44,9 @@ void main()
 	
 	float waterDepth = LinearizeDepth(texture(u_refractionDepthTexture, refractionTextureCoords).r) - LinearizeDepth(gl_FragCoord.z);
 	
-	vec2 distortedUVs = texture(u_dudvTexture, vec2(i_UV.x + u_moveFactor, i_UV.y)).rg * waveStrength * 5.0;
+	vec2 distortedUVs = texture(u_dudvTexture, vec2(i_UV.x + u_moveFactor, i_UV.y)).rg * u_waveStrength * 5.0;
 	distortedUVs = i_UV + vec2(distortedUVs.x, distortedUVs.y + u_moveFactor);
-	vec2 totalDistortion = (texture(u_dudvTexture, distortedUVs).rg * 2.0 - 1.0) * waveStrength * clamp(waterDepth/0.2, 0.0, 1.0);;
+	vec2 totalDistortion = (texture(u_dudvTexture, distortedUVs).rg * 2.0 - 1.0) * u_waveStrength * clamp(waterDepth/20, 0.0, 1.0);;
 	
 	reflectionTextureCoords += totalDistortion;
 	reflectionTextureCoords.x = clamp(reflectionTextureCoords.x, 0.001, 0.999);
@@ -73,7 +73,7 @@ void main()
 	vec3 viewDirection = normalize(-i_fragmentPosition);	
 	vec3 halfwayDirection = normalize(lightDirection + viewDirection);
 	float specular = pow(max(dot(normal, halfwayDirection), 0.0f), specularExponent);	
-	vec3 specularHighlights = specularConstant.rgb * specular * reflectivity * clamp(waterDepth/0.05, 0.0, 1.0);;
+	vec3 specularHighlights = specularConstant.rgb * specular * u_reflectivity * clamp(waterDepth/0.05, 0.0, 1.0);
 	
 	o_color = mix(reflectionColor, refractionColor, refractiveFactor);
 	o_color = mix(o_color, vec4(diffuseHighlights, 1.0), 0.2) + vec4(specularHighlights, 0.0);

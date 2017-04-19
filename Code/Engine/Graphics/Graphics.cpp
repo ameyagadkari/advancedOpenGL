@@ -13,6 +13,7 @@
 #include "UniformBuffer.h"
 #include "UniformBufferData.h"
 #include "Scene.h"
+#include "../UserInput/ConfigurableParameters.h"
 
 namespace
 {
@@ -41,7 +42,6 @@ namespace
 
 	cs6610::Graphics::UniformBuffer* drawcallBuffer = nullptr;
 
-	const float waveSpeed = 0.03f;
 	float moveFactor = 0.0f;
 }
 
@@ -455,13 +455,16 @@ void cs6610::Graphics::RenderFrame()
 			MyGame::reflectionTexture->GetColorBuffer()->BindTexture(10);
 			MyGame::refractionTexture->GetColorBuffer()->BindTexture(11);
 			MyGame::refractionTexture->GetDepthBuffer()->BindTexture(9);
-			moveFactor += waveSpeed * static_cast<float>(Time::GetElapsedTimeDuringPreviousFrame());
+			moveFactor += ConfigurableParameters::waveSpeed * static_cast<float>(Time::GetElapsedTimeDuringPreviousFrame());
 			moveFactor = fmodf(moveFactor, 1.0f);
 			waterProgram->SetUniform(0, moveFactor);
 			waterProgram->SetUniform(1, currentCamera->GetPosition());
 			waterProgram->SetUniform(2, light->GetPosition());
 			waterProgram->SetUniform(3, currentCamera->GetNearPlaneDistance());
 			waterProgram->SetUniform(4, currentCamera->GetFarPlaneDistance());
+			waterProgram->SetUniform(5, ConfigurableParameters::tiling);
+			waterProgram->SetUniform(6, ConfigurableParameters::waveStrength);
+			waterProgram->SetUniform(7, ConfigurableParameters::reflectivity);
 
 			water->GetMesh()->RenderMesh();
 
@@ -536,6 +539,7 @@ namespace
 		if (cs6610::Time::GetElapsedTimeDuringPreviousFrame() > fps)
 		{
 			cs6610::MyGame::mainScene->GetCamera()->UpdateCurrentCameraPosition();
+			cs6610::ConfigurableParameters::Update();
 			glutPostWindowRedisplay(currentWindowID);
 		}
 	}

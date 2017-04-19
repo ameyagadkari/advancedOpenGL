@@ -21,8 +21,7 @@ layout( std140, binding = 1 ) uniform drawcallBuffer
 
 uniform vec3 u_cameraPosition;
 uniform vec3 u_lightPosition;
-
-float tiling = 6.0;
+uniform float u_tiling;
 
 void main()
 {	
@@ -32,7 +31,7 @@ void main()
 	gl_Position = projection * vertexPosition_camera;
 	
 	o_clipSpaceCoords = gl_Position;
-	o_UV = i_UV * tiling;
+	o_UV = i_UV * u_tiling;
 	o_toCameraVector = u_cameraPosition - vertexPosition_world.xyz;
 	o_fromLightVector =  vertexPosition_world.xyz - u_lightPosition;
 	o_fragmentPosition = vec3(vertexPosition_camera);

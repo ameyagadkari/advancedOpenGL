@@ -1,5 +1,5 @@
 newmtl BoatSG
-  Ns 1.0000
+  Ns 50.0000
   Ni 1.5000
   d 1.0000
   Tr 0.0000
@@ -7,6 +7,6 @@ newmtl BoatSG
   illum 2
   Ka 0.59 0.59 0.59
   Kd 0.00 0.00 0.00
-  Ks 0.00 0.00 0.00
+  Ks 0.5 0.5 0.5
   Ke 0.00 0.00 0.00
   map_Kd boat.png

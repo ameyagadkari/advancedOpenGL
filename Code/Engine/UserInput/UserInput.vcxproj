@@ -19,9 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ConfigurableParameters.cpp" />
     <ClCompile Include="UserInput.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ConfigurableParameters.h" />
     <ClInclude Include="UserInput.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
