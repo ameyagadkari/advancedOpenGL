@@ -264,7 +264,7 @@ void cs6610::Graphics::RenderFrame()
 
 			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 
-			light->GetMesh()->RenderMesh();		
+			light->GetMesh()->RenderMesh();
 		}
 
 		//Draw Water
@@ -304,7 +304,9 @@ bool cs6610::Graphics::Initialize(int i_argumentCount, char** i_arguments)
 {
 	bool wereThereErrors = false;
 	glutInit(&i_argumentCount, i_arguments);
+#if defined(_DEBUG)
 	glutInitContextFlags(GLUT_DEBUG);
+#endif
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	glutInitContextVersion(4, 2);
 	glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
@@ -339,7 +341,11 @@ bool cs6610::Graphics::Initialize(int i_argumentCount, char** i_arguments)
 	glutSetOption(option, mode);
 	drawcallBuffer = new UniformBuffer(UniformBufferType::DRAWCALL, sizeof(UniformBufferData::DrawcallBuffer));
 	drawcallBuffer->Bind();
+#if defined(_DEBUG)
 	CY_GL_REGISTER_DEBUG_CALLBACK;
+	GLuint id = 2;
+	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, &id, false);
+#endif
 	return !wereThereErrors;
 }
 
