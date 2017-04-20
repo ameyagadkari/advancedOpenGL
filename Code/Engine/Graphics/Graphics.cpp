@@ -67,6 +67,7 @@ void cs6610::Graphics::RenderFrame()
 
 	Gameplay::GameObject const * const light = MyGame::mainScene->GetGameobjectByName("Light");
 	Material const * const lightMaterial = light->GetMaterial();
+	cyGLSLProgram * const lightProgram = lightMaterial->GetEffect()->GetProgram();
 
 	Gameplay::GameObject const * const boat = MyGame::mainScene->GetGameobjectByName("Boat");
 	Material const * const boatMaterial = boat->GetMaterial();
@@ -121,6 +122,7 @@ void cs6610::Graphics::RenderFrame()
 			cartoonlandProgram->SetUniform(0, cyPoint4f(0.0f, 1.0f, 0.0f, -water->GetPosition().y + 0.1f));
 			cartoonlandProgram->SetUniform(1, normal);
 			cartoonlandProgram->SetUniform(2, light->GetPosition());
+			cartoonlandProgram->SetUniform(3, ConfigurableParameters::lightColor);
 
 			for (size_t i = 0; i < cartoonlandMaterial->GetNumberOfMaterials(); i++)
 			{
@@ -142,6 +144,7 @@ void cs6610::Graphics::RenderFrame()
 			boatProgram->SetUniform(0, cyPoint4f(0.0f, 1.0f, 0.0f, -water->GetPosition().y + 0.1f));
 			boatProgram->SetUniform(1, normal);
 			boatProgram->SetUniform(2, light->GetPosition());
+			boatProgram->SetUniform(3, ConfigurableParameters::lightColor);
 
 			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 
@@ -161,6 +164,7 @@ void cs6610::Graphics::RenderFrame()
 			woodenBridgeProgram->SetUniform(0, cyPoint4f(0.0f, 1.0f, 0.0f, -water->GetPosition().y + 0.1f));
 			woodenBridgeProgram->SetUniform(1, normal);
 			woodenBridgeProgram->SetUniform(2, light->GetPosition());
+			woodenBridgeProgram->SetUniform(3, ConfigurableParameters::lightColor);
 
 			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 
@@ -209,6 +213,7 @@ void cs6610::Graphics::RenderFrame()
 			cartoonlandProgram->SetUniform(0, cyPoint4f(0.0f, -1.0f, 0.0f, water->GetPosition().y));
 			cartoonlandProgram->SetUniform(1, normal);
 			cartoonlandProgram->SetUniform(2, light->GetPosition());
+			cartoonlandProgram->SetUniform(3, ConfigurableParameters::lightColor);
 
 			for (size_t i = 0; i < cartoonlandMaterial->GetNumberOfMaterials(); i++)
 			{
@@ -230,6 +235,7 @@ void cs6610::Graphics::RenderFrame()
 			boatProgram->SetUniform(0, cyPoint4f(0.0f, -1.0f, 0.0f, water->GetPosition().y));
 			boatProgram->SetUniform(1, normal);
 			boatProgram->SetUniform(2, light->GetPosition());
+			boatProgram->SetUniform(3, ConfigurableParameters::lightColor);
 
 			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 
@@ -249,6 +255,7 @@ void cs6610::Graphics::RenderFrame()
 			woodenBridgeProgram->SetUniform(0, cyPoint4f(0.0f, -1.0f, 0.0f, water->GetPosition().y));
 			woodenBridgeProgram->SetUniform(1, normal);
 			woodenBridgeProgram->SetUniform(2, light->GetPosition());
+			woodenBridgeProgram->SetUniform(3, ConfigurableParameters::lightColor);
 
 			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 
@@ -294,6 +301,7 @@ void cs6610::Graphics::RenderFrame()
 			cartoonlandProgram->SetUniform(0, cyPoint4f(0.0f, -1.0f, 0.0f, water->GetPosition().y));
 			cartoonlandProgram->SetUniform(1, normal);
 			cartoonlandProgram->SetUniform(2, light->GetPosition());
+			cartoonlandProgram->SetUniform(3, ConfigurableParameters::lightColor);
 
 			for (size_t i = 0; i < cartoonlandMaterial->GetNumberOfMaterials(); i++)
 			{
@@ -315,6 +323,7 @@ void cs6610::Graphics::RenderFrame()
 			boatProgram->SetUniform(0, cyPoint4f(0.0f, -1.0f, 0.0f, water->GetPosition().y));
 			boatProgram->SetUniform(1, normal);
 			boatProgram->SetUniform(2, light->GetPosition());
+			boatProgram->SetUniform(3, ConfigurableParameters::lightColor);
 
 			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 
@@ -334,6 +343,7 @@ void cs6610::Graphics::RenderFrame()
 			woodenBridgeProgram->SetUniform(0, cyPoint4f(0.0f, -1.0f, 0.0f, water->GetPosition().y));
 			woodenBridgeProgram->SetUniform(1, normal);
 			woodenBridgeProgram->SetUniform(2, light->GetPosition());
+			woodenBridgeProgram->SetUniform(3, ConfigurableParameters::lightColor);
 
 			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 
@@ -380,6 +390,7 @@ void cs6610::Graphics::RenderFrame()
 			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 			cartoonlandProgram->SetUniform(1, normal);
 			cartoonlandProgram->SetUniform(2, light->GetPosition());
+			cartoonlandProgram->SetUniform(3, ConfigurableParameters::lightColor);
 
 			for (size_t i = 0; i < cartoonlandMaterial->GetNumberOfMaterials(); i++)
 			{
@@ -396,6 +407,7 @@ void cs6610::Graphics::RenderFrame()
 			drawcallBufferData.projection = currentCamera->GetPerspectiveProjectionMatrix();
 
 			lightMaterial->Bind();
+			lightProgram->SetUniform(0, ConfigurableParameters::lightColor);
 
 			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 
@@ -414,6 +426,7 @@ void cs6610::Graphics::RenderFrame()
 			boatMaterial->Bind();
 			boatProgram->SetUniform(1, normal);
 			boatProgram->SetUniform(2, light->GetPosition());
+			boatProgram->SetUniform(3, ConfigurableParameters::lightColor);
 
 			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 
@@ -432,6 +445,7 @@ void cs6610::Graphics::RenderFrame()
 			woodenBridgeMaterial->Bind();
 			woodenBridgeProgram->SetUniform(1, normal);
 			woodenBridgeProgram->SetUniform(2, light->GetPosition());
+			woodenBridgeProgram->SetUniform(3, ConfigurableParameters::lightColor);
 
 			drawcallBuffer->Update(&drawcallBufferData, sizeof(drawcallBufferData));
 
@@ -465,6 +479,7 @@ void cs6610::Graphics::RenderFrame()
 			waterProgram->SetUniform(5, ConfigurableParameters::tiling);
 			waterProgram->SetUniform(6, ConfigurableParameters::waveStrength);
 			waterProgram->SetUniform(7, ConfigurableParameters::reflectivity);
+			waterProgram->SetUniform(8, ConfigurableParameters::lightColor);
 
 			water->GetMesh()->RenderMesh();
 

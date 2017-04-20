@@ -29,6 +29,8 @@ uniform float u_farPlane;
 uniform float u_waveStrength;
 uniform float u_reflectivity;
 
+uniform vec3 u_lightColor;
+
 out vec4 o_color;
 
 float LinearizeDepth(float depth)
@@ -73,7 +75,7 @@ void main()
 	vec3 viewDirection = normalize(-i_fragmentPosition);	
 	vec3 halfwayDirection = normalize(lightDirection + viewDirection);
 	float specular = pow(max(dot(normal, halfwayDirection), 0.0f), specularExponent);	
-	vec3 specularHighlights = specularConstant.rgb * specular * u_reflectivity * clamp(waterDepth/0.05, 0.0, 1.0);
+	vec3 specularHighlights = u_lightColor * specular * u_reflectivity * clamp(waterDepth/0.05, 0.0, 1.0);
 	
 	o_color = mix(reflectionColor, refractionColor, refractiveFactor);
 	o_color = mix(o_color, vec4(diffuseHighlights, 1.0), 0.2) + vec4(specularHighlights, 0.0);

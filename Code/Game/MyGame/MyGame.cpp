@@ -41,7 +41,7 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 
 	//Init all scenes
 	{
-		mainScene = new Graphics::Scene(new Camera::Camera(cyPoint3f(0.0f, 5.0f, 10.0f)));
+		mainScene = new Graphics::Scene(new Camera::Camera(cyPoint3f(0.0f, 25.0f, 125.0f)));
 		mainScene->AddGameObjectsToScene("Skybox", new Gameplay::GameObject());
 		mainScene->GetGameobjectByName("Skybox")->LoadMeshAndMaterial(
 			true,
@@ -58,7 +58,7 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 			{ "data/shaders/cartoonlandvertex.glsl", "data/shaders/cartoonlandfragment.glsl" },
 			{},
 			"",
-			"u_clippingplane u_normal u_lightPosition");
+			"u_clippingplane u_normal u_lightPosition u_lightColor");
 
 		mainScene->AddGameObjectsToScene("Water", new Gameplay::GameObject(cyPoint3f(0.0f, 1.0f, 0.0f), cyPoint3f(0.0f), cyPoint3f(55.0f)));
 		mainScene->GetGameobjectByName("Water")->LoadMeshAndMaterial(false,
@@ -66,14 +66,16 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 			{ "data/shaders/watervertex.glsl", "data/shaders/waterfragment.glsl" }, 
 			{},
 			"data/meshes/water/",
-			"u_moveFactor u_cameraPosition u_lightPosition u_nearPlane u_farPlane u_tiling u_waveStrength u_reflectivity");
+			"u_moveFactor u_cameraPosition u_lightPosition u_nearPlane u_farPlane u_tiling u_waveStrength u_reflectivity u_lightColor");
 
 		mainScene->AddGameObjectsToScene("Light", new Gameplay::GameObject(cyPoint3f(0.0f, 30.0f, 0.0f), cyPoint3f(0.0f), cyPoint3f(0.1f)));
 		mainScene->GetGameobjectByName("Light")->LoadMeshAndMaterial(
 			false,
 			"data/meshes/light/light.obj",
 			{ "data/shaders/lightvertex.glsl", "data/shaders/lightfragment.glsl" },
-			{});
+			{},
+			"",
+			"u_lightColor");
 
 		mainScene->AddGameObjectsToScene("Boat", new Gameplay::GameObject(cyPoint3f(-40.0f, -42.5f, 0.0f), cyPoint3f(0.0f, 90.f, 0.0f), cyPoint3f(0.1f)));
 		mainScene->GetGameobjectByName("Boat")->LoadMeshAndMaterial(
@@ -82,7 +84,7 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 			{ "data/shaders/boatvertex.glsl", "data/shaders/boatfragment.glsl" },
 			{},
 			"data/meshes/boat/",
-			"u_clippingplane u_normal u_lightPosition");
+			"u_clippingplane u_normal u_lightPosition u_lightColor");
 
 		mainScene->AddGameObjectsToScene("WoodenBridge", new Gameplay::GameObject(cyPoint3f(25.0f, -45.0f, 0.0f), cyPoint3f(0.0f, 90.0f,0.0f), cyPoint3f(0.1f)));
 		mainScene->GetGameobjectByName("WoodenBridge")->LoadMeshAndMaterial(
@@ -91,7 +93,7 @@ bool cs6610::MyGame::Initialize(int i_argumentCount, char ** i_arguments)
 			{ "data/shaders/woodenbridgevertex.glsl", "data/shaders/woodenbridgefragment.glsl" },
 			{},
 			"data/meshes/woodenbridge/",
-			"u_clippingplane u_normal u_lightPosition");
+			"u_clippingplane u_normal u_lightPosition u_lightColor");
 	}
 
 	reflectionTexture = new Graphics::Scene(nullptr, true, true, false, false);

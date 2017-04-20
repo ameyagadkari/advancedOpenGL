@@ -1,8 +1,10 @@
 #version 420 core
 
+uniform vec3 u_lightColor;
+
 out vec4 o_color;
 
 void main()
 {
-	o_color = vec4(0.98, 0.98, 0.82, 1.0);
+	o_color = vec4(u_lightColor, 1.0);
 }
