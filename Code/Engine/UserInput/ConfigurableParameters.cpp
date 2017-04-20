@@ -42,7 +42,7 @@ namespace cs6610
 	namespace ConfigurableParameters
 	{
 		float waveSpeed = 0.03f;
-		float tiling = 6.0f;
+		float tiling = 4.0f;
 		float waveStrength = 0.02f;
 		float reflectivity = 0.5f;
 		bool autoLight = false;
@@ -57,10 +57,10 @@ void cs6610::ConfigurableParameters::Update()
 	if (UserInput::keys.test('p'))
 		waveSpeed < maxWaveSpeed ? waveSpeed += 0.01f * static_cast<float>(Time::GetElapsedTimeDuringPreviousFrame()) : waveSpeed = maxWaveSpeed;
 
-	if (UserInput::keys.test('k'))
+	/*if (UserInput::keys.test('k'))
 		tiling > minTiling ? tiling -= static_cast<float>(Time::GetElapsedTimeDuringPreviousFrame()) : tiling = minTiling;
 	if (UserInput::keys.test('l'))
-		tiling < maxTiling ? tiling += static_cast<float>(Time::GetElapsedTimeDuringPreviousFrame()) : tiling = maxTiling;
+		tiling < maxTiling ? tiling += static_cast<float>(Time::GetElapsedTimeDuringPreviousFrame()) : tiling = maxTiling;*/
 
 	if (UserInput::keys.test('n'))
 		waveStrength > minWaveStrength ? waveStrength -= 0.01f * static_cast<float>(Time::GetElapsedTimeDuringPreviousFrame()) : waveStrength = minWaveStrength;
