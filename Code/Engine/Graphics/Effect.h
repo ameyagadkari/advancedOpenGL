@@ -1,6 +1,7 @@
 #pragma once
 #include <list>
 #include <vector>
+#include <string>
 
 typedef unsigned int GLuint;
 

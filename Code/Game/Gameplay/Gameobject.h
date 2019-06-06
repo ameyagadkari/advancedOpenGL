@@ -3,6 +3,7 @@
 #include "../../External/cyCodeBase/cyPoint.h"
 
 #include <vector>
+#include <string>
 
 namespace cs6610
 {

@@ -113,7 +113,7 @@ namespace
 			float cosTheta = cosf(theta);
 			float onePlusSineSquareTheta = 1.0f + sinTheta * sinTheta;
 			float x = radius * rootTwo * cosTheta / onePlusSineSquareTheta;
-			float y = 10.0f + (lightHeight - 10.0f)*fabs(sinTheta);
+			float y = 10.0f + (lightHeight - 10.0f)*abs(sinTheta);
 			float z = radius * rootTwo * cosTheta * sinTheta / onePlusSineSquareTheta;
 			curvePoints.push_back(cyPoint3f(x, y, z));
 			colorValue += thetaScale;

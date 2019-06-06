@@ -1,6 +1,7 @@
 #pragma once
 #include "Color.h"
 #include <map>
+#include <string>
 
 typedef unsigned int GLbitfield;
 typedef unsigned int GLenum;
